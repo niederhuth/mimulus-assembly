@@ -1,0 +1,3 @@
+species,genotype,sample,condition,datatype,sra,genomes,adapters,genomeSize,misc(unmethylated_chr/lineage/etc)
+Mguttatus,L1,S1,,ont,no,,,,,
+Mguttatus,S1,S1,,ont,no,,,,,
