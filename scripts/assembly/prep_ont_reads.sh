@@ -22,7 +22,7 @@ quality=0 #guppy filtered on quality of 7
 length=300 #Needs to be >0 or else reads of 0 length will be included!
 
 #The following shouldn't need to be changed, but should set automatically
-input="*/pass/*fastq.gz"
+input="pass/*fastq.gz"
 output1="combined.fastq.gz"
 output2="trimmed.fastq.gz"
 output3="clean.fastq.gz"
