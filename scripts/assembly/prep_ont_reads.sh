@@ -19,7 +19,7 @@ export LD_LIBRARY_PATH="${conda}/envs/assembly/lib:${LD_LIBRARY_PATH}"
 #Set variables
 threads=20
 quality=0 #guppy filtered on quality of 7
-length=100 #Needs to be >0 or else reads of 0 length will be included!
+length=300 #Needs to be >0 or else reads of 0 length will be included!
 
 #The following shouldn't need to be changed, but should set automatically
 input="*/pass/*fastq.gz"
