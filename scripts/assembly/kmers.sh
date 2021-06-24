@@ -39,11 +39,12 @@ cd ${path2}
 #Count kmers
 echo "Counting kmers with jellyfish"
 jellyfish count \
+	-C \
 	-m ${mer_length} \
 	-s ${hash_size} \
 	-t ${threads} \
 	-o ${output} \
-	-C <(zcat ../${reads})
+	 <(zcat ../${reads})
 
 #Generate histogram
 echo "Creating kmer histogram"
