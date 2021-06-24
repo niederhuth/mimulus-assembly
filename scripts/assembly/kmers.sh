@@ -3,9 +3,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
-#SBATCH --mem=50GB
+#SBATCH --mem=500GB
 #SBATCH --job-name kmers
-#SBATCH --output=../job_reports/%x-%j.SLURMout
+#SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -14,7 +14,7 @@ conda="${HOME}/miniconda3"
 threads=10
 mer_length=21
 hash_size="20G"
-reads="filtered.fastq.gz"
+reads="clean.fastq.gz"
 datatype="ont"
 
 #Change to current directory
@@ -52,7 +52,7 @@ jellyfish histo \
 	 ${output1} > ${output2}
 
 #Run Genomescope 2.0
-echo "Running GenomeScope 2.0"
+#echo "Running GenomeScope 2.0"
 #genomescope.R \
 #	-i ${output2} \
 #	-o output_dir \
