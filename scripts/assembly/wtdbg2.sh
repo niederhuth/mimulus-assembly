@@ -13,6 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20
 polish="TRUE"
+edge_min=3 #min read coverage for edges, use 2 for low coverage, 4 for high, default is 3
 
 #This should match the dataype in the misc/samples.csv file
 #Options include:
@@ -87,7 +88,7 @@ else
 		-t ${threads} \
 		-x ${dt} \
 		-g ${genomeSize} \
-		--edge-min 2 \
+		--edge-min ${edge_min} \
 		--rescue-low-cov-edges
 fi
 if [ -s raw/${output}.raw.fa ]
