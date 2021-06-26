@@ -9,6 +9,7 @@
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
+database="gtdb-rs202.genomic.k31.sbt.json"
 
 #Set variables
 #Currently none to set
@@ -24,7 +25,7 @@ path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/^.*\\///)
-microbes="$(pwd | sed s/${genotype}.*/${genotype}/)/microbe-database/genbank-k31.sbt.json"
+microbes="$(pwd | sed s/data.*/data/)/microbe-database/${database}"
 path2="contaminants"
 
 #Check for microbe-genbank/genbank-k31.sbt.json

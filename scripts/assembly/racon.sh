@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=40
-rounds=2
+rounds=3
 datatype="ont"
 input="contaminants/clean.fa" #Can set to empty and script will find fasta in directory submitted
 
