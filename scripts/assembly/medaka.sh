@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 input_dir="racon_*" #Directory or directories with fasta files to polish, assumes racon polished fasta!
-model="r941_min_high_g360" #dna_r9.4.1_450bps_hac.cfg on guppy 4.2.2, guppy 4 models same as guppy 3.6
+model="r941_prom_high_g360" #dna_r9.4.1_450bps_hac.cfg on guppy 4.2.2, guppy 4 models same as guppy 3.6
 threads=20
 datatype="ont"
 batch_size=100

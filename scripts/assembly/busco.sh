@@ -86,7 +86,7 @@ fi
 
 if [ ${remove_tmp_files} = "yes" ]
 then
-	rm -R busco/*/*/*output busco/*/*/busco_sequences/ busco/busco_downloads/ busco/*/logs/
+	rm -R */*/*output */*/busco_sequences/ busco_downloads/ */logs/
 fi
 
 echo "Done"
