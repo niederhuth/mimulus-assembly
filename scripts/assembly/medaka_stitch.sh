@@ -20,8 +20,8 @@ output="consensus.fasta"
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/assembly/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/assembly/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/polishing/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/polishing/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 dir=$(pwd | sed s/^.*\\///)

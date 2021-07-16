@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 input_dir="racon_*" #Directory or directories with fasta files to polish, assumes racon polished fasta!
-model="r941_prom_high_g360" #dna_r9.4.1_450bps_hac.cfg on guppy 4.2.2, guppy 4 models same as guppy 3.6
+model="r941_prom_high_g4011" #dna_r9.4.1_450bps_hac.cfg on guppy 4.2.2, guppy 4 models same as guppy 3.6
 threads=20
 datatype="ont"
 batch_size=100
@@ -20,8 +20,8 @@ batch_size=100
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/assembly/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/assembly/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/polishing/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/polishing/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
