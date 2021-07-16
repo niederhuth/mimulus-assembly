@@ -84,7 +84,7 @@ do
 	a=$(expr ${a} + 1)
 	path2="racon_${a}"
 	echo "Round ${a} of polishing" 
-	if ls ${path2} >/dev/null 2>&1
+	if [ -d ${path2} ]
 	then
 		echo "Directory ${path2} exists."
 		echo "Checking files."
@@ -94,7 +94,7 @@ do
 		cd ${path2}
 	fi
 	#Align data with minimap2
-	if ls round_${a}.paf >/dev/null 2>&1
+	if [ -f round_${a}.paf ]
 	then
 		echo "Round ${a} alignment found"
 		echo "To rerun this step, delete ${path2}/round_${a}.paf and resubmit"

@@ -2,20 +2,19 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=40
 #SBATCH --mem=500GB
-#SBATCH --job-name medaka
+#SBATCH --job-name pilon
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-input_dir="racon_*" #Directory or directories with fasta files to polish, assumes racon polished fasta!
-model="r941_prom_high_g4011" #dna_r9.4.1_450bps_hac.cfg on guppy 4.2.2, guppy 4 models same as guppy 3.6
-threads=20
-datatype="ont"
-batch_size=100
+threads=40
+rounds=4
+datatype="wgs"
+input="" #Can set to empty and script will find fasta in directory submitted
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -29,32 +28,82 @@ species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
 assembly=$(pwd | sed s/^.*\\///)
-path2="medaka"
 
 #Extract reads from assembly job report
 reads="$(grep reads: ../job_reports/${assembly}-*.SLURMout | head -1 | cut -d ' ' -f2)"
 
-#Run medaka
-for i in ${input_dir}
-do
-	path3="medaka_${i}"
-	fasta="${i}/${i}.fa"
-	if [ -d ${path3} ]
+#Look for fasta file, there can only be one!
+if [ -z ${input} ]
+then
+	echo "No input fasta provided, looking for fasta"
+	if ls *.fa >/dev/null 2>&1
 	then
-		echo "Directory ${path3} exists."
-		echo "To rerun medaka, delete ${path3} and resubmit."
+		input=$(ls *fa | sed s/.*\ //)
+		echo "Fasta file ${input} found"
+	elif ls *.fasta >/dev/null 2>&1
+	then
+		input=$(ls *fasta | sed s/.*\ //)
+		echo "Fasta file ${input} found"
+	elif ls *.fna >/dev/null 2>&1
+	then
+		input=$(ls *fna | sed s/.*\ //)
+		echo "Fasta file ${input} found"
 	else
-		echo "Running medaka on ${fasta}"
-		medaka_consensus \
-			-i ../${reads} \
-			-d ${fasta} \
-			-o ${path3} \
-			-t ${threads} \
-			-m ${model} \
-			-b ${batch_size}
+		echo "No fasta file found, please check and restart"
 	fi
+else
+	echo "Input fasta: ${input}"
+fi
+
+#Loop over designated number of rounds for polishing
+ref=../${input}
+a=0
+until [ ${a} -eq ${rounds} ]
+do
+	a=$(expr ${a} + 1)
+	path2="pilon_${a}"
+	echo "Round ${a} of polishing" 
+	if [ -d ${path2} ]							
+	then
+		echo "Directory ${path2} exists."
+		echo "Checking files."
+		cd ${path2}
+	else
+		mkdir ${path2}
+		cd ${path2}
+	fi
+	#Align data with minimap2
+	if [ -f round_${a}.bam ]
+	then
+		echo "Round ${a} alignment found"
+		echo "To rerun this step, delete ${path2}/round_${a}.paf and resubmit"
+	else
+		echo "Aligning with minimap2"
+		bwa \
+			-t ${threads} \
+			-x ${preset} \
+			${ref} \
+			../../${reads} > round_${a}.paf
+	fi
+	#Polish with Pilon
+	if [ -f pilon_${a}.fasta ]
+	then
+		echo "Round ${a} polishing found"
+		echo "To rerun this step, delete ${path2}/pilon_${a}.fasta and resubmit"
+	else
+		echo "Polishing data with Pilon"
+		pilon \
+			--threads ${threads} \
+			--genome ${ref} \
+			--frags round_${a}.bam --unpaired unpaired.bam \
+			--diploid \
+			--fix all \
+			--output pilon_${a}
+	fi
+	ref="../${path2}/pilon_${a}.fasta"
+	cd ../
+	echo "Round ${a} of polishing complete"
 done
 
 echo "Done"
-
 

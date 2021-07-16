@@ -14,6 +14,7 @@ conda="${HOME}/miniconda3"
 threads=20
 datatype="ont"
 remove_tmp_files="yes" #if yes, delete a lot of the busco files to save space, if no, keep them
+lineage="" #if left empty, will check misc/samples to find lineage
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -32,14 +33,17 @@ assembly=$(pwd | sed s/^.*\\///)
 path2="busco"
 output="${genotype}_${assembly}"
 
-#Get lineage to use for Busco analysis
-lineage=$(awk -v FS="," \
-	-v a=${species} \
-	-v b=${genotype} \
-	-v c=${sample} \
-	-v d=${datatype} \
-	'{if ($1 == a && $2 == b && $3 == c && $5 == d) print $10}' \
-	${path1}/samples.csv)
+#Check if lineage is set, otherwise, get lineage to use for Busco analysis
+if [ -z ${lineage} ]
+then
+	lineage=$(awk -v FS="," \
+		-v a=${species} \
+		-v b=${genotype} \
+		-v c=${sample} \
+		-v d=${datatype} \
+		'{if ($1 == a && $2 == b && $3 == c && $5 == d) print $10}' \
+		${path1}/samples.csv)
+fi
 echo "Using lineage dataset: ${lineage}"
 
 #Look for fasta file, there can only be one!
