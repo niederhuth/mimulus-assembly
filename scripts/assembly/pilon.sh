@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=40
 #SBATCH --mem=500GB
 #SBATCH --job-name pilon
-#SBATCH --output=../job_reports/%x-%j.SLURMout
+#SBATCH --output=../../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -13,24 +13,152 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=40
 rounds=4
-datatype="wgs"
+java_options="-Xmx32G"
 input="" #Can set to empty and script will find fasta in directory submitted
+
+#In general dont change this, unless using a similar datatype
+#This should match the dataype in the misc/samples.csv file
+datatype="wgs"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
 export PATH="${conda}/envs/polishing/bin:$PATH"
 export LD_LIBRARY_PATH="${conda}/envs/polishing/lib:$LD_LIBRARY_PATH"
+#Path to picard
+picard="${conda}/envs/polishing/share/picard-*/picard.jar"
+#Path to pilon
+pilon="${conda}/envs/polishing/share/pilon-*/pilon.jar"
+#Path to trimmomatic fastas 
+adapter_path="${conda}/envs/polishing/share/trimmomatic/adapters"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
-assembly=$(pwd | sed s/^.*\\///)
+sample=${genotype}
 
-#Extract reads from assembly job report
-reads="$(grep reads: ../job_reports/${assembly}-*.SLURMout | head -1 | cut -d ' ' -f2)"
+#Adapter fasta, set automatically from misc/samples.csv
+adapters=$(awk -v FS="," \
+	-v a=${species} \
+	-v b=${genotype} \
+	-v c=${sample} \
+	-v d=${datatype} \
+	'{if ($1 == a && $2 == b && $3 == c && $5 == d) print $8}' \
+	${path1}/samples.csv)
+
+#Fastq files, these should not have to be changed, but should set automatically
+path3="fastq/${datatype}"
+r1="${path3}/combined.1.fastq.gz"
+r2="${path3}/combined.2.fastq.gz"
+t1="${path3}/trimmed.1.fastq.gz"
+t2="${path3}/trimmed.2.fastq.gz"
+t3="${path3}/trimmed.1.single.fastq.gz"
+t4="${path3}/trimmed.2.single.fastq.gz"
+if ls ${path3}/*_R1_001.fastq.gz >/dev/null 2>&1
+then
+	if ls ${path3}/*_R2_001.fastq.gz >/dev/null 2>&1
+	then
+		echo "Data is Paired-end"
+		PE="TRUE"
+		if [ -f ${t1} ]
+		then
+			echo "Trimmed reads found, skipping trimming"
+		else
+			cat ${path3}/*_R1_001.fastq.gz > $r1
+			cat ${path3}/*_R2_001.fastq.gz > $r2
+		fi
+	else
+		echo "Data is Single-end"
+		PE="FALSE"
+		if [ -f ${t1} ]
+		then
+			echo "Trimmed reads found, skipping trimming"
+		else
+			cat ${path3}/*_R1_001.fastq.gz > $r1
+		fi
+	fi
+elif ls ${path3}/*_1.fastq.gz >/dev/null 2>&1
+then
+	if ls ${path3}/*_2.fastq.gz >/dev/null 2>&1	
+	then
+		echo "Data is Paired-end"
+		PE="TRUE"
+		if [ -f ${t1} ]
+		then
+			echo "Trimmed reads found, skipping trimming"
+		else
+			cat ${path3}/*_1.fastq.gz > $r1
+			cat ${path3}/*_2.fastq.gz > $r2
+		fi
+	else
+		echo "Data is Single-end"
+		PE="FALSE"
+		if [ -f ${t1} ]
+		then
+			echo "Trimmed reads found, skipping trimming"
+		else
+			cat ${path3}/*_1.fastq.gz > $r1
+		fi
+	fi
+else
+	echo "Data Missing"
+fi
+
+#Trim & QC reads
+if [ -f ${t1} ]
+then
+	if [ ${PE} = "TRUE" ]
+	then
+		echo "To rerun this step, please delete ${t1} & ${t2} and resubmit"
+	else
+		echo "To rerun this step, please delete ${t1} and resubmit"
+	fi
+else
+	if [ ${PE} = "TRUE" ]
+	then
+		echo "Running trimmomatic PE"
+		trimmomatic PE \
+			-threads ${threads} \
+			-phred33 \
+			-trimlog ${path3}/trim_log.txt \
+			-summary ${path3}/trim_summary.txt \
+			${r1} ${r2} ${t1} ${t3} ${t2} $t4 \
+			ILLUMINACLIP:${adapter_path}/${adapters}.fa:2:30:10:4:TRUE \
+			LEADING:3 \
+			TRAILING:3 \
+			SLIDINGWINDOW:4:15 \
+			MINLEN:30
+		echo "Running fastqc"
+		mkdir ${path3}/fastqc
+		fastqc -t ${threads} -o ${path3}/fastqc/ ${t1} ${t2} ${r1} ${r2}
+	elif [ ${PE} = "FALSE" ]
+	then
+		echo "Running trimmomatic SE"
+		trimmomatic SE \
+			-threads ${threads} \
+			-phred33 \
+			-trimlog ${path3}/trim_log.txt \
+			-summary ${path3}/trim_summary.txt \
+			${r1} ${t1} \
+			ILLUMINACLIP:${adapter_path}/${adapters}.fa:2:30:10:4:TRUE \
+			LEADING:3 \
+			TRAILING:3 \
+			SLIDINGWINDOW:4:15 \
+			MINLEN:30 
+		echo "Running fastqc"
+		mkdir ${path3}/fastqc
+		fastqc -t ${threads} -o ${path3}/fastqc/ ${t1} ${r1}
+	fi
+fi
+rm ${r1} ${r2}
+
+#Define Read Group
+ID=$(zcat ${t1} | head -1 | cut -d ':' -f 3,4 | tr ':' '.')
+PU=$(zcat ${t1} | head -1 | cut -d ':' -f 3,4,10 | tr ':' '.')
+SM=$(pwd | sed s/^.*\\///)
+PL="ILLUMINA"
+LB="lib1"
 
 #Look for fasta file, there can only be one!
 if [ -z ${input} ]
@@ -72,30 +200,62 @@ do
 		mkdir ${path2}
 		cd ${path2}
 	fi
-	#Align data with minimap2
-	if [ -f round_${a}.bam ]
+	#Index fasta
+	if [ -s ${ref}.sa ]
 	then
-		echo "Round ${a} alignment found"
-		echo "To rerun this step, delete ${path2}/round_${a}.paf and resubmit"
+		echo "Indexing fasta"
+		bwa index ${ref}
+	fi
+	#Align data with bwa mem
+	if [ -s round_${a}.bam ]
+	then
+		echo "Existing bam file found, skipping to mark duplicates"
+		echo "To rerun this step, delete round_${a}.bam and resubmit"
 	else
-		echo "Aligning with minimap2"
-		bwa \
-			-t ${threads} \
-			-x ${preset} \
-			${ref} \
-			../../${reads} > round_${a}.paf
+		echo "Running BWA for ${sample} to ${i} genome"
+		if [ ${PE} = "TRUE" ]
+		then
+			bwa mem -t ${threads} \
+				-R "@RG\tID:${ID}\tLB:${LB}\tPL:${PL}\tSM:${SM}\tPU:${PU}" \
+				-M ${ref} ${t1} ${t2} | samtools view -@ 4 -bSh | samtools sort -@ 4 > round_${a}.bam
+		elif [ ${PE} = "False" ]
+		then	
+			bwa mem -t ${threads} \
+				-R "@RG\tID:${ID}\tLB:${LB}\tPL:${PL}\tSM:${SM}\tPU:${PU}" \
+				-M ${ref} ${t1} | samtools view -@ 4 -bSh | samtools sort -@ 4 > round_${a}.bam
+		fi
+		echo "Indexing round_${a}.bam"
+		samtools index round_${a}.bam
+	fi
+	#Mark Duplicates
+	if [ -s round_${a}_md.bam ]
+	then
+		echo "Existing marked duplicate bam found"
+		echo "To rerun this step, delete ${md} and resubmit"
+	else	
+		echo "Marking duplicates for ${sample}-${i}"
+		java ${java_options} -jar ${picard} MarkDuplicates \
+			-I round_${a}.bam \
+			-O round_${a}_md.bam \
+			-M ${metrics} \
+			--REMOVE_DUPLICATES=true
+		echo "Indexing ${sample}-${i} marked duplicate bam"
+		samtools index round_${a}_md.bam
+		#Alignment Stats
+		echo "Getting ${sample}-${i} marked duplicate alignment stats"
+		samtools flagstat round_${a}_md.bam > round_${a}_md.bam.flagstats
 	fi
 	#Polish with Pilon
-	if [ -f pilon_${a}.fasta ]
+	if [ -s pilon_${a}.fasta ]
 	then
 		echo "Round ${a} polishing found"
 		echo "To rerun this step, delete ${path2}/pilon_${a}.fasta and resubmit"
 	else
 		echo "Polishing data with Pilon"
-		pilon \
+		java ${java_options} -jar ${pilon} \
 			--threads ${threads} \
 			--genome ${ref} \
-			--frags round_${a}.bam --unpaired unpaired.bam \
+			--frags round_${a}_md.bam \
 			--diploid \
 			--fix all \
 			--output pilon_${a}

@@ -94,7 +94,7 @@ do
 		cd ${path2}
 	fi
 	#Align data with minimap2
-	if [ -f round_${a}.paf ]
+	if [ -s round_${a}.paf ]
 	then
 		echo "Round ${a} alignment found"
 		echo "To rerun this step, delete ${path2}/round_${a}.paf and resubmit"
@@ -107,7 +107,7 @@ do
 			../../${reads} > round_${a}.paf
 	fi
 	#Polish with Racon
-	if ls racon_${a}.fa >/dev/null 2>&1
+	if [ -s racon_${a}.fa ]
 	then
 		echo "Round ${a} polishing found"
 		echo "To rerun this step, delete ${path2}/racon_${a}.fa and resubmit"
