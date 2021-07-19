@@ -9,6 +9,7 @@
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
+database="gtdb-rs202.genomic.k31.sbt.json"
 
 #Set variables
 #Currently none to set
@@ -20,11 +21,11 @@ export PATH="${conda}/envs/assembly/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/assembly/lib:${LD_LIBRARY_PATH}"
 
 #The following shouldn't need to be changed, but should set automatically
-path1=$(pwd | sed s/data.*/misc/)
+path1=$(pwd | sed s/data.*/scripts/assembly/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/^.*\\///)
-microbes="$(pwd | sed s/${genotype}.*/${genotype}/)/microbe-database/genbank-k31.sbt.json"
+microbes="$(pwd | sed s/data.*/data/)/microbe-database/${database}"
 path2="contaminants"
 
 #Check for microbe-genbank/genbank-k31.sbt.json
@@ -56,7 +57,7 @@ fi
 #Download database
 mkdir ${path2}
 echo "Checking for contaminants with gather-by-contig.py"
-gather-by-contig.py \
+${path1}/gather-by-contig.py \
 	${input} \
 	${microbes} \
 	--output-nomatch ${path2}/clean.fa \

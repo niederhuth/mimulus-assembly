@@ -12,15 +12,15 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=40
-rounds=2
+rounds=3
 datatype="ont"
 input="contaminants/clean.fa" #Can set to empty and script will find fasta in directory submitted
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/assembly/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/assembly/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/polishing/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/polishing/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
@@ -84,7 +84,7 @@ do
 	a=$(expr ${a} + 1)
 	path2="racon_${a}"
 	echo "Round ${a} of polishing" 
-	if ls ${path2} >/dev/null 2>&1
+	if [ -d ${path2} ]
 	then
 		echo "Directory ${path2} exists."
 		echo "Checking files."
@@ -94,7 +94,7 @@ do
 		cd ${path2}
 	fi
 	#Align data with minimap2
-	if ls round_${a}.paf >/dev/null 2>&1
+	if [ -s round_${a}.paf ]
 	then
 		echo "Round ${a} alignment found"
 		echo "To rerun this step, delete ${path2}/round_${a}.paf and resubmit"
@@ -107,7 +107,7 @@ do
 			../../${reads} > round_${a}.paf
 	fi
 	#Polish with Racon
-	if ls racon_${a}.fa >/dev/null 2>&1
+	if [ -s racon_${a}.fa ]
 	then
 		echo "Round ${a} polishing found"
 		echo "To rerun this step, delete ${path2}/racon_${a}.fa and resubmit"
