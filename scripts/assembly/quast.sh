@@ -4,14 +4,14 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=200GB
-#SBATCH --job-name lrscaf
-#SBATCH --output=job_reports/%x-%j.SLURMout
+#SBATCH --job-name quast
+#SBATCH --output=%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=60
+threads=20
 ref="IM62/ref/IM62-v2.fa"
 features="M62/ref/annotations/IM62-v2.gff"
 eukaryote="true" #true or false, will modify arguments
