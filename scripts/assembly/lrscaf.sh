@@ -99,10 +99,10 @@ else
 		${path1}/${reads} > mapping.paf
 fi
 
-if [ -d ../${path3} ]
+if [ -d logs ]
 then
-	echo ""
-	echo "To rerun this step, delete and resubmit"
+	echo "LRScaf Log files found"
+	echo "To rerun this step, delete ${path3}/Logs/ and resubmit"
 else
 	echo "Scaffolding with LRScaf"
 	java -jar ${LRScaf} \
