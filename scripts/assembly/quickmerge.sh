@@ -51,7 +51,7 @@ do
 				--c ${C} \
 				--length_cutoff ${LENGTH_CUTOFF} \
 				--merging_length_cutoff ${MERGING_LENGTH_CUTOFF} \
-				${a} ${b}
+				../${a} ../${b}
 			cd ../
 		fi
 	done
