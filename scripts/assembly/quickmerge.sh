@@ -14,8 +14,8 @@ conda="${HOME}/miniconda3"
 fasta_list="" #If left blank, will search for fasta sequences in submitted directory
 HCO=5.0
 C=1.5
-LENGTH_CUTOFF=0
-MERGING_LENGTH_CUTOFF=5000
+length_cutoff=0
+merging_length_cutoff=5000
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -49,9 +49,15 @@ do
 				--prefix ${a}_vs_${b} \
 				--hco ${HCO} \
 				--c ${C} \
+<<<<<<< HEAD
 				--length_cutoff ${LENGTH_CUTOFF} \
 				--merging_length_cutoff ${MERGING_LENGTH_CUTOFF} \
 				../${a} ../${b}
+=======
+				--length_cutoff ${length_cutoff} \
+				--merging_length_cutoff ${merging_length_cutoff} \
+				${a} ${b}
+>>>>>>> 5e49e91c70989af9dcd2189b80c0e4881e16d7ba
 			cd ../
 		fi
 	done
