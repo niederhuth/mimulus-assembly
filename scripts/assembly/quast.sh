@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20
 ref="IM62/ref/IM62-v2.fa"
-features="M62/ref/annotations/IM62-v2.gff"
+features="IM62/ref/annotations/IM62-v2.gff"
 eukaryote="true" #true or false, will modify arguments
 fragmented="true" #true or false, will modify arguments
 datatype="ont"
