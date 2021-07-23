@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=200GB
 #SBATCH --job-name lrscaf
-#SBATCH --output=job_reports/%x-%j.SLURMout
+#SBATCH --output=%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -14,7 +14,6 @@ conda="${HOME}/miniconda3"
 threads=20
 datatype="ont"
 reads="fastq/ont/clean.fastq.gz"
-output="lrscaf"
 input="" #Input assembly, if left blank, will search for fasta file
 
 #Change to current directory
@@ -29,6 +28,7 @@ genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
 path1=$(pwd | sed s/${genotype}.*/${genotype}/)
 path2=$(pwd | sed s/data.*/scripts/)
+path3="lrscaf"
 #Path to LRScaf
 LRScaf="${path2}/assembly/LRScaf-1.1.11.jar"
 
@@ -76,6 +76,15 @@ else
 	echo "Input fasta: ${input}"
 fi
 
+#Check for output directory and change to that
+if [ -d ${path3} ]
+then
+	cd ${path3}
+else
+	mkdir ${path3}
+	cd ${path3}
+fi
+
 #Align reads to assembly
 if [ -s reads.paf.gz ]
 then
@@ -86,20 +95,20 @@ else
 	minimap2 \
 		-t ${threads} \
 		-x ${preset} \
-		${input} \
-		${path1}/${reads} > ${output}/reads.paf
+		../${input} \
+		${path1}/${reads} > mapping.paf
 fi
 
-if [ -d lrscaf ]
+if [ -d ../${path3} ]
 then
-	echo "Output directory ${output} found"
+	echo ""
 	echo "To rerun this step, delete and resubmit"
 else
 	echo "Scaffolding with LRScaf"
 	java -jar ${LRScaf} \
 		-c ${input} \
-		-a ${output}/reads.paf \
-		-o ${output} \
+		-a mapping.paf \
+		-o ./ \
 		-t mm \
 		-p ${threads}
 fi
