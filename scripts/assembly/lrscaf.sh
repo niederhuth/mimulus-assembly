@@ -22,14 +22,15 @@ cd ${PBS_O_WORKDIR}
 #Export paths to conda
 export PATH="${conda}/envs/scaffolding/bin:$PATH"
 export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
-#Path to LRScaf
-LRScaf="${conda}/envs/scaffolding/bin/LRScaf-1.1.11.jar"
 
 #The following shouldn't need to be changed, but should set automatically
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
 path1=$(pwd | sed s/${genotype}.*/${genotype}/)
+path2=$(pwd | sed s/data.*/scripts/)
+#Path to LRScaf
+LRScaf="${path2}/assembly/LRScaf-1.1.11.jar"
 
 #Change preset based on datatype
 if [ ${datatype} = "ont" ]
