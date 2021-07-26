@@ -14,7 +14,7 @@ conda="${HOME}/miniconda3"
 threads=40
 rounds=3
 datatype="ont"
-input="contaminants/clean.fa" #Can set to empty and script will find fasta in directory submitted
+input="" #Can set to empty and script will find fasta in directory submitted
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
