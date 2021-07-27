@@ -86,7 +86,7 @@ else
 fi
 
 #Align reads to assembly
-if [ -s reads.paf.gz ]
+if [ -s mapping.paf ]
 then
 	echo "Previous alignment found, proceeding to LRScaf"
 	echo "To rerun this step, delete reads.paf.gz and resubmit"
@@ -106,7 +106,7 @@ then
 else
 	echo "Scaffolding with LRScaf"
 	java -jar ${LRScaf} \
-		-c ${input} \
+		-c ../${input} \
 		-a mapping.paf \
 		-o ./ \
 		-t mm \
