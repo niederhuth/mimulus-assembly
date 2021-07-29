@@ -18,7 +18,10 @@ eukaryote="true" #true or false, will modify arguments
 fragmented="true" #true or false, will modify arguments
 datatype="ont"
 reads="fastq/ont/clean.fastq.gz"
+<<<<<<< HEAD
 ambiquity_score="" #between 0.8-1.0
+=======
+>>>>>>> fe2725a6cfeed4dfc9e34ed702dd59ccf8e55c86
 min_contig=500
 
 #Change to current directory
@@ -60,21 +63,10 @@ fi
 #Set arguments
 args="--threads ${threads}" 
 
-#Set arguments if eukaryote
-if [ ${eukaryote} = "true" ]
-then
-	echo "Genome is eukaryotic"
-	args="${args} --eukaryote --large --k-mer-stats"
-fi
-
 #Set arguments based on above variables
-if [ -z ${min_contig} ]
+if [ ! -z ${min_contig} ]
 then
 	args="${args} --min-contig ${min_contig}"
-fi
-if [ -z ${ambiquity_score} ]
-then
-	args="${args} --ambiguity-score ${ambiquity_score}"
 fi
 
 #Set arguments if eukaryote
@@ -92,14 +84,14 @@ then
 fi
 
 #If reference genome is provided, add to args
-if [ -z ${ref} ]
+if [ ! -z ${ref} ]
 then
 	echo "Reference genome provided"
 	args="${args} -r ${path2}/${ref}"
 fi
 
 #If gene annotations from reference is provided, add to args
-if [ -z ${features} ]
+if [ ! -z ${features} ]
 then
 	echo "Reference annotations provdided"
 	args="${args} -g ${path2}/${features}"
@@ -110,13 +102,12 @@ if [ ${datatype} = "ont" ]
 then
 	if [ -z ${reads} ]
 	then
-		args="${args} --nanopore ${path1}/${reads} --upper-bound-assembly"
-	else
 		echo "No reads found"
-		echo "If this is a mistake, check and resubmit"
+                echo "If this is a mistake, check and resubmit"
+	else
+		args="${args} --nanopore ${path1}/${reads} --upper-bound-assembly --est-insert-size 255"
 	fi
-elif [ -z ${datatype} ]
-then
+else
 	echo "Do not recognize ${datatype}"
 	echo "Please check and resubmit"
 fi
@@ -128,22 +119,4 @@ quast \
 	${input}
 
 echo "Done"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
