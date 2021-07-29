@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=40
-alt_cds="$(pwd | sed s/data.*/data/)/Zmays/B73/ref/annotations/B73-v5-cds.fa"
+alt_cds=""
 TElibrary="" #Curated library
 
 #Change to current directory
@@ -58,10 +58,10 @@ then
 		echo "Using currated library ${TElibrary}"
 	else
 		echo "No currated library provided, proceeding with denovo detection"
-		currated=""
+		args=""
 	fi
 else
-	currated="--curatedlib ${TElibrary}"
+	args="--curatedlib ${TElibrary}"
 	echo "Using currated library ${TElibrary}"
 fi
 
@@ -72,12 +72,18 @@ then
 	cds_seqs="annotations/${genotype}-v${version}-cds.fa"
 	echo "CDS sequences found"
 	echo "Using ${cds_seqs}"
+	args="${args} --cds ${cds_seqs}"
 else
 	cds_seqs=${alt_cds}
 	echo "No CDS sequences found"
 	echo "Is this an un-annotated genome?"
-	echo "Using ${alt_cds} as cds."
-	echo "If this is a mistake, check if CDS sequences are in proper place and resubmit."
+	if [ -s ${alt_cds} ]
+	then
+		echo "Using ${alt_cds} as cds."
+		echo "If this is a mistake, check if CDS sequences are in proper place and resubmit."
+		args="${args} --cds ${alt_cds}"
+	else
+		echo "No CDS sequences provided"
 fi
 
 #Look for fasta file, there can only be one!
@@ -105,12 +111,11 @@ then
 	echo "To repeat this analysis, delete ${path2} and resubmit."
 	echo "Rusuming EDTA for ${fasta}"
 	cd ${path2}
-	EDTA.pl ${currated} \
+	EDTA.pl ${args} \
 		--genome ${fasta} \
 		--species ${TIRspecies} \
 		--step all \
 		--overwrite 0 \
-		--cds cds.fa \
 		--sensitive 1 \
 		--anno 1 \
 		--evaluate 0 \
@@ -127,7 +132,6 @@ else
 		--species ${TIRspecies} \
 		--step all \
 		--overwrite 1 \
-		--cds cds.fa \
 		--sensitive 1 \
 		--anno 1 \
 		--evaluate 0 \
