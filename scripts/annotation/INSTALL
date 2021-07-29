@@ -2,4 +2,14 @@ conda env create -f maker.yml
 
 Download genemark-ES http://exon.gatech.edu/GeneMark/license_download.cgi
 unzip and copy contents to miniconda3/envs/maker/bin/
+Download maker https://www.yandell-lab.org/software/maker.html
+unzip
+cd maker/src
+perl Build.pl
+./Build install
+cd ..
+cp bin/* miniconda3/envs/maker/bin/
+cp lib/* miniconda3/envs/maker/lib/
+cp -R src miniconda3/envs/maker/
+cp -R perl miniconda3/envs/maker/
 
