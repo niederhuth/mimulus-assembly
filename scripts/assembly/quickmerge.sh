@@ -49,15 +49,9 @@ do
 				--prefix ${a}_vs_${b} \
 				--hco ${HCO} \
 				--c ${C} \
-<<<<<<< HEAD
 				--length_cutoff ${LENGTH_CUTOFF} \
 				--merging_length_cutoff ${MERGING_LENGTH_CUTOFF} \
 				../${a} ../${b}
-=======
-				--length_cutoff ${length_cutoff} \
-				--merging_length_cutoff ${merging_length_cutoff} \
-				${a} ${b}
->>>>>>> 5e49e91c70989af9dcd2189b80c0e4881e16d7ba
 			cd ../
 		fi
 	done

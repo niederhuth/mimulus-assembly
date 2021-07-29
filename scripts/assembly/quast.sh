@@ -18,10 +18,7 @@ eukaryote="true" #true or false, will modify arguments
 fragmented="true" #true or false, will modify arguments
 datatype="ont"
 reads="fastq/ont/clean.fastq.gz"
-<<<<<<< HEAD
 ambiquity_score="" #between 0.8-1.0
-=======
->>>>>>> fe2725a6cfeed4dfc9e34ed702dd59ccf8e55c86
 min_contig=500
 
 #Change to current directory
