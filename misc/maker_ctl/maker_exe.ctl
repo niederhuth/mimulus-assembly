@@ -18,7 +18,7 @@ gmhmme3=/mnt/home/niederhu/miniconda3/envs/maker/bin/gmhmme3 #location of eukary
 gmhmmp= #location of prokaryotic genemark executable
 augustus=/mnt/home/niederhu/miniconda3/envs/maker/bin/augustus #location of augustus executable
 fgenesh= #location of fgenesh executable
-evm= #location of EvidenceModeler executable
+evm=/mnt/home/niederhu/miniconda3/envs/maker/bin/evidence_modeler.pl #location of EvidenceModeler executable
 tRNAscan-SE=/mnt/home/niederhu/miniconda3/envs/maker/bin/tRNAscan-SE #location of trnascan executable
 snoscan=/mnt/home/niederhu/miniconda3/envs/maker/bin/snoscan #location of snoscan executable
 
