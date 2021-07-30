@@ -84,6 +84,7 @@ else
 		args="${args} --cds ${alt_cds}"
 	else
 		echo "No CDS sequences provided"
+	fi
 fi
 
 #Look for fasta file, there can only be one!
