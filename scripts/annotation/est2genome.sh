@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=40
 #SBATCH --mem=400GB
-#SBATCH --job-name protein2genome
+#SBATCH --job-name est2genome
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -64,31 +64,31 @@ else
 	cd ${path4}
 fi
 
-#Get protein sources
-proteins=$(awk -v FS="," \
+#Get transcript sources
+transcripts=$(awk -v FS="," \
 	-v a=${species} \
 	-v b=${genotype} \
 	-v c=${sample} \
-	'{if ($1 == a && $2 == b && $3 == c) print $4}' \
+	'{if ($1 == a && $2 == b && $3 == c) print $5}' \
 	${path1}/annotation/annotation_sources.csv)
 
 #Run EDTA
-for i in ${proteins}
+for i in ${transcripts}
 do
 	source_species=$(echo $i | cut -d '_' -f1)
 	source_genotype=$(echo $i | cut -d '_' -f2)
-	input="${path2}/${source_species}/${source_genotype}/ref/annotations/${source_genotype}-v*-protein.fa"
-	output1="${i}_protein.output"
-	output2="${i}_protein.gff"
+	input="${path2}/${source_species}/${source_genotype}/ref/annotations/${source_genotype}-v*-transcript.fa"
+	output1="${i}_transcript.output"
+	output2="${i}_transcript.gff"
 	if [ -s ${output2} ]
 	then
 		echo "${output2} already exists."
 		echo "To rerun this step, delete ${output2} and resubmit"
 	else
-		echo "Running exonerate protein2genome on ${fasta}"
+		echo "Running exonerate est2genome on ${fasta}"
 		exonerate \
 			--cores ${threads} \
-			--model protein2genome \
+			--model est2genome \
 			--bestn ${bestn} \
 			--minintron ${minintron} \
 			--maxintron ${maxintron} \
@@ -101,7 +101,7 @@ do
 			--refine > ${output1}
 		#Reformat exonerate output
 		echo "Reformatting exonerate gff"
-		perl ${path3}/annotation/reformat_exonerate_protein_gff.pl \
+		perl ${path3}/annotation/reformat_exonerate_transcript_gff.pl \
 			--input_gff ${output1} \
 			--output_gff ${output2}
 	fi
