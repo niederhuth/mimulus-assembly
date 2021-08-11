@@ -24,9 +24,9 @@ export PATH="${conda}/envs/assembly/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/assembly/lib:${LD_LIBRARY_PATH}"
 
 #Set temporary directories for large memory operations
-export TMPDIR=$PBS_O_WORKDIR
-export TMP=$PBS_O_WORKDIR
-export TEMP=$PBS_O_WORKDIR
+export TMPDIR=$(pwd | sed s/data.*/data/)
+export TMP=$(pwd | sed s/data.*/data/)
+export TEMP=$(pwd | sed s/data.*/data/)
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
