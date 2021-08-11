@@ -22,9 +22,9 @@ export PATH="${conda}/envs/EDTA/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/EDTA/lib:${LD_LIBRARY_PATH}"
 
 #Set temporary directories for large memory operations
-export TMPDIR=$(pwd | sed s/cre-genomes.*//)
-export TMP=$(pwd | sed s/cre-genomes.*//)
-export TEMP=$(pwd | sed s/cre-genomes.*//)
+export TMPDIR=$PBS_O_WORKDIR
+export TMP=$PBS_O_WORKDIR
+export TEMP=$PBS_O_WORKDIR
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
