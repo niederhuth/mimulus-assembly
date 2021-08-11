@@ -13,6 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=40
 protein="Mguttatus/IM62/ref/annotations/IM62-v2-protein.fa"
+ryo="no" #">%qi length=%ql alnlen=%qal\n>%ti length=%tl alnlen=%tal\n"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -63,9 +64,8 @@ then
 		--target ${fasta} \
 		--showtargetgff yes \
 		--showalignment no \
-		--ryo ">%qi length=%ql alnlen=%qal\n>%ti length=%tl alnlen=%tal\n" \
-		--targetchunkid 1 \
-		--targetchunktotal 20 > ${output}
+		--showvulgar no \
+		--ryo ${ryo} > ${output}
 
 		--refine
 
