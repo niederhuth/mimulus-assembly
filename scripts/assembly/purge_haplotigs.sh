@@ -13,6 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20
 datatype="ont"
+depth=200
 minimum_length="10k"
 asm=""
 
@@ -28,7 +29,7 @@ genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
 assembly=$(pwd | sed s/^.*\\///)
 path1=$(pwd | sed s/${genotype}.*/${genotype}/)
-path2="purge_dups"
+path2="purge_haplotigs"
 
 #Output location
 echo "Purging Duplicates for ${species} ${genotype} ${sample} ${assembly}"
@@ -90,89 +91,73 @@ else
 fi
 
 #Align reads to assembly
-if [ -s reads.paf.gz ]
+if [ -s aligned.bam ]
 then
 	echo "Aligned reads found, proceeding to coverage statistics."
-	echo "To repeat this step, delete ${path2}/reads.paf.gz and resubmit."
+	echo "To repeat this step, delete ${path2}/aligned.bam and resubmit."
 else
 	echo "Aligning reads to assembly"
 	minimap2 \
 		-t ${threads} \
 		-x ${preset} \
 		../${asm} \
-		${path1}/${reads} | gzip -c - > reads.paf.gz
+		${path1}/${reads} | gzip -c - > aligned.bam
 fi
 
-#Generate coverage stats
-if [ -s PB.base.cov ]
+#Generate read-depth histogram
+if [ -s aligned.bam.genecov ]
 then
-	echo "Coverage stats found, proceeding to cutoff generation."
-	echo "To repeat this step, delete ${path2}/PB.base.cov & ${path2}/PB.stat and resubmit."
+	echo "Aligned reads found, proceeding to read-depth histogram."
+	echo "To repeat this step, delete ${path2}/aligned.bam.genecov and resubmit."
+else
+	echo "Generating read-depth histogram"
+	purge_haplotigs hist \
+		-bam aligned.bame \
+		-genome ${asm} \
+		-threads ${threads} \
+		-depth ${depth}
+fi
+
+#Get coverage stats
+if [ -s coverage_stats.csv ]
+then
+	echo "Aligned reads found, proceeding to coverage statistics."
+	echo "To repeat this step, delete ${path2}/coverage_stats.csv and resubmit."
 else
 	echo "Generating coverage statistics"
-	pbcstat *.paf.gz #produces *.base.cov and *.stat files
-fi
-
-#Set cutoffs based on coverage
-if [ -s cutoffs ]
-then
-	echo "Cutoffs file found, proceeding to fasta splitting."
-	echo "To repeat this step, delete ${path2}/cutoffs and resubmit."
-else
-	echo "Generating cutoffs file"
-	calcuts PB.stat > cutoffs 2>calcults.log
-fi
-
-#Split fasta sequence on 'Ns'
-if [ -s fasta.split ]
-then
-	echo "Split fasta found, proceeding to self-alignment."
-	echo "To repeat this step, delete ${path2}/fasta.split and resubmit."
-else
-	echo "Splitting fasta"
-	split_fa ../${asm} > fasta.split
-fi
-
-#Align genome to itself
-if [ -s fasta.split.self.paf.gz ]
-then
-	echo "Self-alignment found, proceding to duplicate purging."
-	echo "To repeat this step, delete ${path2}/fasta.split.self.paf.gz and resubmit."
-else
-	echo "Aligning genome to itself"
-	minimap2 \
-		-t ${threads} \
-		-x asm5 \
-		-DP fasta.split \
-		fasta.split | gzip -c - > fasta.split.self.paf.gz
+	purge_haplotigs cov \
+		-in aligned.bam.genecov \
+		-low ${low} \
+		-high ${high} \
+		-mid ${mid} \
+		-out coverage_stats.csv \
+		-junk \
+		-suspect
 fi
 
 #Purge duplicates
 if [ -s dups.bed ]
 then
-	echo "Duplicates bed found, proceeding to retrieve sequences."
+	echo "Aligned reads found, proceeding to coverage statistics."
 	echo "To repeat this step, delete ${path2}/dups.bed and resubmit."
 else
-	echo "Running purge_dups"
-	purge_dups \
-		-2 \
-		-T cutoffs \
-		-c PB.base.cov \
-		fasta.split.self.paf.gz > dups.bed 2> purge_dups.log
-fi
+	echo "Purging haplotigs"
+	purge_haplotigs purge \
+		-genome ${asm}
+		-coverage coverage_stats.csv \
+		-threads ${threads} \
+		-outprefix curated \
+		-repeats ${repeats} \ BED-format file of repeats to ignore during analysis.
+		-dotplots \ Generate dotplots for manual inspection.
+		-bam \ Samtools-indexed bam file of aligned and sorted reads/subreads to the reference, required for generating dotplots.
+		-align_cov \ Percent cutoff for identifying a contig as a haplotig. DEFAULT = 70
+		-max_match \     Percent cutoff for identifying repetitive contigs. Ignored when using repeat annotations (-repeats). DEFAULT = 250
+		-I                  Minimap2 indexing, drop minimisers every N bases, DEFAULT = 4G
+		-v / -verbose       Print EVERYTHING.
+		-limit_io           Limit for I/O intensive jobs. DEFAULT = -threads
+		-wind_min           Min window size for BED coverage plots (for dotplots). DEFAULT = 5000
+		-wind_nmax          Max windows per contig for BED coverage plots (for dotplots). DEFAULT = 200
 
-#Retrieve sequences
-if [ -s ${asm}.purge.fa ]
-then
-	echo "Purged fasta found, skipping."
-	echo "To repeat this step, delete ${path2}/${asm}.purge.fa and resubmit."
-else
-	echo "Getting purged duplicate sequences"
-	get_seqs \
-		-l ${minimum_length} \
-		-e dups.bed ../${asm} 
-	mkdir hap
-	mv hap.fa hap/
 fi
 
 echo "Done"
