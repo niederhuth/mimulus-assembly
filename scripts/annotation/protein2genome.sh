@@ -2,8 +2,8 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=40
-#SBATCH --mem=400GB
+#SBATCH --cpus-per-task=20
+#SBATCH --mem=500GB
 #SBATCH --job-name protein2genome
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=40
+threads=20
 minintron=10
 maxintron=3000
 bestn=5
@@ -20,8 +20,8 @@ ryo="no" #">%qi length=%ql alnlen=%qal\n>%ti length=%tl alnlen=%tal\n"
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/EDTA/bin:${PATH}"
-export LD_LIBRARY_PATH="${conda}/envs/EDTA/lib:${LD_LIBRARY_PATH}"
+export PATH="${conda}/envs/maker/bin:${PATH}"
+export LD_LIBRARY_PATH="${conda}/envs/maker/lib:${LD_LIBRARY_PATH}"
 
 #Set temporary directories for large memory operations
 export TMPDIR=$(pwd | sed s/data.*/data/)
@@ -97,8 +97,7 @@ do
 			--showtargetgff yes \
 			--showalignment no \
 			--showvulgar no \
-			--ryo ${ryo} \
-			--refine > ${output1}
+			--ryo ${ryo} > ${output1}
 		#Reformat exonerate output
 		echo "Reformatting exonerate gff"
 		perl ${path3}/annotation/reformat_exonerate_protein_gff.pl \
