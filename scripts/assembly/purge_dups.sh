@@ -106,7 +106,7 @@ fi
 #Generate coverage stats
 if [ -s PB.base.cov ]
 then
-	echo "Aligned reads found, proceeding to coverage statistics."
+	echo "Coverage stats found, proceeding to cutoff generation."
 	echo "To repeat this step, delete ${path2}/PB.base.cov & ${path2}/PB.stat and resubmit."
 else
 	echo "Generating coverage statistics"
@@ -116,7 +116,7 @@ fi
 #Set cutoffs based on coverage
 if [ -s cutoffs ]
 then
-	echo "Aligned reads found, proceeding to coverage statistics."
+	echo "Cutoffs file found, proceeding to fasta splitting."
 	echo "To repeat this step, delete ${path2}/cutoffs and resubmit."
 else
 	echo "Generating cutoffs file"
@@ -126,7 +126,7 @@ fi
 #Split fasta sequence on 'Ns'
 if [ -s fasta.split ]
 then
-	echo "Aligned reads found, proceeding to coverage statistics."
+	echo "Split fasta found, proceeding to self-alignment."
 	echo "To repeat this step, delete ${path2}/fasta.split and resubmit."
 else
 	echo "Splitting fasta"
@@ -136,7 +136,7 @@ fi
 #Align genome to itself
 if [ -s fasta.split.self.paf.gz ]
 then
-	echo "Aligned reads found, proceeding to coverage statistics."
+	echo "Self-alignment found, proceding to duplicate purging."
 	echo "To repeat this step, delete ${path2}/fasta.split.self.paf.gz and resubmit."
 else
 	echo "Aligning genome to itself"
@@ -150,7 +150,7 @@ fi
 #Purge duplicates
 if [ -s dups.bed ]
 then
-	echo "Aligned reads found, proceeding to coverage statistics."
+	echo "Duplicates bed found, proceeding to retrieve sequences."
 	echo "To repeat this step, delete ${path2}/dups.bed and resubmit."
 else
 	echo "Running purge_dups"
@@ -164,17 +164,16 @@ fi
 #Retrieve sequences
 if [ -s ${asm}.purge.fa ]
 then
-	echo "Aligned reads found, proceeding to coverage statistics."
+	echo "Purged fasta found, skipping."
 	echo "To repeat this step, delete ${path2}/${asm}.purge.fa and resubmit."
 else
 	echo "Getting purged duplicate sequences"
 	get_seqs \
 		-l ${minimum_length} \
 		-e dups.bed ../${asm} 
+	mkdir hap
+	mv hap.fa hap/
 fi
-
-mkdir hap
-mv hap.fa hap/
 
 echo "Done"
 
