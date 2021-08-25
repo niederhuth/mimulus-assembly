@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=200GB
-#SBATCH --job-name purge_dups
+#SBATCH --job-name purge_haplotigs_step1
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -15,13 +15,13 @@ threads=20
 datatype="ont"
 depth=200
 minimum_length="10k"
-asm=""
+fasta=""
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/scaffolding/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/purge_haplotigs/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/purge_haplotigs/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
@@ -59,69 +59,32 @@ else
 fi
 
 #Look for fasta file, there can only be one!
-if [ -z ${asm} ]
+if [ -z ${fasta} ]
 then
 	echo "No input fasta provided, looking for fasta"
 	if ls *.fa >/dev/null 2>&1
 	then
-		asm=$(ls *fa | sed s/.*\ //)
-		echo "Fasta file ${asm} found"
+		fasta=$(ls *fa | sed s/.*\ //)
+		echo "Fasta file ${fasta} found"
 	elif ls *.fasta >/dev/null 2>&1
 	then
-		asm=$(ls *fasta | sed s/.*\ //)
-		echo "Fasta file ${asm} found"
+		fasta=$(ls *fasta | sed s/.*\ //)
+		echo "Fasta file ${fasta} found"
 	elif ls *.fna >/dev/null 2>&1
 	then
-		asm=$(ls *fna | sed s/.*\ //)
-		echo "Fasta file ${asm} found"
+		fasta=$(ls *fna | sed s/.*\ //)
+		echo "Fasta file ${fasta} found"
 	else
 		echo "No fasta file found, please check and restart"
 	fi
 else
-	echo "Input fasta: ${asm}"
-fi
-
-#Create output directory and change directory
-if [ -d ${path2} ]
-then
-	cd ${path2}
-else
-	mkdir ${path2}
-	cd ${path2}
-fi
-
-#Align reads to assembly
-if [ -s aligned.bam ]
-then
-	echo "Aligned reads found, proceeding to coverage statistics."
-	echo "To repeat this step, delete ${path2}/aligned.bam and resubmit."
-else
-	echo "Aligning reads to assembly"
-	minimap2 \
-		-t ${threads} \
-		-x ${preset} \
-		../${asm} \
-		${path1}/${reads} | gzip -c - > aligned.bam
-fi
-
-#Generate read-depth histogram
-if [ -s aligned.bam.genecov ]
-then
-	echo "Aligned reads found, proceeding to read-depth histogram."
-	echo "To repeat this step, delete ${path2}/aligned.bam.genecov and resubmit."
-else
-	echo "Generating read-depth histogram"
-	purge_haplotigs hist \
-		-bam aligned.bame \
-		-genome ${asm} \
-		-threads ${threads} \
-		-depth ${depth}
+	echo "Input fasta: ${fasta}"
 fi
 
 #Get coverage stats
 if [ -s coverage_stats.csv ]
 then
-	echo "Aligned reads found, proceeding to coverage statistics."
+	echo "Coverage stats found, proceeding to haplotig purging."
 	echo "To repeat this step, delete ${path2}/coverage_stats.csv and resubmit."
 else
 	echo "Generating coverage statistics"
@@ -143,7 +106,7 @@ then
 else
 	echo "Purging haplotigs"
 	purge_haplotigs purge \
-		-genome ${asm}
+		-genome ${fasta}
 		-coverage coverage_stats.csv \
 		-threads ${threads} \
 		-outprefix curated \
@@ -161,5 +124,3 @@ else
 fi
 
 echo "Done"
-
-
