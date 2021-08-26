@@ -15,7 +15,6 @@ threads=20
 threads2=10
 datatype="ont"
 depth=200
-minimum_length="10k"
 fasta=""
 
 #Change to current directory

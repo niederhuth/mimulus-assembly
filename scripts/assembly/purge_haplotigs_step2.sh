@@ -12,9 +12,13 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=20
-datatype="ont"
-depth=200
-minimum_length="10k"
+low=4
+mid=16
+high=60
+suspect=80
+junk=60
+align_cov=70
+max_match=250
 fasta=""
 
 #Change to current directory
@@ -81,6 +85,14 @@ else
 	echo "Input fasta: ${fasta}"
 fi
 
+if [ -f ${path2} ]
+then
+	cd ${path2}
+else
+	echo "${path2} directory not found. Has purge_haplotigs_step1 been run?"
+	echo "If not, first run purge_haplotigs_step1.sh and then rerun this step."
+fi
+
 #Get coverage stats
 if [ -s coverage_stats.csv ]
 then
@@ -110,17 +122,10 @@ else
 		-coverage coverage_stats.csv \
 		-threads ${threads} \
 		-outprefix curated \
-		-repeats ${repeats} \ BED-format file of repeats to ignore during analysis.
-		-dotplots \ Generate dotplots for manual inspection.
-		-bam \ Samtools-indexed bam file of aligned and sorted reads/subreads to the reference, required for generating dotplots.
-		-align_cov \ Percent cutoff for identifying a contig as a haplotig. DEFAULT = 70
-		-max_match \     Percent cutoff for identifying repetitive contigs. Ignored when using repeat annotations (-repeats). DEFAULT = 250
-		-I                  Minimap2 indexing, drop minimisers every N bases, DEFAULT = 4G
-		-v / -verbose       Print EVERYTHING.
-		-limit_io           Limit for I/O intensive jobs. DEFAULT = -threads
-		-wind_min           Min window size for BED coverage plots (for dotplots). DEFAULT = 5000
-		-wind_nmax          Max windows per contig for BED coverage plots (for dotplots). DEFAULT = 200
-
+		-dotplots \
+		-bam aligned.bam \
+		-align_cov ${align_cov} \
+		-max_match ${max_match} 
 fi
 
 echo "Done"
