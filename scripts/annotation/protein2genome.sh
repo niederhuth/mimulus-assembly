@@ -12,6 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=20
+chunks=20
 minintron=10
 maxintron=3000
 bestn=5
@@ -78,32 +79,40 @@ do
 	source_species=$(echo $i | cut -d '_' -f1)
 	source_genotype=$(echo $i | cut -d '_' -f2)
 	input="${path2}/${source_species}/${source_genotype}/ref/annotations/${source_genotype}-v*-protein.fa"
-	output1="${i}_protein.output"
-	output2="${i}_protein.gff"
-	if [ -s ${output2} ]
-	then
-		echo "${output2} already exists."
-		echo "To rerun this step, delete ${output2} and resubmit"
-	else
-		echo "Running exonerate protein2genome on ${fasta}"
-		exonerate \
-			--cores ${threads} \
-			--model protein2genome \
-			--bestn ${bestn} \
-			--minintron ${minintron} \
-			--maxintron ${maxintron} \
-			--query ${input} \
-			--target ../${fasta} \
-			--showtargetgff yes \
-			--showalignment no \
-			--showvulgar no \
-			--ryo ${ryo} > ${output1}
-		#Reformat exonerate output
-		echo "Reformatting exonerate gff"
-		perl ${path3}/annotation/reformat_exonerate_protein_gff.pl \
-			--input_gff ${output1} \
-			--output_gff ${output2}
-	fi
+	cat ${input} >> protein_seqs.fa
 done
+
+output1="protein2genome.output"
+output2="protein2genome.gff"
+
+a=1
+while [ ${a} -le ${chunks} ]
+do
+	echo "Running exonerate protein2genome chunk ${a} on ${fasta}"
+	exonerate \
+		--cores ${threads} \
+		--model protein2genome \
+		--bestn ${bestn} \
+		--minintron ${minintron} \
+		--maxintron ${maxintron} \
+		--targetchunkid ${a} \
+		--targetchunktotal ${chunks} \
+		--query protein_seqs.fa \
+		--target ../${fasta} \
+		--showtargetgff yes \
+		--showalignment no \
+		--showvulgar no \
+		--ryo ${ryo} > ${output1}_chunk_${a}
+done
+
+#Combine chunks
+echo "Combining exonerate output chunks"
+cat ${output1}_chunk_* > ${output1}
+
+#Reformat gff files
+echo "Reformatting exonerate gff"
+perl ${path3}/annotation/reformat_exonerate_protein_gff.pl \
+	--input_gff ${output1} \
+	--output_gff ${output2}
 
 echo "Done"
