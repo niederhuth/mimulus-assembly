@@ -85,12 +85,21 @@ done
 output1="protein2genome.output"
 output2="protein2genome.gff"
 
-a=1
+#Check for previous runs
+if ls ${output1}_chunk_* >/dev/null 2>&1
+then
+	a=$(ls test_* | tail -1 | sed s/.*_//)
+	echo "Previous chunks found, picking up starting with chunk ${a}"
+else
+	a=1
+	echo "No previous chunks found, starting from chunk 1"
+fi
+
+
 while [ ${a} -le ${chunks} ]
 do
 	echo "Running exonerate protein2genome chunk ${a} on ${fasta}"
 	exonerate \
-		--cores ${threads} \
 		--model protein2genome \
 		--bestn ${bestn} \
 		--minintron ${minintron} \
@@ -103,6 +112,7 @@ do
 		--showalignment no \
 		--showvulgar no \
 		--ryo ${ryo} > ${output1}_chunk_${a}
+	a=$(expr ${a} + 1)
 done
 
 #Combine chunks
