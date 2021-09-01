@@ -37,7 +37,7 @@ species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=${genotype}
 version=$(ls ${genotype}-v*.fa | sed s/.*\-v// | sed s/.fa//) 
-path4="exonerate"
+path4="exonerate_test"
 
 #Look for fasta file, there can only be one!
 if ls *.fa >/dev/null 2>&1
@@ -100,12 +100,13 @@ while [ ${a} -le ${chunks} ]
 do
 	echo "Running exonerate protein2genome chunk ${a} on ${fasta}"
 	exonerate \
+		--cores ${threads} \
 		--model protein2genome \
 		--bestn ${bestn} \
 		--minintron ${minintron} \
 		--maxintron ${maxintron} \
-		--targetchunkid ${a} \
-		--targetchunktotal ${chunks} \
+		--querychunkid ${a} \
+		--querychunktotal ${chunks} \
 		--query protein_seqs.fa \
 		--target ../${fasta} \
 		--showtargetgff yes \
