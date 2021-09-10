@@ -38,7 +38,7 @@ reads="$(grep reads: ${path2}/job_reports/${assembly}-*.SLURMout | head -1 | cut
 #Run medaka
 for i in ${input_dir}
 do
-	path4="medaka_${i}"
+	path3="medaka_${i}"
 	fasta="${i}/${i}.fa"
 	if [ -d ${path3} ]
 	then
