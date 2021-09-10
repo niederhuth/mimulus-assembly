@@ -47,7 +47,7 @@ do
 	else
 		echo "Running medaka on ${fasta}"
 		medaka_consensus \
-			-i ../${reads} \
+			-i ${path2}/${reads} \
 			-d ${fasta} \
 			-o ${path3} \
 			-t ${threads} \
