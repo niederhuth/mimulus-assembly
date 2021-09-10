@@ -4,17 +4,16 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=40
 #SBATCH --mem=500GB
-#SBATCH --job-name racon
-#SBATCH --output=../job_reports/%x-%j.SLURMout
+#SBATCH --job-name align_LR
+#SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
 threads=40
-rounds=3
+threads2=20
 datatype="ont"
-input="" #Can set to empty and script will find fasta in directory submitted
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -26,8 +25,8 @@ export LD_LIBRARY_PATH="${conda}/envs/lr_variants/lib:$LD_LIBRARY_PATH"
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
-assembly=$(pwd | sed s/^.*\\///)
+sample=$(pwd | sed s/.*\\///)
+condition="variants"
 reads="fastq/${datatype}/clean.fastq.gz"
 path2="LRvariants"
 
@@ -67,13 +66,14 @@ genomes=$(awk -v FS="," \
 	-v a=${species} \
 	-v b=${genotype} \
 	-v c=${sample} \
-	-v d=${datatype} \
-	'{if ($1 == a && $2 == b && $3 == c && $5 == d) print $7}' \
+	-v d=${condition} \
+	-v e=${datatype} \
+	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $7}' \
 	${path1}/samples.csv)
- 
+
 #Create output directory
 if [ -d ${path2} ]
-do
+then
 	cd ${path2}
 else
 	mkdir ${path2}
@@ -84,9 +84,9 @@ fi
 for i in ${genomes}
 do
 	#Set variables
-	path4=$(pwd | sed s/${species}\\/.*/${species}\\/${i}/)
-	version=$(ls ${path4}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
-	ref="${path4}/ref/${i}-v${version}.fa"
+	path3=$(pwd | sed s/${species}\\/.*/${species}\\/${i}/)
+	version=$(ls ${path3}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
+	ref="${path3}/ref/${i}-v${version}.fa"
 	sam="${sample}-${i}.sam"
 	bam="${sample}-${i}.bam"
 
@@ -102,7 +102,7 @@ do
 			-t ${threads} \
 			-x ${preset} \
 			${ref} \
-			${path1}/${reads} > ${sam}
+			${path3}/${reads} > ${sam}
 	fi
 
 	if [ -s ${bam} ]
@@ -111,7 +111,7 @@ do
 		echo "To repeat this step, delete ${bam} and resubmit."
 	else
 		echo "Sorting and converting to bam"
-		samtools view -@ ${threads2} -bSh aligned.sam | samtools sort -@ ${threads2} > ${bam}
+		samtools view -@ ${threads2} -bSh ${sam} | samtools sort -@ ${threads2} > ${bam}
 		echo "Indexing aligned.bam"
 		samtools index ${bam}
 	fi

@@ -28,7 +28,7 @@ export AUGUSTUS_CONFIG_PATH="${conda}/envs/busco/config"
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=${genotype}
+sample=$(pwd | sed s/\\/${genotype}// | sed s/\\/.*//)
 assembly=$(pwd | sed s/^.*\\///)
 path2="busco"
 output="${genotype}_${assembly}"
@@ -77,7 +77,7 @@ then
 		-o ${output} \
 		--restart
 else
-	echo "Running Busco analysis for ${species} ${genotype} ${assembly}"
+	echo "Running Busco analysis for ${species} ${genotype} ${sample} ${assembly}"
 	mkdir ${path2}
 	cd ${path2}
 	busco \
