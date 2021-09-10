@@ -36,7 +36,9 @@ adapter_path="${conda}/envs/polishing/share/trimmomatic/adapters"
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=${genotype}
+sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
+condition="assembly"
+assembly=$(pwd | sed s/^.*\\///)
 
 #Adapter fasta, set automatically from misc/samples.csv
 adapters=$(awk -v FS="," \

@@ -38,7 +38,8 @@ export TEMP=$(pwd | sed s/data.*/data/)
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/^.*\\///)
+sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
+condition="assembly"
 path2="flye"
 reads="fastq/${datatype}/clean.fastq.gz"
 
@@ -76,8 +77,9 @@ genomeSize=$(awk -v FS="," \
 	-v a=${species} \
 	-v b=${genotype} \
 	-v c=${sample} \
-	-v d=${datatype} \
-	'{if ($1 == a && $2 == b && $3 == c && $5 == d) print $9}' \
+	-v d=${condition} \
+	-v e=${datatype} \
+	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $9}' \
 	${path1}/samples.csv)
 
 #Run flye
