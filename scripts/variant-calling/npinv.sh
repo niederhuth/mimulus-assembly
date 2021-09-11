@@ -21,8 +21,8 @@ threshold=3 #minimum number of supporting reads for an inversion. Default[3]
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/polishing/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/polishing/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/lr_variants/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/lr_variants/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)

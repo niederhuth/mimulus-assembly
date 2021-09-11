@@ -2,8 +2,8 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=200GB
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=500GB
 #SBATCH --job-name purge_dups
 #SBATCH --output=../../job_reports/%x-%j.SLURMout
 
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
+threads=10
 datatype="ont"
 minimum_length="10k"
 asm=""
@@ -19,15 +19,22 @@ asm=""
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/scaffolding/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/assembly/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/assembly/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
+<<<<<<< HEAD
 sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
 assembly=$(pwd | sed s/.*\\/${sample}\\/// | sed s/\\/.*//)
 path1=$(pwd | sed s/${sample}.*/${sample}/)
+=======
+sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
+condition="assembly"
+assembly=$(pwd | sed s/.*${genotype}\\/${sample}\\/// | sed s/\\/.*//)
+path1=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
+>>>>>>> f638d867cdd12036a2e9f49045e10d4f651b41b5
 path2="purge_dups"
 
 #Output location
@@ -106,7 +113,7 @@ fi
 #Generate coverage stats
 if [ -s PB.base.cov ]
 then
-	echo "Coverage stats found, proceeding to cutoff generation."
+	echo "Aligned reads found, proceeding to coverage statistics."
 	echo "To repeat this step, delete ${path2}/PB.base.cov & ${path2}/PB.stat and resubmit."
 else
 	echo "Generating coverage statistics"
@@ -116,7 +123,7 @@ fi
 #Set cutoffs based on coverage
 if [ -s cutoffs ]
 then
-	echo "Cutoffs file found, proceeding to fasta splitting."
+	echo "Aligned reads found, proceeding to coverage statistics."
 	echo "To repeat this step, delete ${path2}/cutoffs and resubmit."
 else
 	echo "Generating cutoffs file"
@@ -126,7 +133,7 @@ fi
 #Split fasta sequence on 'Ns'
 if [ -s fasta.split ]
 then
-	echo "Split fasta found, proceeding to self-alignment."
+	echo "Aligned reads found, proceeding to coverage statistics."
 	echo "To repeat this step, delete ${path2}/fasta.split and resubmit."
 else
 	echo "Splitting fasta"
@@ -136,7 +143,7 @@ fi
 #Align genome to itself
 if [ -s fasta.split.self.paf.gz ]
 then
-	echo "Self-alignment found, proceding to duplicate purging."
+	echo "Aligned reads found, proceeding to coverage statistics."
 	echo "To repeat this step, delete ${path2}/fasta.split.self.paf.gz and resubmit."
 else
 	echo "Aligning genome to itself"
@@ -150,7 +157,7 @@ fi
 #Purge duplicates
 if [ -s dups.bed ]
 then
-	echo "Duplicates bed found, proceeding to retrieve sequences."
+	echo "Aligned reads found, proceeding to coverage statistics."
 	echo "To repeat this step, delete ${path2}/dups.bed and resubmit."
 else
 	echo "Running purge_dups"
@@ -164,16 +171,17 @@ fi
 #Retrieve sequences
 if [ -s ${asm}.purge.fa ]
 then
-	echo "Purged fasta found, skipping."
+	echo "Aligned reads found, proceeding to coverage statistics."
 	echo "To repeat this step, delete ${path2}/${asm}.purge.fa and resubmit."
 else
 	echo "Getting purged duplicate sequences"
 	get_seqs \
 		-l ${minimum_length} \
 		-e dups.bed ../${asm} 
-	mkdir hap
-	mv hap.fa hap/
 fi
+
+mkdir hap
+mv hap.fa hap/
 
 echo "Done"
 

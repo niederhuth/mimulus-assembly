@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
-#SBATCH --mem=500GB
+#SBATCH --mem=800GB
 #SBATCH --job-name medaka
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
@@ -27,12 +27,13 @@ export LD_LIBRARY_PATH="${conda}/envs/polishing/lib:$LD_LIBRARY_PATH"
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
+sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
+condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
-path2="medaka"
+path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
 
 #Extract reads from assembly job report
-reads="$(grep reads: ../job_reports/${assembly}-*.SLURMout | head -1 | cut -d ' ' -f2)"
+reads="$(grep reads: ${path2}/job_reports/${assembly}-*.SLURMout | head -1 | cut -d ' ' -f2)"
 
 #Run medaka
 for i in ${input_dir}
@@ -46,7 +47,7 @@ do
 	else
 		echo "Running medaka on ${fasta}"
 		medaka_consensus \
-			-i ../${reads} \
+			-i ${path2}/${reads} \
 			-d ${fasta} \
 			-o ${path3} \
 			-t ${threads} \

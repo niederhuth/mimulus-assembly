@@ -28,7 +28,8 @@ export AUGUSTUS_CONFIG_PATH="${conda}/envs/busco/config"
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
+sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
+condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
 path2="busco"
 output="${genotype}_${assembly}"
@@ -40,8 +41,9 @@ then
 		-v a=${species} \
 		-v b=${genotype} \
 		-v c=${sample} \
-		-v d=${datatype} \
-		'{if ($1 == a && $2 == b && $3 == c && $5 == d) print $10}' \
+		-v d=${condition} \
+		-v e=${datatype} \
+		'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $10}' \
 		${path1}/samples.csv)
 fi
 echo "Using lineage dataset: ${lineage}"

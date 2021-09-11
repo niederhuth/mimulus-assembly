@@ -86,19 +86,16 @@ do
 		echo "To rerun this step, delete ${output2} and resubmit"
 	else
 		echo "Running exonerate est2genome on ${fasta}"
-		exonerate \
-			--cores ${threads} \
-			--model est2genome \
-			--bestn ${bestn} \
-			--minintron ${minintron} \
-			--maxintron ${maxintron} \
-			--query ${input} \
-			--target ../${fasta} \
-			--showtargetgff yes \
-			--showalignment no \
-			--showvulgar no \
-			--ryo ${ryo} \
-			--refine > ${output1}
+		stringtie ${} \
+			-o ${} \
+			-l
+			-f
+			-L
+			-R
+			
+
+
+
 		#Reformat exonerate output
 		echo "Reformatting exonerate gff"
 		perl ${path3}/annotation/reformat_exonerate_transcript_gff.pl \

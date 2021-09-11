@@ -26,11 +26,13 @@ export LD_LIBRARY_PATH="${conda}/envs/polishing/lib:$LD_LIBRARY_PATH"
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
+sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
+condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
+path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
 
 #Extract reads from assembly job report
-reads="$(grep reads: ../job_reports/${assembly}-*.SLURMout | head -1 | cut -d ' ' -f2)"
+reads="$(grep reads: ${path2}/job_reports/${assembly}-*.SLURMout | head -1 | cut -d ' ' -f2)"
 
 #Change preset based on datatype
 if [ ${datatype} = "ont" ]
@@ -82,22 +84,22 @@ a=0
 until [ ${a} -eq ${rounds} ]
 do
 	a=$(expr ${a} + 1)
-	path2="racon_${a}"
+	path3="racon_${a}"
 	echo "Round ${a} of polishing" 
-	if [ -d ${path2} ]
+	if [ -d ${path3} ]
 	then
-		echo "Directory ${path2} exists."
+		echo "Directory ${path3} exists."
 		echo "Checking files."
-		cd ${path2}
+		cd ${path3}
 	else
-		mkdir ${path2}
-		cd ${path2}
+		mkdir ${path3}
+		cd ${path3}
 	fi
 	#Align data with minimap2
 	if [ -s round_${a}.paf ]
 	then
 		echo "Round ${a} alignment found"
-		echo "To rerun this step, delete ${path2}/round_${a}.paf and resubmit"
+		echo "To rerun this step, delete ${path3}/round_${a}.paf and resubmit"
 	else
 		echo "Aligning with minimap2"
 		minimap2 \
@@ -110,7 +112,7 @@ do
 	if [ -s racon_${a}.fa ]
 	then
 		echo "Round ${a} polishing found"
-		echo "To rerun this step, delete ${path2}/racon_${a}.fa and resubmit"
+		echo "To rerun this step, delete ${path3}/racon_${a}.fa and resubmit"
 	else
 		echo "Polishing data with Racon"
 		racon \
@@ -124,7 +126,7 @@ do
 			round_${a}.paf \
 			${ref} > racon_${a}.fa
 	fi
-	ref="../${path2}/racon_${a}.fa"
+	ref="../${path3}/racon_${a}.fa"
 	cd ../
 	echo "Round ${a} of polishing complete"
 done
