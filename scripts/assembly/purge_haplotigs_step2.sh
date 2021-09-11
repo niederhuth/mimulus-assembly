@@ -4,8 +4,8 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=200GB
-#SBATCH --job-name purge_haplotigs_step1
-#SBATCH --output=../job_reports/%x-%j.SLURMout
+#SBATCH --job-name purge_haplotigs_step2
+#SBATCH --output=../../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -111,10 +111,10 @@ else
 fi
 
 #Purge duplicates
-if [ -s dups.bed ]
+if [ -s curated.fasta ]
 then
 	echo "Aligned reads found, proceeding to coverage statistics."
-	echo "To repeat this step, delete ${path2}/dups.bed and resubmit."
+	echo "To repeat this step, delete ${path2}/curated.fasta and resubmit."
 else
 	echo "Purging haplotigs"
 	purge_haplotigs purge \

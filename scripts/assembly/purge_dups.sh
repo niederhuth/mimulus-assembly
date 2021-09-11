@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=200GB
 #SBATCH --job-name purge_dups
-#SBATCH --output=../job_reports/%x-%j.SLURMout
+#SBATCH --output=../../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -26,8 +26,8 @@ export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
-assembly=$(pwd | sed s/^.*\\///)
-path1=$(pwd | sed s/${genotype}.*/${genotype}/)
+assembly=$(pwd | sed s/.*\\/${sample}\\/// | sed s/\\/.*//)
+path1=$(pwd | sed s/${sample}.*/${sample}/)
 path2="purge_dups"
 
 #Output location
