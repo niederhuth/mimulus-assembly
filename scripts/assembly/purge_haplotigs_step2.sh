@@ -24,8 +24,8 @@ fasta=""
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/purge_haplotigs/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/purge_haplotigs/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/assembly/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/assembly/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
