@@ -4,14 +4,13 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=200GB
-#SBATCH --job-name nucmer
+#SBATCH --job-name=lastz
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=10
 fa1=scaffold_507.fa
 fa2=contig_1056.fa
 
