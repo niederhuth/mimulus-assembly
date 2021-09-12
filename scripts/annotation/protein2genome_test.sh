@@ -78,8 +78,7 @@ for i in ${proteins}
 do
 	a=$(echo $i | cut -d '_' -f1)
 	b=$(echo $i | cut -d '_' -f2)
-	c=$(echo $i | cut -d '_' -f3)
-	input="${path2}/${a}/${b}/${c}/ref/annotations/${c}-v*-protein.fa"
+	input="${path2}/${a}/${b}/ref/annotations/${b}-v*-protein.fa"
 	cat ${input} >> protein_seqs.fa
 done
 

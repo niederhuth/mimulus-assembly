@@ -1,3 +1,3 @@
 species,genotype,sample,proteins(species_genotype_sample),transcripts (species_genotype_sample)
-Mguttatus,S1,S1,Mguttatus_IM62_IM62,"	"
-Mguttatus,L1,L1,Mguttatus_IM62_IM62,"	"
+Mguttatus,S1,S1,Mguttatus_IM62,,
+Mguttatus,L1,L1,Mguttatus_IM62,,
