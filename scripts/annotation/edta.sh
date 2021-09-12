@@ -30,8 +30,8 @@ export TEMP=$(pwd | sed s/data.*/data/)
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
-version=$(ls ${genotype}-v*.fa | sed s/.*\-v// | sed s/.fa//) 
+sample=$(pwd | sed s/.*/${species}\\/${genotype}\\/// | sed s/\\/.*//)
+version=$(ls ${sample}-v*.fa | sed s/.*\-v// | sed s/.fa//) 
 path2="edta"
 
 #Set species for TIR-learner
@@ -51,25 +51,25 @@ then
 	if [ ${species} == "Zmays" ]
 	then
 		TElibrary="${conda}/envs/EDTA/share/EDTA/database/maizeTE11122019"
-		echo "Using currated library ${TElibrary}"
+		echo "Using curated library ${TElibrary}"
 	elif [ ${species} == "Osativa" ]
 	then
 		TElibrary="${conda}/envs/EDTA/share/EDTA/database/rice6.9.5.liban"
-		echo "Using currated library ${TElibrary}"
+		echo "Using curated library ${TElibrary}"
 	else
-		echo "No currated library provided, proceeding with denovo detection"
+		echo "No curated library provided, proceeding with denovo detection"
 		args=""
 	fi
 else
 	args="--curatedlib ${TElibrary}"
-	echo "Using currated library ${TElibrary}"
+	echo "Using curated library ${TElibrary}"
 fi
 
 #Get CDS sequences
 #This will adjust depending on whether or not these are available
-if [ -f annotations/${genotype}-v${version}-cds.fa ]
+if [ -f annotations/${sample}-v${version}-cds.fa ]
 then
-	cds_seqs="annotations/${genotype}-v${version}-cds.fa"
+	cds_seqs="annotations/${sample}-v${version}-cds.fa"
 	echo "CDS sequences found"
 	echo "Using ${cds_seqs}"
 	args="${args} --cds ${cds_seqs}"
@@ -128,7 +128,7 @@ else
 	cp ${fasta} ${path2}/${fasta}
 	cd ${path2}
 	echo "Running EDTA for ${fasta}"
-	EDTA.pl ${currated} \
+	EDTA.pl ${curated} \
 		--genome ${fasta} \
 		--species ${TIRspecies} \
 		--step all \

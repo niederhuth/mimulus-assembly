@@ -34,8 +34,8 @@ path2=$(pwd | sed s/data.*/data/)
 path3=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=${genotype}
-version=$(ls ${genotype}-v*.fa | sed s/.*\-v// | sed s/.fa//) 
+sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
+version=$(ls ${sample}-v*.fa | sed s/.*\-v// | sed s/.fa//) 
 path4="exonerate"
 
 #Look for fasta file, there can only be one!
