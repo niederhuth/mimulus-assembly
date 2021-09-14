@@ -1,9 +1,9 @@
 #!/bin/bash --login
-#SBATCH --time=168:00:00
+#SBATCH --time=128:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=40
-#SBATCH --mem=200GB
+#SBATCH --cpus-per-task=5
+#SBATCH --mem=500GB
 #SBATCH --job-name ragtag_correct
 #SBATCH --output=../../job_reports/%x-%j.SLURMout
 
@@ -11,13 +11,15 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=40
+threads=5
 datatype="ont"
 aligner="unimap"
 min_len=1000
 merge_dist=100000
 break_dist=5000
-cov_win_size=10000
+cov_win_size=8000
+min_cov=
+max_cov=
 ref=$(pwd | sed s/data.*/data/)/Mguttatus/IM62/ref/IM62-v2.fa
 
 #Change to current directory
@@ -37,6 +39,24 @@ path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
 
 #Extract reads from assembly job report
 reads=${path2}/fastq/${datatype}/clean.fastq.gz
+
+#Check for coverage limits
+if [ -z ${min_cov} ]
+then
+	if [ -z ${max_cov} ]
+	then
+		cov_vars="-v ${cov_win_size}"
+	else
+		cov_vars="-v ${cov_win_size} --max-cov ${max_cov}"
+	fi
+else
+	if [ -z ${max_cov} ]
+	then
+		cov_vars="-v ${cov_win_size} --min-cov ${min_cov}"
+	else
+		cov_vars="-v ${cov_win_size} --min-cov ${min_cov} --max-cov ${max_cov}"
+	fi
+fi
 
 #Look for fasta file, there can only be one!
 if [ -z ${input} ]
@@ -74,7 +94,7 @@ ragtag.py correct \
 	--read-aligner minimap2 \
 	-R ${reads} \
 	-T ${datatype} \
-	-v ${cov_win_size} \
+	${cov_vars} \
 	${ref} ${input}
 
 echo "Done"
