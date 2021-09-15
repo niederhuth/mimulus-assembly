@@ -21,6 +21,8 @@ cov_win_size=8000
 min_cov=
 max_cov=
 ref=$(pwd | sed s/data.*/data/)/Mguttatus/IM62/ref/IM62-v2.fa
+reads=clean.fastq.gz #Set blank to run without read validation
+#reads=
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -36,9 +38,6 @@ sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
 path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
-
-#Extract reads from assembly job report
-reads=${path2}/fastq/${datatype}/clean.fastq.gz
 
 #Check for coverage limits
 if [ -z ${min_cov} ]
@@ -82,20 +81,39 @@ else
 fi
 
 #Run ragtag correct
-echo "Running ragtag correct on ${assembly} against ${ref}"
-ragtag.py correct \
-	-t ${threads} \
-	--aligner ${aligner} \
-	-f ${min_len} \
-	--remove-small \
-	-d ${merge_dist} \
-	-b ${break_dist} \
-	-u \
-	--read-aligner minimap2 \
-	-R ${reads} \
-	-T ${datatype} \
-	${cov_vars} \
-	${ref} ${input}
+#Check if reads are provided
+if [ -z ${reads} ]
+then
+	#If not, then run based on just alignment to the genome
+	echo "No reads provided, running without validation"
+	echo "Running ragtag correct on ${assembly} against ${ref}"
+		ragtag.py correct \
+		-t ${threads} \
+		--aligner ${aligner} \
+		-f ${min_len} \
+		--remove-small \
+		-d ${merge_dist} \
+		-b ${break_dist} \
+		-u \
+		${ref} ${input}
+else
+	#If reads provided, run with read validation
+	echo "Using ${reads} for validation"
+	echo "Running ragtag correct on ${assembly} against ${ref}"
+	ragtag.py correct \
+		-t ${threads} \
+		--aligner ${aligner} \
+		-f ${min_len} \
+		--remove-small \
+		-d ${merge_dist} \
+		-b ${break_dist} \
+		-u \
+		--read-aligner minimap2 \
+		-R ${path2}/fastq/${datatype}/${reads} \
+		-T ${datatype} \
+		${cov_vars} \
+		${ref} ${input}
+fi
 
 echo "Done"
 
