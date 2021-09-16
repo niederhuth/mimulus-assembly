@@ -29,7 +29,7 @@ path1=$(pwd | sed s/data.*/misc/)
 CTL_FILES="${path1}/maker_ctl_round_1/*"
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/^.*\\///)
+sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
 path2="maker"
 
 #Run Maker

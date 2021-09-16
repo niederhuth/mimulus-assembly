@@ -35,8 +35,8 @@ path2=$(pwd | sed s/data.*/data/)
 path3=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=${genotype}
-version=$(ls ${genotype}-v*.fa | sed s/.*\-v// | sed s/.fa//) 
+sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
+version=$(ls ${sample}-v*.fa | sed s/.*\-v// | sed s/.fa//) 
 path4="exonerate"
 
 #Look for fasta file, there can only be one!
@@ -73,12 +73,12 @@ proteins=$(awk -v FS="," \
 	'{if ($1 == a && $2 == b && $3 == c) print $4}' \
 	${path1}/annotation/annotation_sources.csv)
 
-#Run EDTA
+#Copy & combined protein sources
 for i in ${proteins}
 do
-	source_species=$(echo $i | cut -d '_' -f1)
-	source_genotype=$(echo $i | cut -d '_' -f2)
-	input="${path2}/${source_species}/${source_genotype}/ref/annotations/${source_genotype}-v*-protein.fa"
+	a=$(echo $i | cut -d '_' -f1)
+	b=$(echo $i | cut -d '_' -f2)
+	input="${path2}/${a}/${b}/ref/annotations/${b}-v*-protein.fa"
 	cat ${input} >> protein_seqs.fa
 done
 
@@ -95,7 +95,7 @@ else
 	echo "No previous chunks found, starting from chunk 1"
 fi
 
-
+#Run exonerate over for each chunk
 while [ ${a} -le ${chunks} ]
 do
 	echo "Running exonerate protein2genome chunk ${a} on ${fasta}"

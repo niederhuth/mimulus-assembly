@@ -26,10 +26,10 @@ export LD_LIBRARY_PATH="${conda}/envs/EDTA/lib:${LD_LIBRARY_PATH}"
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
+sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
 path2="repeatmasker"
 #Set what repeat library to use. This is currently set to a set of denovo TEs identified by EDTA
-repeats="$(pwd | sed s/${genotype}\\/.*/${genotype}/)/ref/edta/*.fa.mod.EDTA.TElib.fa" 
+repeats="$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}/${sample}\\/)/ref/edta/*.fa.mod.EDTA.TElib.fa" 
 
 #Look for fasta file, there can only be one!
 if ls *.fa >/dev/null 2>&1

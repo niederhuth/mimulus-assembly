@@ -2,17 +2,17 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=40
 #SBATCH --mem=200GB
 #SBATCH --job-name purge_haplotigs_step1
-#SBATCH --output=../job_reports/%x-%j.SLURMout
+#SBATCH --output=../../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
-threads2=10
+threads=40
+threads2=20
 datatype="ont"
 depth=200
 fasta=""
@@ -20,22 +20,22 @@ fasta=""
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/purge_haplotigs/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/purge_haplotigs/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/assembly/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/assembly/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
-assembly=$(pwd | sed s/^.*\\///)
-path1=$(pwd | sed s/${genotype}.*/${genotype}/)
+sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
+assembly=$(pwd | sed s/.*${genotype}\\/${sample}\\/// | sed s/\\/.*//)
+path1=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
 path2="purge_haplotigs"
 
 #Output location
 echo "Purging Duplicates for ${species} ${genotype} ${sample} ${assembly}"
 
 #Extract reads from assembly job report
-reads="$(grep reads: ${path1}/job_reports/${sample}-*.SLURMout | head -1 | cut -d ' ' -f2)"
+reads="$(grep reads: ${path1}/job_reports/${assembly}-*.SLURMout | head -1 | cut -d ' ' -f2)"
 
 #Change preset based on datatype
 if [ ${datatype} = "ont" ]
@@ -125,7 +125,7 @@ else
 	echo "Generating read-depth histogram"
 	purge_haplotigs hist \
 		-bam aligned.bam \
-		-genome ${fasta} \
+		-genome ../${fasta} \
 		-threads ${threads} \
 		-depth ${depth}
 fi
