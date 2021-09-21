@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=40
-rounds=4
+rounds=2
 input="" #Can set to empty and script will find fasta in directory submitted
 
 #In general dont change this, unless using a similar datatype
@@ -37,6 +37,7 @@ genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
+path2=$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}\\/${sample}/)
 
 #Adapter fasta, set automatically from misc/samples.csv
 adapters=$(awk -v FS="," \
@@ -48,7 +49,7 @@ adapters=$(awk -v FS="," \
 	${path1}/samples.csv)
 
 #Fastq files, these should not have to be changed, but should set automatically
-path3="fastq/${datatype}"
+path3="${path2}/fastq/${datatype}"
 r1="${path3}/combined.1.fastq.gz"
 r2="${path3}/combined.2.fastq.gz"
 t1="${path3}/trimmed.1.fastq.gz"
@@ -189,38 +190,30 @@ a=0
 until [ ${a} -eq ${rounds} ]
 do
 	a=$(expr ${a} + 1)
-	path2="polca_${a}"
+	path4="polca_${a}"
 	echo "Round ${a} of polishing" 
-	if [ -d ${path2} ]							
+	if [ -d ${path4} ]							
 	then
-		echo "Directory ${path2} exists."
+		echo "Directory ${path4} exists."
 		echo "Checking files."
-		cd ${path2}
+		cd ${path4}
 	else
-		mkdir ${path2}
-		cd ${path2}
+		mkdir ${path4}
+		cd ${path4}
 	fi
-	#Index fasta
-	if [ -s ${ref}.sa ]
-	then
-		echo "Indexing fasta"
-		bwa index ${ref}
-	fi
-	#Polish with Pilon
+	#Polish with Polca
 	if [ -s polca_${a}.fasta ]
 	then
 		echo "Round ${a} polishing found"
-		echo "To rerun this step, delete ${path2}/polca_${a}.fasta and resubmit"
+		echo "To rerun this step, delete ${path4}/polca_${a}.fasta and resubmit"
 	else
 		echo "Polishing data with Polca"
 		polca.sh \
-			-a  
-			-r <'Illumina_reads_fastq1 Illumina_reads_fastq'> 
+			-a ${ref} \
+			-r ${t1} ${t2} \ 
 			-t ${threads}
-			[-n] <optional:do not fix errors that are found> [
-			-m] <optional: memory per thread to use in samtools sort>
 	fi
-	ref="../${path2}/polca_${a}.fasta"
+	ref="../${path4}/polca_${a}.fasta"
 	cd ../
 	echo "Round ${a} of polishing complete"
 done
