@@ -243,7 +243,7 @@ do
 			-I round_${a}.bam \
 			-O round_${a}_md.bam \
 			-M ${metrics} \
-			--REMOVE_DUPLICATES=true
+			--REMOVE_DUPLICATES true
 		echo "Indexing ${sample}-${i} marked duplicate bam"
 		samtools index round_${a}_md.bam
 		#Alignment Stats
