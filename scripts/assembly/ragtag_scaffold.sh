@@ -2,8 +2,8 @@
 #SBATCH --time=128:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=5
-#SBATCH --mem=500GB
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=100GB
 #SBATCH --job-name ragtag_correct
 #SBATCH --output=../../job_reports/%x-%j.SLURMout
 
@@ -11,18 +11,17 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-ref=$(pwd | sed s/data.*/data/)/Mguttatus/IM62/ref/IM62-v2.fa
-reads=clean.fastq.gz #Set blank to run without read validation
-#reads=
-threads=5
-datatype="ont"
+ref=
+threads=10
 aligner="unimap"
 min_len=1000
 merge_dist=100000
-break_dist=5000
-cov_win_size=8000
-min_cov=
-max_cov=
+min_gap=100
+max_gap=100000
+infer_gaps="yes" #yes or no
+min_orient_score=0.0
+min_location_score=0.0
+min_grouping_score=0.2
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -38,24 +37,6 @@ sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
 path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
-
-#Check for coverage limits
-if [ -z ${min_cov} ]
-then
-	if [ -z ${max_cov} ]
-	then
-		cov_vars="-v ${cov_win_size}"
-	else
-		cov_vars="-v ${cov_win_size} --max-cov ${max_cov}"
-	fi
-else
-	if [ -z ${max_cov} ]
-	then
-		cov_vars="-v ${cov_win_size} --min-cov ${min_cov}"
-	else
-		cov_vars="-v ${cov_win_size} --min-cov ${min_cov} --max-cov ${max_cov}"
-	fi
-fi
 
 #Look for fasta file, there can only be one!
 if [ -z ${input} ]
@@ -80,40 +61,22 @@ else
 	echo "Input fasta: ${input}"
 fi
 
-#Run ragtag correct
-#Check if reads are provided
-if [ -z ${reads} ]
+if [ ${infer_gaps} ]
 then
-	#If not, then run based on just alignment to the genome
-	echo "No reads provided, running without validation"
-	echo "Running ragtag correct on ${assembly} against ${ref}"
-		ragtag.py correct \
-		-t ${threads} \
-		--aligner ${aligner} \
-		-f ${min_len} \
-		--remove-small \
-		-d ${merge_dist} \
-		-b ${break_dist} \
-		-u \
-		${ref} ${input}
+	gaps="-r -g ${min_gap} -m ${max_gap} "
 else
-	#If reads provided, run with read validation
-	echo "Using ${reads} for validation"
-	echo "Running ragtag correct on ${assembly} against ${ref}"
-	ragtag.py correct \
-		-t ${threads} \
-		--aligner ${aligner} \
-		-f ${min_len} \
-		--remove-small \
-		-d ${merge_dist} \
-		-b ${break_dist} \
-		-u \
-		--read-aligner minimap2 \
-		-R ${path2}/fastq/${datatype}/${reads} \
-		-T ${datatype} \
-		${cov_vars} \
-		${ref} ${input}
+	gaps=
 fi
+
+#Run ragtag scaffold
+echo "Running ragtag scaffold"
+ragtag.py scaffold \
+	-f ${min_len} \
+	-d ${merge_dist} \
+	-i ${min_grouping_score} \
+	-a ${min_location_score} \
+	-s ${min_orient_score} ${gaps}\
+	${ref} ${input}
 
 echo "Done"
 
