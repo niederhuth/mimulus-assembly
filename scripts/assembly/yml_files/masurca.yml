@@ -13,6 +13,8 @@ dependencies:
   - c-ares=1.17.2=h7f98852_0
   - ca-certificates=2021.5.30=ha878542_0
   - cairo=1.16.0=h6cf1ce9_1008
+  - fastqc=0.11.9=hdfd78af_1
+  - font-ttf-dejavu-sans-mono=2.37=hab24e00_0
   - fontconfig=2.13.1=hba837de_1005
   - freebayes=0.9.21.7=0
   - freetype=2.10.4=h0708190_1
