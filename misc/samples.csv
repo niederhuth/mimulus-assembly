@@ -1,7 +1,7 @@
 species,genotype,sample,condition,datatype,sra,genomes,adapters,genomeSize,misc(unmethylated_chr/lineage/etc)
 Mguttatus,L1,L1,assembly,ont,no,,,0.32g,eudicots_odb10
 Mguttatus,S1,S1,assembly,ont,no,,,0.32g,eudicots_odb10
-Mguttatus,L1,L1,assembly,wgs,no,,,,
-Mguttatus,S1,S1,assembly,wgs,no,,,,
+Mguttatus,L1,L1,assembly,wgs,no,,IDT,,
+Mguttatus,S1,S1,assembly,wgs,no,,IDT,,
 Mguttatus,L1,L1,variants,ont,no,S1,,,
 Mguttatus,S1,S1,variants,ont,no,L1,,,
