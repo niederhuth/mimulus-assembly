@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=40
-rounds=2
+rounds=3
 input="" #Can set to empty and script will find fasta in directory submitted
 
 #In general dont change this, unless using a similar datatype
@@ -213,6 +213,7 @@ do
 			-r "${t1} ${t2}" \
 			-t ${threads}
 	fi
+	mv ${input}.PolcaCorrected.fa polca_${a}.fasta
 	ref="../${path4}/polca_${a}.fasta"
 	cd ../
 	echo "Round ${a} of polishing complete"
