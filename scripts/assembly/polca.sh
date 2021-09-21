@@ -210,7 +210,7 @@ do
 		echo "Polishing data with Polca"
 		polca.sh \
 			-a ${ref} \
-			-r ${t1} ${t2} \ 
+			-r "${t1} ${t2}" \
 			-t ${threads}
 	fi
 	ref="../${path4}/polca_${a}.fasta"
