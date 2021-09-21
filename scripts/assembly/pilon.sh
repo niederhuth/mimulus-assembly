@@ -206,6 +206,8 @@ do
 	#Index fasta
 	if [ -s ${ref}.sa ]
 	then
+		echo "BWA index found"
+	else
 		echo "Indexing fasta"
 		bwa index ${ref}
 	fi
