@@ -238,16 +238,16 @@ do
 		echo "Existing marked duplicate bam found"
 		echo "To rerun this step, delete ${md} and resubmit"
 	else	
-		echo "Marking duplicates for ${sample}-${i}"
+		echo "Marking duplicates for round ${a}"
 		java ${java_options} -jar ${picard} MarkDuplicates \
 			-I round_${a}.bam \
 			-O round_${a}_md.bam \
-			-M ${metrics} \
+			-M round_${a}_md_metrics.txt \
 			--REMOVE_DUPLICATES true
-		echo "Indexing ${sample}-${i} marked duplicate bam"
+		echo "Indexing round ${a} marked duplicate bam"
 		samtools index round_${a}_md.bam
 		#Alignment Stats
-		echo "Getting ${sample}-${i} marked duplicate alignment stats"
+		echo "Getting round ${a} marked duplicate alignment stats"
 		samtools flagstat round_${a}_md.bam > round_${a}_md.bam.flagstats
 	fi
 	#Polish with Pilon
