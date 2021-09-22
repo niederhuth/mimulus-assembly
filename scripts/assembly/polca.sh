@@ -208,10 +208,18 @@ do
 		echo "To rerun this step, delete ${path4}/polca_${a}.fasta and resubmit"
 	else
 		echo "Polishing data with Polca"
-		polca.sh \
-			-a ${ref} \
-			-r "${t1} ${t2}" \
-			-t ${threads}
+		if [ ${PE} = "TRUE" ]
+		then
+			polca.sh \
+				-a ${ref} \
+				-r 'trimmed.1.fastq.gz trimmed.2.fastq.gz' \
+				-t ${threads}
+		else
+			polca.sh \
+				-a ${ref} \
+				-r 'trimmed.1.fastq.gz' \
+				-t ${threads}
+		fi
 	fi
 	mv ${input}.PolcaCorrected.fa polca_${a}.fasta
 	ref="../${path4}/polca_${a}.fasta"
