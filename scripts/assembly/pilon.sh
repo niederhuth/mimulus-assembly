@@ -13,6 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=40
 rounds=4
+fix="all" #,breaks,novel"
 java_options="-Xmx32G"
 input="" #Can set to empty and script will find fasta in directory submitted
 
@@ -222,7 +223,8 @@ do
 		then
 			bwa mem -t ${threads} \
 				-R "@RG\tID:${ID}\tLB:${LB}\tPL:${PL}\tSM:${SM}\tPU:${PU}" \
-				-M ${ref} ${t1} ${t2} | samtools view -@ 4 -bSh | samtools sort -@ 4 > round_${a}.bam
+				-M ${ref} ${t1} ${t2} | \
+				samtools view -@ 4 -bSh | samtools sort -@ 4 > round_${a}.bam
 		elif [ ${PE} = "False" ]
 		then	
 			bwa mem -t ${threads} \
@@ -262,8 +264,10 @@ do
 			--genome ${ref} \
 			--frags round_${a}_md.bam \
 			--diploid \
-			--fix all \
-			--output pilon_${a}
+			--fix ${fix} \
+			--output pilon_${a} \
+			--changes \
+			--tracks
 	fi
 	ref="../${path4}/pilon_${a}.fasta"
 	cd ../

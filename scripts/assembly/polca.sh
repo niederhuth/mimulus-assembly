@@ -215,6 +215,7 @@ do
 	fi
 	mv ${input}.PolcaCorrected.fa polca_${a}.fasta
 	ref="../${path4}/polca_${a}.fasta"
+	input="polca_${a}.fasta"
 	cd ../
 	echo "Round ${a} of polishing complete"
 done
