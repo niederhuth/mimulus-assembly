@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=40
 #SBATCH --mem=500GB
-#SBATCH --job-name pilon
+#SBATCH --job-name pilon-test
 #SBATCH --output=../../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -16,7 +16,7 @@ rounds=4
 fix="all" #,breaks,novel"
 java_options="-Xmx32G"
 input="" #Can set to empty and script will find fasta in directory submitted
-long_read=FALSE #TRUE or FALSE
+long_read=TRUE #TRUE or FALSE
 long_read_type="ont"
 threads2=5
 
@@ -196,7 +196,7 @@ a=0
 until [ ${a} -eq ${rounds} ]
 do
 	a=$(expr ${a} + 1)
-	path4="pilon_${a}"
+	path4="pilon_test_${a}"
 	echo "Round ${a} of polishing" 
 	if [ -d ${path4} ]							
 	then
@@ -297,10 +297,10 @@ do
 		bam_files="${bam_files} --nanopore long_reads.bam"
 	fi
 	#Polish with Pilon
-	if [ -s pilon_${a}.fasta ]
+	if [ -s pilon_test_${a}.fasta ]
 	then
 		echo "Round ${a} polishing found"
-		echo "To rerun this step, delete ${path4}/pilon_${a}.fasta and resubmit"
+		echo "To rerun this step, delete ${path4}/pilon_test_${a}.fasta and resubmit"
 	else
 		echo "Polishing data with Pilon"
 		java ${java_options} -jar ${pilon} \
@@ -308,11 +308,11 @@ do
 			${bam_files}
 			--diploid \
 			--fix ${fix} \
-			--output pilon_${a} \
+			--output pilon_test_${a} \
 			--changes \
 			--tracks
 	fi
-	ref="../${path4}/pilon_${a}.fasta"
+	ref="../${path4}/pilon_test_${a}.fasta"
 	cd ../
 	echo "Round ${a} of polishing complete"
 done
