@@ -212,12 +212,12 @@ do
 		then
 			polca.sh \
 				-a ${ref} \
-				-r 'trimmed.1.fastq.gz trimmed.2.fastq.gz' \
+				-r '../../../fastq/wgs/trimmed.1.fastq.gz ../../../fastq/wgs/trimmed.2.fastq.gz' \
 				-t ${threads}
 		else
 			polca.sh \
 				-a ${ref} \
-				-r 'trimmed.1.fastq.gz' \
+				-r '../../../fastq/wgs/trimmed.1.fastq.gz' \
 				-t ${threads}
 		fi
 	fi
