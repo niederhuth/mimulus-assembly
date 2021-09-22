@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=40
-rounds=3
+rounds=4
 input="" #Can set to empty and script will find fasta in directory submitted
 
 #In general dont change this, unless using a similar datatype
