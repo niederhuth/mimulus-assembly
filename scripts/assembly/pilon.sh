@@ -16,7 +16,7 @@ rounds=4
 fix="all" #,breaks,novel"
 java_options="-Xmx32G"
 input="" #Can set to empty and script will find fasta in directory submitted
-long_read=false #true or false
+long_read=FALSE #TRUE or FALSE
 
 #In general dont change this, unless using a similar datatype
 #This should match the dataype in the misc/samples.csv file
@@ -252,6 +252,17 @@ do
 		echo "Getting round ${a} marked duplicate alignment stats"
 		samtools flagstat round_${a}_md.bam > round_${a}_md.bam.flagstats
 	fi
+	if [ ${long_read} = "TRUE" ]
+	then
+		echo "Aligning long reads to assembly"
+		minimap2 \
+			-a \
+			-t ${threads} \
+			-x ${preset} \
+			${ref} \
+			${path1}/${reads} > aligned.sam 
+
+
 	#Polish with Pilon
 	if [ -s pilon_${a}.fasta ]
 	then
