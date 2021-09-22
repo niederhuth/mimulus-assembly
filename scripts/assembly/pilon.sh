@@ -16,6 +16,7 @@ rounds=4
 fix="all" #,breaks,novel"
 java_options="-Xmx32G"
 input="" #Can set to empty and script will find fasta in directory submitted
+long_read=false #true or false
 
 #In general dont change this, unless using a similar datatype
 #This should match the dataype in the misc/samples.csv file
@@ -244,8 +245,7 @@ do
 		java ${java_options} -jar ${picard} MarkDuplicates \
 			-I round_${a}.bam \
 			-O round_${a}_md.bam \
-			-M round_${a}_md_metrics.txt \
-			--REMOVE_DUPLICATES true
+			-M round_${a}_md_metrics.txt
 		echo "Indexing round ${a} marked duplicate bam"
 		samtools index round_${a}_md.bam
 		#Alignment Stats
