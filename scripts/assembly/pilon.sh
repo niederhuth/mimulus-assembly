@@ -251,6 +251,7 @@ do
 			-M round_${a}_md_metrics.txt
 		echo "Indexing round ${a} marked duplicate bam"
 		samtools index round_${a}_md.bam
+		bam_files="--frags round_${a}_md.bam"
 		#Alignment Stats
 		echo "Getting round ${a} marked duplicate alignment stats"
 		samtools flagstat round_${a}_md.bam > round_${a}_md.bam.flagstats
