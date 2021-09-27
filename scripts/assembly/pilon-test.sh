@@ -14,7 +14,7 @@ conda="${HOME}/miniconda3"
 threads=40
 rounds=4
 fix="all" #,breaks,novel"
-java_options="-Xmx32G"
+java_options="-Xmx490G"
 input="" #Can set to empty and script will find fasta in directory submitted
 long_read=TRUE #TRUE or FALSE
 long_read_type="ont"
@@ -306,7 +306,7 @@ do
 		echo "Polishing data with Pilon"
 		java ${java_options} -jar ${pilon} \
 			--genome ${ref} \
-			${bam_files}
+			${bam_files} \
 			--diploid \
 			--fix ${fix} \
 			--output pilon_test_${a} \
