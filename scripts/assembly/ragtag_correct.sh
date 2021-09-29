@@ -113,7 +113,7 @@ genomes=$(awk -v FS="," \
 #Run ragtag correct
 for i in ${genomes}
 do
-	echo "Running ragtag against ${i} genome"
+	echo "Running ragtag with ${i} genome as reference genome"
 	path3=$(pwd | sed s/${species}\\/.*/${species}\\/${i}/)
 	version=$(ls ${path3}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
 	ref="${path3}/ref/${i}-v${version}.fa"
@@ -122,10 +122,9 @@ do
 	then
 		#If not, then run based on just alignment to the genome
 		echo "No reads provided, running without validation"
-		echo "Running ragtag correct on ${assembly} against ${i}"
 		ragtag.py correct \
 			-t ${threads} \
-			-o ${i}_ragtag \
+			-o ${i}_ragtag_correct \
 			--aligner ${aligner} \
 			-R ${min_len} \
 			--remove-small \
@@ -136,10 +135,9 @@ do
 	else
 		#If reads provided, run with read validation
 		echo "Using ${reads} for validation"
-		echo "Running ragtag correct on ${assembly} against ${i}"
 		ragtag.py correct \
 			-t ${threads} \
-			-o ${i}_ragtag \
+			-o ${i}_ragtag_correct \
 			--aligner ${aligner} \
 			-R ${min_len} \
 			--remove-small \

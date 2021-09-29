@@ -11,17 +11,19 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-ref=$(pwd | sed s/data.*/data/)/Mguttatus/TOL/ref/TOL-v5.fa
 threads=10
 aligner="unimap"
 min_len=1000
 merge_dist=100000
 min_gap=100
 max_gap=100000
-infer_gaps="yes" #yes or no
+infer_gaps=TRUE #TRUE or FALSE
 min_orient_score=0.0
 min_location_score=0.0
 min_grouping_score=0.2
+
+#Set to whatever you used for genome assembly
+datatype="ont"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -61,22 +63,42 @@ else
 	echo "Input fasta: ${input}"
 fi
 
-if [ ${infer_gaps} ]
+#Change settings based on if infer_gaps is set to yes
+if [ ${infer_gaps} = "TRUE" ]
 then
 	gaps="-r -g ${min_gap} -m ${max_gap} "
 else
 	gaps=
 fi
 
-#Run ragtag scaffold
-echo "Running ragtag scaffold"
-ragtag.py scaffold \
-	-f ${min_len} \
-	-d ${merge_dist} \
-	-i ${min_grouping_score} \
-	-a ${min_location_score} \
-	-s ${min_orient_score} ${gaps}\
-	${ref} ${input}
+#Get list of genomes
+genomes=$(awk -v FS="," \
+	-v a=${species} \
+	-v b=${genotype} \
+	-v c=${sample} \
+	-v d=${condition} \
+	-v e=${datatype} \
+	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $7}' \
+	${path1}/samples.csv)
+
+#Run ragtag correct
+for i in ${genomes}
+do
+	echo "Running ragtag scaffold with ${i} as reference genome"
+	path3=$(pwd | sed s/${species}\\/.*/${species}\\/${i}/)
+	version=$(ls ${path3}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
+	ref="${path3}/ref/${i}-v${version}.fa"
+	#Run ragtag scaffold
+	echo "Running ragtag scaffold"
+	ragtag.py scaffold \
+		-o ${i}_ragtag_scaffold \
+		-f ${min_len} \
+		-d ${merge_dist} \
+		-i ${min_grouping_score} \
+		-a ${min_location_score} \
+		-s ${min_orient_score} ${gaps}\
+		${ref} ${input}
+done
 
 echo "Done"
 
