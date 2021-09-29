@@ -16,7 +16,7 @@ rounds=4
 fix="all" #,breaks,novel"
 java_options="-Xmx490G"
 input="" #Can set to empty and script will find fasta in directory submitted
-long_read=FALSE #TRUE or FALSE
+long_read=FALSE #TRUE or FALSE, from experience, illumina only tends to work better
 long_read_type="ont"
 threads2=5
 
