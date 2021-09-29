@@ -5,13 +5,13 @@
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=100GB
 #SBATCH --job-name ragtag_correct
-#SBATCH --output=../../job_reports/%x-%j.SLURMout
+#SBATCH --output=%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-ref=
+ref=$(pwd | sed s/data.*/data/)/Mguttatus/TOL/ref/TOL-v5.fa
 threads=10
 aligner="unimap"
 min_len=1000

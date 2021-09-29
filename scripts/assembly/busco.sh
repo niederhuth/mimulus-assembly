@@ -1,9 +1,9 @@
 #!/bin/bash --login
-#SBATCH --time=168:00:00
+#SBATCH --time=3:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
-#SBATCH --mem=500GB
+#SBATCH --mem=200GB
 #SBATCH --job-name busco
 #SBATCH --output=%x-%j.SLURMout
 

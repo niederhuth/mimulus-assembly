@@ -3,16 +3,16 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=5
-#SBATCH --mem=500GB
+#SBATCH --mem=200GB
 #SBATCH --job-name ragtag_correct
-#SBATCH --output=../../job_reports/%x-%j.SLURMout
+#SBATCH --output=%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-ref=$(pwd | sed s/data.*/data/)/Mguttatus/IM62/ref/IM62-v2.fa
-reads=clean.fastq.gz #Set blank to run without read validation
+ref=$(pwd | sed s/data.*/data/)/Mguttatus/TOL/ref/TOL-v5.fa
+reads= #Set blank to run without read validation
 #reads=
 threads=5
 datatype="ont"
