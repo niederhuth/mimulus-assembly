@@ -2,7 +2,7 @@
 #SBATCH --time=128:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=5
+#SBATCH --cpus-per-task=20
 #SBATCH --mem=200GB
 #SBATCH --job-name ragtag_correct
 #SBATCH --output=%x-%j.SLURMout
@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 read_validation=TRUE #TRUE or FALSE
 reads= #if read validation TRUE and this is blank, will look for reads based on datatype
-threads=5
+threads=20
 datatype="wgs"
 aligner="unimap"
 min_len=1000
@@ -67,16 +67,17 @@ then
 	if [ ${datatype} = "ont" ]
 	then
 		read_type="ont"
-		reads="${path2}/fastq/${datatype}/clean.fastq.gz"
+		echo "${path2}/fastq/${datatype}/clean.fastq.gz" > reads.fofn
 	elif [ ${datatype} = "wgs" ]
 	then
 		read_type="sr"
 		if [ -f ${path2}/fastq/${datatype}/trimmed.2.fastq.gz ]
 		then
-			reads="${path2}/fastq/${datatype}/trimmed.1.fastq.gz ${path2}/fastq/${datatype}/trimmed.2.fastq.gz"
+			echo "${path2}/fastq/${datatype}/trimmed.1.fastq.gz" > reads.fofn
+			echo "${path2}/fastq/${datatype}/trimmed.2.fastq.gz" >> reads.fofn
 		elif [ -f ${path2}/fastq/${datatype}/trimmed.1.fastq.gz ]
 		then
-			reads="${path2}/fastq/${datatype}/trimmed.1.fastq.gz"
+			echo "${path2}/fastq/${datatype}/trimmed.1.fastq.gz" > reads.fofn
 		fi
 	fi
 fi
@@ -121,34 +122,34 @@ do
 	then
 		#If not, then run based on just alignment to the genome
 		echo "No reads provided, running without validation"
-		echo "Running ragtag correct on ${assembly} against ${ref}"
+		echo "Running ragtag correct on ${assembly} against ${i}"
 		ragtag.py correct \
 			-t ${threads} \
+			-o ${i}_ragtag \
 			--aligner ${aligner} \
-			-f ${min_len} \
+			-R ${min_len} \
 			--remove-small \
 			-d ${merge_dist} \
 			-b ${break_dist} \
 			-u \
-			-o ${i}_ragtag \
 			${ref} ${input}
 	else
 		#If reads provided, run with read validation
 		echo "Using ${reads} for validation"
-		echo "Running ragtag correct on ${assembly} against ${ref}"
+		echo "Running ragtag correct on ${assembly} against ${i}"
 		ragtag.py correct \
 			-t ${threads} \
+			-o ${i}_ragtag \
 			--aligner ${aligner} \
-			-f ${min_len} \
+			-R ${min_len} \
 			--remove-small \
 			-d ${merge_dist} \
 			-b ${break_dist} \
 			-u \
 			--read-aligner minimap2 \
-			-F ${reads} \
+			-F reads.fofn \
 			-T ${read_type} \
 			${cov_vars} \
-			-o ${i}_ragtag \
 			${ref} ${input}
 	fi
 done
