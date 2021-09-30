@@ -11,14 +11,14 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
+threads=20 #doesn't seem to want to use more than 6
 datatype="ont"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/test/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/test/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/scaffolding/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
@@ -79,9 +79,9 @@ cp ${path2}/fastq/${datatype}/clean.fastq.gz reads.fq.gz
 
 #Run tigmint
 echo "Running tigmint"
-tigmint-make tigmint-long \
-	draft=input.fa \
-	reads=reads.fq.gz \
+tigmint-make tigmint-long arcs \
+	draft=input \
+	reads=reads \
 	span=auto \
 	G=${genomeSize2/.0/} \
 	dist=auto \
