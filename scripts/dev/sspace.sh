@@ -74,11 +74,16 @@ else
 	cd ${path3}
 fi
 
+#Uncompress reads
+echo "Uncompressing fastq files"
+zcat ${t1} > r1.fastq
+zcat ${t2} > r2.fastq
+ 
 #Creat library file
-echo "lib1 ${t1} ${t2} ${insert_size} ${insert_error} ${read_orientation}" | tr ' ' '\t' > libraries.tsv
+echo "lib1 r1.fastq r2.fastq ${insert_size} ${insert_error} ${read_orientation}" | tr ' ' '\t' > libraries.tsv
 
 #Run SSPACE
-echo ""
+echo "Running SSPACE_Basic"
 perl $HOME/Dev/sspace_basic/SSPACE_Basic.pl \
 	-l libraries.tsv \
 	-s ../${input} \
