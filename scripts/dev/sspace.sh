@@ -11,11 +11,17 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
-extension=0 #extend the contigs of -s using paired reads in -l (-x 1=extension, -x 0=no extension, default -x 0)
 insert_size=379 #mean insert size
 insert_error=0.23 #insert size error, I take SD/mean insert size
-read_orientation=FR
+read_orientation=FR 
+threads=20
+extension=0 #extend the contigs of -s using paired reads (1=extension, 0=no extension, default -x 0)
+dot_file=1 #1=make file, 0=dont make file
+min_contig=500 #Minimum contig length used for scaffolding. Filters out contigs below this value (default -z 0)
+min_lengths=5 #Minimum number of links (read pairs) to compute scaffold (default -k 5)
+max_link_ratio=0.7  #Max link ratio between two contig pairs. Higher values less accurate (default -a 0.7)
+min_overlap=15 #Minimum overlap required between contigs to merge adjacent contigs in a scaffold (default -n 15)
+bowtie_gaps=0 #Maximum number of allowed gaps during mapping with Bowtie (default -g 0)
 
 #In general dont change this, unless using a similar datatype
 #This should match the dataype in the misc/samples.csv file
@@ -88,7 +94,13 @@ perl $HOME/Dev/sspace_basic/SSPACE_Basic.pl \
 	-l libraries.tsv \
 	-s ../${input} \
 	-x ${extension} \
-	-T ${threads}
+	-z ${min_contig} \
+	-k ${min_lengths} \
+	-a ${max_link_ratio} \
+	-n ${min_overlap} \
+	-g ${bowtie_gaps} \
+	-T ${threads} \
+	-p ${dot_file}
 
-
+echo "Done"
 
