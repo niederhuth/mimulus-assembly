@@ -30,11 +30,11 @@ datatype="wgs"
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/test/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/test/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/scaffolding/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
-path1=$(pwd | sed s/data.*/misc/)
+path1=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
@@ -90,7 +90,7 @@ echo "lib1 r1.fastq r2.fastq ${insert_size} ${insert_error} ${read_orientation}"
 
 #Run SSPACE
 echo "Running SSPACE_Basic"
-perl $HOME/Dev/sspace_basic/SSPACE_Basic.pl \
+perl ${path1}/assembly/sspace_basic/SSPACE_Basic.pl \
 	-l libraries.tsv \
 	-s ../${input} \
 	-x ${extension} \
