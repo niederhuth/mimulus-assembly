@@ -79,7 +79,7 @@ cp ${path2}/fastq/${datatype}/clean.fastq.gz reads.fq.gz
 
 #Run tigmint
 echo "Running tigmint"
-tigmint-make tigmint-long \
+tigmint-make tigmint-long arcs \
 	draft=input \
 	reads=reads \
 	span=auto \
