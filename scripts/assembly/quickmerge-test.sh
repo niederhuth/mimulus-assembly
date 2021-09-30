@@ -17,8 +17,8 @@ fasta_list=""
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/quickmerge/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/quickmerge/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/scaffolding/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)

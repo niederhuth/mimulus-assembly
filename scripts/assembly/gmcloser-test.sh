@@ -53,6 +53,14 @@ else
 	echo "Input fasta: ${input}"
 fi
 
+#
+if []
+then
+	read_data="--query_seq --read_file ${t1} ${t2}"
+else
+	read_data="--query_seq "
+fi
+
 #Make and cd to output directory
 if [ -d ${path3} ]
 then
@@ -65,6 +73,11 @@ fi
 #Run GMcloser
 echo "Running GMcloser"
 gmcloser \
-	--target_scaf
+	--target_scaf \
+	--query_seq \
+	--read_file 
+
+
+
 
 echo "Done"
