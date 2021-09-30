@@ -2,7 +2,7 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=5
+#SBATCH --cpus-per-task=20
 #SBATCH --mem=500GB
 #SBATCH --job-name sspace
 #SBATCH --output=%x-%j.SLURMout
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=5
+threads=20
 extension=0 #extend the contigs of -s using paired reads in -l (-x 1=extension, -x 0=no extension, default -x 0)
 insert_size=379 #mean insert size
 insert_error=0.23 #insert size error, I take SD/mean insert size
