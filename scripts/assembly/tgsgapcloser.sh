@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
-#SBATCH --mem=200GB
+#SBATCH --mem=500GB
 #SBATCH --job-name tgsgapcloser
 #SBATCH --output=%x-%j.SLURMout
 
@@ -65,7 +65,7 @@ fi
 #Run TGS-GapCloser
 echo "Running TGS-GapCloser"
 tgsgapcloser \
-	--scaff ${input} \
+	--scaff ../${input} \
 	--reads ${path2}/fastq/${datatype}/clean.fastq.gz \
 	--output tgsgapcloser \
 	--ne \
