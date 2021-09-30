@@ -2,8 +2,8 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=200GB
+#SBATCH --cpus-per-task=40
+#SBATCH --mem=500GB
 #SBATCH --job-name lrscaf
 #SBATCH --output=%x-%j.SLURMout
 
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
+threads=40
 datatype="ont"
 reads="fastq/ont/clean.fastq.gz"
 input="" #Input assembly, if left blank, will search for fasta file
@@ -23,14 +23,17 @@ export PATH="${conda}/envs/scaffolding/bin:$PATH"
 export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
+path1=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
-path1=$(pwd | sed s/${genotype}.*/${genotype}/)
-path2=$(pwd | sed s/data.*/scripts/)
+sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
+condition="assembly"
+assembly=$(pwd | sed s/^.*\\///)
+path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
 path3="lrscaf"
+
 #Path to LRScaf
-LRScaf="${path2}/assembly/LRScaf-1.1.11.jar"
+LRScaf="${path1}/assembly/LRScaf-1.1.11.jar"
 
 #Change preset based on datatype
 if [ ${datatype} = "ont" ]
@@ -96,7 +99,7 @@ else
 		-t ${threads} \
 		-x ${preset} \
 		../${input} \
-		${path1}/${reads} > mapping.paf
+		${path2}/fastq/${datatype}/clean.fastq.gz > mapping.paf
 fi
 
 if [ -d logs ]
