@@ -3,22 +3,22 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
-#SBATCH --mem=500GB
-#SBATCH --job-name tigmint
-#SBATCH --output=job_reports/%x-%j.SLURMout
+#SBATCH --mem=200GB
+#SBATCH --job-name tgsgapcloser
+#SBATCH --output=%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20 #doesn't seem to want to use more than 6
+threads=20
 datatype="ont"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/scaffolding/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/test/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/test/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
@@ -28,18 +28,7 @@ sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
 path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
-path3="tigmint"
-
-#Get genome size estimate
-genomeSize=$(awk -v FS="," \
-	-v a=${species} \
-	-v b=${genotype} \
-	-v c=${sample} \
-	-v d=${condition} \
-	-v e=${datatype} \
-	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $9}' \
-	${path1}/samples.csv)
-genomeSize2=$(python -c "print(${genomeSize/g/} * 1000000000)")
+path3="tgsgapcloser"
 
 #Look for fasta file, there can only be one!
 if [ -z ${input} ]
@@ -64,6 +53,14 @@ else
 	echo "Input fasta: ${input}"
 fi
 
+#
+if []
+then
+	read_data="--query_seq --read_file ${t1} ${t2}"
+else
+	read_data="--query_seq "
+fi
+
 #Make and cd to output directory
 if [ -d ${path3} ]
 then
@@ -73,22 +70,14 @@ else
 	cd ${path3}
 fi
 
-#Copy and rename files...because of stupid eccentricities of some code
-cp ../${input} input.fa
-cp ${path2}/fastq/${datatype}/clean.fastq.gz reads.fq.gz
+#Run GMcloser
+echo "Running GMcloser"
+gmcloser \
+	--target_scaf \
+	--query_seq \
+	--read_file 
 
-#Run tigmint
-echo "Running tigmint"
-tigmint-make tigmint-long \
-	draft=input \
-	reads=reads \
-	span=auto \
-	G=${genomeSize2/.0/} \
-	dist=auto \
-	t=${threads}
 
-#Clean some stuff up for downstream analyses
-unlink input.cut500.tigmint.fa
-rm input.fa input.fa.fai reads.fq.gz
+
 
 echo "Done"
