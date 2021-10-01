@@ -4,8 +4,8 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=500GB
-#SBATCH --job-name tigmint
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --job-name tigmint-test
+#SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -28,7 +28,7 @@ sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
 path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
-path3="tigmint"
+path3="tigmint_test"
 
 #Get genome size estimate
 genomeSize=$(awk -v FS="," \
