@@ -15,6 +15,7 @@ primers=TRUE #Paired primer sequences for genetic markers
 markers=FALSE #Have not implemented this option
 synteny=FALSE #Have not implemented this option
 optical=FALSE #Have not implemented this option
+primer_max_dist=5000 #max distance for primers to be separated
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -85,7 +86,7 @@ then
 		--sam-nohead \
 		--no-unal \
 		-f \
-		-X 5000 \
+		-X ${primer_max_dist} \
 		-x bowtie_index/input \
 		-1 ${path1}/genetic_map/Marker_forward_primers.fa \
 		-2 ${path1}/genetic_map/Marker_reverse_primers.fa \
@@ -142,10 +143,10 @@ echo "Running allmaps path"
 python -m jcvi.assembly.allmaps path allmaps.bed input.fa
 
 #Cleanup
-mkdir alt_fasta
-mv allmaps.chr.fasta alt_fasta
-mv allmaps.unplaced.fasta alt_fasta
-mv input.fa alt_fasta
+mkdir fasta_other
+mv allmaps.chr.fasta fasta_other
+mv allmaps.unplaced.fasta fasta_other
+mv input.fa fasta_other
 
 echo "Done"
 
