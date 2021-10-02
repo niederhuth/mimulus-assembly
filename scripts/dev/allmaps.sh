@@ -2,8 +2,8 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=100GB
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=50GB
 #SBATCH --job-name allmaps
 #SBATCH --output=%x-%j.SLURMout
 
@@ -11,13 +11,13 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-
+primers=TRUE
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/test/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/test/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/allmaps/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/allmaps/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
@@ -56,37 +56,93 @@ fi
 if [ -d ${path3} ]
 then
 	cd ${path3}
+	cp ../${input} input.fa
 else
 	mkdir ${path3}
 	cd ${path3}
+	cp ../${input} input.fa
 fi
 
-#
-cp ../${input} input.fa
-bowtie-build input.fa input
-
-#
-bowtie --sam-nohead --no-unal -f -X 5000 -x bowtie/input -1 ${path1}/genetic_map/Marker_forward_primers.fa -2 ${path1}/genetic_map/Marker_reverse_primers.fa -S markers.sam
-
-#
-for i in $(cut -d ',' -f1 genetic_map.csv)
-do
-	F=$(grep ${i}_F markers.sam | cut -f3,4)
-	Fchr=$(echo ${F} | cut -d ' ' -f1)
-	Fpos=$(echo ${F} | cut -d ' ' -f2)
-	R=$(grep ${i}_R markers.sam | cut -f3,4)
-	Rchr=$(echo ${R} | cut -d ' ' -f1)
-	Rpos=$(echo ${R} | cut -d ' ' -f2)
-	if [ ${Fchr} == ${Rchr} ]
+#Aligning primer data with bowtie
+if [ ${primers} = "TRUE" ]
+then
+	#Make bowtie index
+	if [ -s bowtie_index/input.rev.2.ebwt ]
 	then
-		
-
-	else
-		echo "False"
+		echo "Building bowtie index"
+		mkdir bowtie_index
+		bowtie-build input.fa bowtie_index/input
 	fi
-done
 
+	#Align primers
+	echo "Aligning primer data with bowtie"
+	bowtie \
+		--sam-nohead \
+		--no-unal \
+		-f \
+		-X 5000 \
+		-x bowtie/input \
+		-1 ${path1}/genetic_map/Marker_forward_primers.fa \
+		-2 ${path1}/genetic_map/Marker_reverse_primers.fa \
+		-S primers.sam
 
+	#Format primers.bed
+	for i in $(sed '1d' ${path1}/genetic_map/genetic_map.csv)
+	do
+		M=$(echo ${i} | cut -d ',' -f1)
+		LG=$(echo ${i} | cut -d ',' -f2)
+		GP=$(echo ${i} | cut -d ',' -f3)
+		F=$(grep ${M}_F markers.sam | cut -f3,4)
+		Fchr=$(echo ${F} | cut -d ' ' -f1)
+		Fpos=$(echo ${F} | cut -d ' ' -f2)
+		R=$(grep ${M}_R markers.sam | cut -f3,4)
+		Rchr=$(echo ${R} | cut -d ' ' -f1)
+		Rpos=$(echo ${R} | cut -d ' ' -f2)
+		if [[ ! -z ${F} && ! -z ${R} ]]
+		then
+			if [ ${Fchr} == ${Rchr} ]
+			then
+				echo "Primers ${M} properly paired"
+				if [ ${Fpos} -gt ${Rpos} ]
+				then
+					echo "${Fchr},${Rpos},${Fpos},LG${LG}:${GP}" | tr ',' '\t' >> primers.bed
+				elif [ ${Fpos} -lt ${Rpos} ]
+				then
+					echo "${Fchr},${Fpos},${Rpos},"LG"${LG}:${GP}" | tr ',' '\t' >> primers.bed
+				fi
+			else
+				echo "Primers ${M} improperly paired, skipping"
+			fi
+		elif [ ! -z ${F} ]
+		then
+			echo "${M} forward primer only"
+			echo "${Fchr},${Fpos},$(expr `${Fpos} + 1`),LG${LG}:${GP}" | tr ',' '\t' >> primers.bed
+		elif [ ! -z ${R} ]
+		then
+			echo "${M} reverse primer only"
+			echo "${Rchr},${Fpos},$(expr `${Rpos} + 1`),LG${LG}:${GP}" | tr ',' '\t' >> primers.bed
+		else
+			echo "Primers ${M} missing data" >> missing_primers.txt
+		fi
+	done
+	position_data="primers.bed ${position_data} "
+fi
+
+#Merge files and create weights file
+echo "Merging position data files"
+python -m jcvi.assembly.allmaps mergebed ${position_data} -o allmaps.bed
+
+#Run allmaps path
+echo "Running allmaps path"
+python -m jcvi.assembly.allmaps path allmaps.bed input.fa
+
+#Cleanup
+mkdir alt_fasta
+mv allmaps.chr.fasta alt_fasta
+mv allmaps.unplaced.fasta alt_fasta
+mv input.fa alt_fasta
+
+echo "Done"
 
 
 
