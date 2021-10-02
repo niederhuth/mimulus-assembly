@@ -90,7 +90,8 @@ echo "lib1 r1.fastq r2.fastq ${insert_size} ${insert_error} ${read_orientation}"
 
 #Run SSPACE
 echo "Running SSPACE_Basic"
-perl ${path1}/assembly/sspace_basic/SSPACE_Basic.pl \
+#perl ${path1}/assembly/sspace_basic/SSPACE_Basic.pl \
+perl ${HOME}/Dev/sspace_basic/SSPACE_Basic.pl \
 	-l libraries.tsv \
 	-s ../${input} \
 	-x ${extension} \
