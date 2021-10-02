@@ -62,6 +62,31 @@ else
 fi
 
 #
+cp ../${input} input.fa
+bowtie-build input.fa input
+
+#
+bowtie --sam-nohead --no-unal -f -X 5000 -x bowtie/input -1 ${path1}/genetic_map/Marker_forward_primers.fa -2 ${path1}/genetic_map/Marker_reverse_primers.fa -S markers.sam
+
+#
+for i in $(cut -d ',' -f1 genetic_map.csv)
+do
+	F=$(grep ${i}_F markers.sam | cut -f3,4)
+	Fchr=$(echo ${F} | cut -d ' ' -f1)
+	Fpos=$(echo ${F} | cut -d ' ' -f2)
+	R=$(grep ${i}_R markers.sam | cut -f3,4)
+	Rchr=$(echo ${R} | cut -d ' ' -f1)
+	Rpos=$(echo ${R} | cut -d ' ' -f2)
+	if [ ${Fchr} == ${Rchr} ]
+	then
+		
+
+	else
+		echo "False"
+	fi
+done
+
+
 
 
 
