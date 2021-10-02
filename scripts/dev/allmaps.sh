@@ -67,11 +67,13 @@ fi
 if [ ${primers} = "TRUE" ]
 then
 	#Make bowtie index
-	if [ -s bowtie_index/input.rev.2.ebwt ]
+	if [ -d bowtie_index ]
 	then
 		echo "Building bowtie index"
 		mkdir bowtie_index
 		bowtie-build input.fa bowtie_index/input
+	else
+		echo "bowtie index found"
 	fi
 
 	#Align primers
