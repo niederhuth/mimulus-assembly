@@ -11,7 +11,10 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-primers=TRUE
+primers=TRUE #Paired primer sequences for genetic markers
+markers=FALSE #Have not implemented this option
+synteny=FALSE #Have not implemented this option
+optical=FALSE #Have not implemented this option
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -83,7 +86,7 @@ then
 		--no-unal \
 		-f \
 		-X 5000 \
-		-x bowtie/input \
+		-x bowtie_index/input \
 		-1 ${path1}/genetic_map/Marker_forward_primers.fa \
 		-2 ${path1}/genetic_map/Marker_reverse_primers.fa \
 		-S primers.sam
@@ -94,10 +97,10 @@ then
 		M=$(echo ${i} | cut -d ',' -f1)
 		LG=$(echo ${i} | cut -d ',' -f2)
 		GP=$(echo ${i} | cut -d ',' -f3)
-		F=$(grep ${M}_F markers.sam | cut -f3,4)
+		F=$(grep ${M}_F primers.sam | cut -f3,4)
 		Fchr=$(echo ${F} | cut -d ' ' -f1)
 		Fpos=$(echo ${F} | cut -d ' ' -f2)
-		R=$(grep ${M}_R markers.sam | cut -f3,4)
+		R=$(grep ${M}_R primers.sam | cut -f3,4)
 		Rchr=$(echo ${R} | cut -d ' ' -f1)
 		Rpos=$(echo ${R} | cut -d ' ' -f2)
 		if [[ ! -z ${F} && ! -z ${R} ]]
