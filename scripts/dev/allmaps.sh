@@ -1,5 +1,5 @@
 #!/bin/bash --login
-#SBATCH --time=168:00:00
+#SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
@@ -67,13 +67,13 @@ fi
 if [ ${primers} = "TRUE" ]
 then
 	#Make bowtie index
-	if [ -d bowtie_index ]
+	if [ -s bowtie_index/input.rev.2.ebwt ]
 	then
+		echo "bowtie index found"
+	else
 		echo "Building bowtie index"
 		mkdir bowtie_index
 		bowtie-build input.fa bowtie_index/input
-	else
-		echo "bowtie index found"
 	fi
 
 	#Align primers
