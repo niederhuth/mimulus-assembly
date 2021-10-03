@@ -2,7 +2,7 @@
 #SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=20
 #SBATCH --mem=50GB
 #SBATCH --job-name allmaps
 #SBATCH --output=%x-%j.SLURMout
@@ -11,6 +11,8 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
+threads=20
+distance=rank #cM or rank
 primers=TRUE #Paired primer sequences for genetic markers
 markers=FALSE #Have not implemented this option
 synteny=FALSE #Have not implemented this option
@@ -131,16 +133,34 @@ then
 			echo "Primers ${M} missing data" >> missing_primers.txt
 		fi
 	done
-	position_data="primers.bed ${position_data} "
+	position_data="${position_data} primers.bed"
 fi
+
+#Synteny data
+if [ ${synteny} = "TRUE" ]
+then
+
+	#
+	python -m jcvi.assembly.syntenypath bed \
+		${something}.anchors 
+		--switch \
+		-o synteny.bed
+	position_data="${position_data} synteny.bed "
+fi
+
+
 
 #Merge files and create weights file
 echo "Merging position data files"
-python -m jcvi.assembly.allmaps mergebed ${position_data} -o allmaps.bed
+python -m jcvi.assembly.allmaps mergebed \
+	${position_data} -o allmaps.bed
 
 #Run allmaps path
 echo "Running allmaps path"
-python -m jcvi.assembly.allmaps path allmaps.bed input.fa
+python -m jcvi.assembly.allmaps path \
+	--cpus=${threads} \
+	--distance=${distance}
+	allmaps.bed input.fa
 
 #Cleanup
 mkdir fasta_other
