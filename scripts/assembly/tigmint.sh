@@ -13,6 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20 #doesn't seem to want to use more than 6
 datatype="ont"
+input= #input fasta, if left blank, will look for it in current directory
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
