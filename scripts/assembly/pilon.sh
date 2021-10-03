@@ -283,19 +283,26 @@ do
 			echo "Do not recognize ${long_read_type}"
 			echo "Please check and resubmit"
 		fi
-		echo "Aligning ${long_read_type} reads to assembly"
-		minimap2 \
-			-a \
-			-t ${threads} \
-			-x ${preset} \
-			${ref} \
-			${path2}/fastq/${long_read_type}/clean.fastq.gz > long_reads.sam 
-		echo "Sorting and converting to bam"
-		samtools view -@ ${threads2} -bSh long_reads.sam | \
-		samtools sort -@ ${threads2} > long_reads.bam
-		echo "Indexing aligned.bam"
-		samtools index long_reads.bam
-		bam_files="${bam_files} --nanopore long_reads.bam"
+		if [ -s long_reads.bam ]
+		then
+			echo "Existing marked duplicate bam found"
+			echo "To rerun this step, delete long_reads.bam and resubmit"
+			bam_files="${bam_files} --nanopore long_reads.bam"
+		else
+			echo "Aligning ${long_read_type} reads to assembly"
+			minimap2 \
+				-a \
+				-t ${threads} \
+				-x ${preset} \
+				${ref} \
+				${path2}/fastq/${long_read_type}/clean.fastq.gz > long_reads.sam 
+			echo "Sorting and converting to bam"
+			samtools view -@ ${threads2} -bSh long_reads.sam | \
+			samtools sort -@ ${threads2} > long_reads.bam
+			echo "Indexing aligned.bam"
+			samtools index long_reads.bam
+			bam_files="${bam_files} --nanopore long_reads.bam"
+		fi
 	fi
 	#Polish with Pilon
 	if [ -s pilon_${a}.fasta ]

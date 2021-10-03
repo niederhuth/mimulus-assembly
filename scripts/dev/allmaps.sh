@@ -142,13 +142,10 @@ then
 
 	#
 	python -m jcvi.assembly.syntenypath bed \
-		${something}.anchors 
-		--switch \
+		${}.${}.1x1.anchors 
 		-o synteny.bed
 	position_data="${position_data} synteny.bed "
 fi
-
-
 
 #Merge files and create weights file
 echo "Merging position data files"
