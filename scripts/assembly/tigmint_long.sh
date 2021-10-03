@@ -4,15 +4,21 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=500GB
-#SBATCH --job-name tigmint
-#SBATCH --output=job_reports/%x-%j.SLURMout
+#SBATCH --job-name tigmint-long
+#SBATCH --output=../../../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
 threads=20 #doesn't seem to want to use more than 6
-datatype="ont"
+cut=500 #cut length for long reads
+span=auto #Number of spanning molecules threshold. Set span=auto to automatically select
+dist=auto #Max dist between reads to be considered same molecule. auto to automatically calculate
+window=1000 #Window size (bp) for checking spanning molecules
+minsize=2000 #Minimum molecule size
+trim=0 #Number of bases to trim off contigs following cuts
+datatype="ont" #ont or pb
 input= #input fasta, if left blank, will look for it in current directory
 
 #Change to current directory
@@ -49,14 +55,17 @@ then
 	if ls *.fa >/dev/null 2>&1
 	then
 		input=$(ls *fa | sed s/.*\ //)
+		name=${input/.fa/}
 		echo "Fasta file ${input} found"
 	elif ls *.fasta >/dev/null 2>&1
 	then
 		input=$(ls *fasta | sed s/.*\ //)
+		name=${input/.fasta/}
 		echo "Fasta file ${input} found"
 	elif ls *.fna >/dev/null 2>&1
 	then
 		input=$(ls *fna | sed s/.*\ //)
+		name=${input/.fna/}
 		echo "Fasta file ${input} found"
 	else
 		echo "No fasta file found, please check and restart"
@@ -75,21 +84,31 @@ else
 fi
 
 #Copy and rename files...because of stupid eccentricities of some code
-cp ../${input} input.fa
+cp ../${input} ${name}.fa
 cp ${path2}/fastq/${datatype}/clean.fastq.gz reads.fq.gz
 
 #Run tigmint
-echo "Running tigmint"
+echo "Running tigmint-long"
 tigmint-make tigmint-long \
-	draft=input \
+	draft=${name} \
 	reads=reads \
-	span=auto \
+	longmap=${datatype} \
+	cut=${cut} \
+	span=${span} \
+	dist=${dist} \
+	window=${window} \
+	minsize=${minsize} \
+	trim=${trim} \
 	G=${genomeSize2/.0/} \
-	dist=auto \
 	t=${threads}
 
 #Clean some stuff up for downstream analyses
-unlink input.cut500.tigmint.fa
-rm input.fa input.fa.fai reads.fq.gz
+unlink ${name}.cut${cut}.tigmint.fa
+rm ${name}.fa ${name}.fa.fai reads.fq.gz
+
+#rename fasta & bed file to something more easily handled
+long_name=${name}.reads.cut${cut}.molecule.size${minsize}.trim${trim}.window${window}.span${span}.breaktigs
+mv ${long_name}.fa ${name}_tigmint.fa
+mv ${long_name}.bed ${name}_tigmint.bed
 
 echo "Done"
