@@ -81,68 +81,70 @@ do
 	#Make and cd to output directory
 	if [ -d ${path3} ]
 	then
-		cd ${path3}
+		echo "Previous run for $i already found, skipping"
+		echo "To rerun this step, delete directory ${path3} and resubmit"
 	else
 		mkdir ${path3}
 		cd ${path3}
-	fi
 
-	#Look for fasta file, there can only be one!
-	if [ -z ${input} ] && [ ${input_dir} ]
-	then
-		echo "No input fasta provided, looking for fasta"
-		if ls ${path4}/*.fa >/dev/null 2>&1
+		#Look for fasta file, there can only be one!
+		if [ -z ${input} ] && [ ${input_dir} ]
 		then
-			input=$(ls ${path4}/*fa | sed s/.*\\///)
-			name=${input/.fa/}
-			echo "Fasta file ${input} found"
-		elif ls ${path4}/*.fasta >/dev/null 2>&1
-		then
-			input=$(ls ${path4}/*fasta | sed s/.*\\///)
-			name=${input/.fasta/}
-			echo "Fasta file ${input} found"
-		elif ls ${path4}/*.fna >/dev/null 2>&1
-		then
-			input=$(ls ${path4}/*fna | sed s/.*\\///)
-			name=${input/.fna/}
-			echo "Fasta file ${input} found"
+			echo "No input fasta provided, looking for fasta"
+			if ls ${path4}/*.fa >/dev/null 2>&1
+			then
+				input=$(ls ${path4}/*fa | sed s/.*\\///)
+				name=${input/.fa/}
+				echo "Fasta file ${input} found"
+			elif ls ${path4}/*.fasta >/dev/null 2>&1
+			then
+				input=$(ls ${path4}/*fasta | sed s/.*\\///)
+				name=${input/.fasta/}
+				echo "Fasta file ${input} found"
+			elif ls ${path4}/*.fna >/dev/null 2>&1
+			then
+				input=$(ls ${path4}/*fna | sed s/.*\\///)
+				name=${input/.fna/}
+				echo "Fasta file ${input} found"
+			else
+				echo "No fasta file found, please check and restart"
+			fi
 		else
-			echo "No fasta file found, please check and restart"
+			echo "Input fasta: ${input}"
 		fi
-	else
-		echo "Input fasta: ${input}"
+
+		#Copy and rename files...because of stupid eccentricities of some code
+		cp ${path4}/${input} ${name}.fa
+		cp ${path2}/fastq/${datatype}/clean.fastq.gz reads.fq.gz
+
+		#Run tigmint
+		echo "Running tigmint-long on ${i}"
+		tigmint-make tigmint-long arcs \
+			draft=${name} \
+			reads=reads \
+			longmap=${datatype} \
+			cut=${cut} \
+			span=${span} \
+			dist=${dist} \
+			window=${window} \
+			minsize=${minsize} \
+			trim=${trim} \
+			G=${genomeSize2/.0/} \
+			t=${threads}
+
+		#Clean some stuff up for downstream analyses
+		unlink ${name}.cut${cut}.tigmint.fa
+		rm ${name}.fa ${name}.fa.fai reads.fq.gz
+
+		#rename fasta & bed file to something more easily handled
+		long_part=cut${cut}.molecule.size${minsize}.trim${trim}.window${window}.span${span}.breaktigs
+		name2=${name}.reads.${long_part}
+		mv ${name2}.fa ${name}_tigmint.fa
+		mv ${name2}.bed ${name}_tigmint.bed
+
+		cd ../
+		echo "tigmint-long arcs on ${i} complete"
 	fi
-
-	#Copy and rename files...because of stupid eccentricities of some code
-	cp ${path4}/${input} ${name}.fa
-	cp ${path2}/fastq/${datatype}/clean.fastq.gz reads.fq.gz
-
-	#Run tigmint
-	echo "Running tigmint-long on ${i}"
-	tigmint-make tigmint-long arcs \
-		draft=${path4}/${name} \
-		reads=reads \
-		longmap=${datatype} \
-		cut=${cut} \
-		span=${span} \
-		dist=${dist} \
-		window=${window} \
-		minsize=${minsize} \
-		trim=${trim} \
-		G=${genomeSize2/.0/} \
-		t=${threads}
-
-	#Clean some stuff up for downstream analyses
-	unlink ${name}.cut${cut}.tigmint.fa
-	rm ${name}.fa ${name}.fa.fai reads.fq.gz
-
-	#rename fasta & bed file to something more easily handled
-	long_name=${name}.reads.cut${cut}.molecule.size${minsize}.trim${trim}.window${window}.span${span}.breaktigs
-	mv ${long_name}.fa ${name}_tigmint.fa
-	mv ${long_name}.bed ${name}_tigmint.bed
-
-	cd ../
-	echo "tigmint-long on ${i} complete"
-fi
+done
 
 echo "Done"
