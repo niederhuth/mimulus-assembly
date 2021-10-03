@@ -19,7 +19,8 @@ window=1000 #Window size (bp) for checking spanning molecules
 minsize=2000 #Minimum molecule size
 trim=0 #Number of bases to trim off contigs following cuts
 datatype="ont" #ont or pb
-input= #input fasta, if left blank, will look for it in current directory
+input= #input fasta, if left blank, will look for it in current directory, mutually exclusive with input_dir
+input_dir="pilon" #common directory name, e.g. pilon or polca to look for assemblies, eclusive with "input"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -47,17 +48,34 @@ genomeSize=$(awk -v FS="," \
 	${path1}/samples.csv)
 genomeSize2=$(python -c "print(${genomeSize/g/} * 1000000000)")
 
-for i in 
+#Maker sure only one is specified
+if [ ${input} ] && [ ${input_dir} ]
+then
+	echo "Error: input & input_dir cannot both be set!"
+	echo "Please set only one"
+	exit 1
+fi
+
+#Get list of assemblies to work on
+if [ -z input_dir ]
+then
+	assembly_list=${assembly}
+else
+	assembly_list=${input_dir}*
+fi
+
+#Iterate over assembly list and run tigmint-long
+for i in ${assembly_list}
 do
 
 	#set directory name
 	if [ -z ${input_dir} ]
 	then
 		path3="tigmint_long"
-		path4="../${i}"
+		path4=".."
 	else
 		path3="tigmint_long_${i}"
-		path4=".."
+		path4="../${i}"
 	fi
 
 	#Make and cd to output directory
@@ -100,7 +118,7 @@ do
 	cp ${path2}/fastq/${datatype}/clean.fastq.gz reads.fq.gz
 
 	#Run tigmint
-	echo "Running tigmint-long"
+	echo "Running tigmint-long on ${i}"
 	tigmint-make tigmint-long \
 		draft=${path4}/${name} \
 		reads=reads \
