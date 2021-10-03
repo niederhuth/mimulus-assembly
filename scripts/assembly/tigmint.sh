@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=500GB
 #SBATCH --job-name tigmint
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -86,5 +86,9 @@ tigmint-make tigmint-long \
 	G=${genomeSize2/.0/} \
 	dist=auto \
 	t=${threads}
+
+#Clean some stuff up for downstream analyses
+unlink input.cut500.tigmint.fa
+rm input.fa input.fa.fai reads.fq.gz
 
 echo "Done"

@@ -1,24 +1,27 @@
 #!/bin/bash --login
-#SBATCH --time=168:00:00
+#SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=500GB
-#SBATCH --job-name tigmint-test
-#SBATCH --output=job_reports/%x-%j.SLURMout
+#SBATCH --cpus-per-task=50
+#SBATCH --mem=200GB
+#SBATCH --job-name alignment-stats
+#SBATCH --output=%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20 #doesn't seem to want to use more than 6
-datatype="ont"
+threads=40
+
+#In general dont change this, unless using a similar datatype
+#This should match the dataype in the misc/samples.csv file
+datatype="wgs"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/scaffolding/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/polishing/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/polishing/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
@@ -27,19 +30,12 @@ genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
-path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
-path3="tigmint_test"
+path2=$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}\\/${sample}/)
 
-#Get genome size estimate
-genomeSize=$(awk -v FS="," \
-	-v a=${species} \
-	-v b=${genotype} \
-	-v c=${sample} \
-	-v d=${condition} \
-	-v e=${datatype} \
-	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $9}' \
-	${path1}/samples.csv)
-genomeSize2=$(python -c "print(${genomeSize/g/} * 1000000000)")
+#Fastq files, these should not have to be changed, but should set automatically
+path3="${path2}/fastq/${datatype}"
+t1="${path3}/trimmed.1.fastq.gz"
+t2="${path3}/trimmed.2.fastq.gz"
 
 #Look for fasta file, there can only be one!
 if [ -z ${input} ]
@@ -64,27 +60,29 @@ else
 	echo "Input fasta: ${input}"
 fi
 
-#Make and cd to output directory
-if [ -d ${path3} ]
+#check for index, if absent, make it
+if [ -s ${input}.sa ]
 then
-	cd ${path3}
+	echo "BWA index found"
 else
-	mkdir ${path3}
-	cd ${path3}
+	echo "Indexing fasta"
+	bwa index ${input}
 fi
 
-#Copy and rename files...because of stupid eccentricities of some code
-cp ../${input} input.fa
-cp ${path2}/fastq/${datatype}/clean.fastq.gz reads.fq.gz
+#Align reads
+echo "Aligning reads to ${input} with bwa mem"
+bwa mem -t ${threads} -M ${input} ${t1} ${t2} | samtools view -@ 4 -bSh | samtools sort -@ 4 > wgs.bam
 
-#Run tigmint
-echo "Running tigmint"
-tigmint-make tigmint-long arcs \
-	draft=input \
-	reads=reads \
-	span=auto \
-	G=${genomeSize2/.0/} \
-	dist=auto \
-	t=${threads}
+#Index bam file
+echo "Indexing bam file"
+samtools index wgs.bam
+
+#Get flagstats
+echo "Getting flagstats"
+samtools flagstat wgs.bam > alignment.flagstat
+
+#Cleanup
+rm wgs.bam wgs.bam.bai
 
 echo "Done"
+
