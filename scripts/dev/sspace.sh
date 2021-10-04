@@ -128,7 +128,7 @@ do
 	#perl ${path1}/assembly/sspace_basic/SSPACE_Basic.pl \
 	perl ${HOME}/Dev/sspace_basic/SSPACE_Basic.pl \
 		-l libraries.tsv \
-		-s ${input} \
+		-s ${path5}/${input} \
 		-x ${extension} \
 		-z ${min_contig} \
 		-k ${min_lengths} \
