@@ -158,7 +158,7 @@ then
 
 		#Retain only unique alignments
 		cut -f4 ${i}_aln.bed | sort | uniq -c | sed 's/^ *//' | \
-		wk -v FS=" " '{if ($1 == 1) print $2}' > tmp
+		awk -v FS=" " '{if ($1 == 1) print $2}' > tmp
 		fgrep -f tmp ${i}_aln.bed > ${i}.bed
 		rm tmp
 	done
