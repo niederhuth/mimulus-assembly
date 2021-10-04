@@ -14,10 +14,14 @@ conda="${HOME}/miniconda3"
 threads=20
 distance=rank #cM or rank
 primers=TRUE #Paired primer sequences for genetic markers
+quick_synt=TRUE #Use synteny, by mapping transcript seqs, requires quick_synt_ref & quick_synt_transcripts
 markers=FALSE #Have not implemented this option
 synteny=FALSE #Have not implemented this option
 optical=FALSE #Have not implemented this option
 primer_max_dist=5000 #max distance for primers to be separated
+chr_list=
+quick_synt_ref="IM62/ref/IM62-v2.fa"
+quick_synt_transcripts="IM62/ref/annotations/IM62-v2-cds-primary.fa"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -133,17 +137,54 @@ then
 			echo "Primers ${M} missing data" >> missing_primers.txt
 		fi
 	done
+
+	#Add to list of data for allmaps
 	position_data="${position_data} primers.bed"
 fi
 
-#Synteny data
-if [ ${synteny} = "TRUE" ]
+#Quick Synteny data
+if [ ${quick_synt} = "TRUE" ]
 then
+	path4=$(pwd | sed s/${species}\\/.*/${species}/)
+	#Copy over quick_synt_ref
+	cp ${path4}/${quick_synt_ref} ref.fa
+	for i in input ref
+	do
+		#Map transcripts to fasta
+		minimap2 -x splice ${i}.fa ${path4}/${quick_synt_transcripts} > ${i}.paf 
 
-	#
+		#Convert to bed file
+		awk -v OFS="\t" '{print $6,$8,$9,$1,100,$5}' ${i}.paf > ${i}_aln.bed
+
+		#Retain only unique alignments
+		cut -f4 ${i}_aln.bed | sort | uniq -c | sed 's/^ *//' | \
+		wk -v FS=" " '{if ($1 == 1) print $2}' > tmp
+		fgrep -f tmp ${i}_aln.bed > ${i}.bed
+		rm tmp
+	done
+
+	#Filter out only chromosomes in chr_list, make anchor_list
+	if [ ${chr_list} ]
+	then
+		echo ${chr_list} | tr ' ' '\n' > chr_list.txt
+		fgrep -w -f chr_list.txt ref.bed | cut -f4 > anchor_list
+	else
+		cut -f4 ref.bed > anchor_list
+	fi
+
+	#Make anchors
+	fgrep -f anchor_list input.bed | cut -f4 | \
+	awk -v OFS="\t" '{print $1,$1,100}' > ref.input.1x1.anchors
+
+	#Build synteny.bed
 	python -m jcvi.assembly.syntenypath bed \
-		${}.${}.1x1.anchors 
+		ref.input.1x1.anchors \
 		-o synteny.bed
+
+	#Clean up fasta files
+	rm ref.fa
+
+	#Add to list of data for allmaps
 	position_data="${position_data} synteny.bed "
 fi
 
@@ -156,7 +197,7 @@ python -m jcvi.assembly.allmaps mergebed \
 echo "Running allmaps path"
 python -m jcvi.assembly.allmaps path \
 	--cpus=${threads} \
-	--distance=${distance}
+	--distance=${distance} \
 	allmaps.bed input.fa
 
 #Cleanup
