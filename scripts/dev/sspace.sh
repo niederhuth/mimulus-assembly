@@ -72,10 +72,10 @@ do
 	#set directory name
 	if [ -z ${input_dir} ]
 	then
-		path4="tigmint_long"
+		path4="sspace"
 		path5=".."
 	else
-		path4="tigmint_long_${i}"
+		path4="sspace_${i}"
 		path5="../${i}"
 	fi
 
