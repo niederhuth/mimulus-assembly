@@ -9,6 +9,7 @@
 
 #
 i="IM62"
+chr_list="scaffold_1 scaffold_2 scaffold_3 scaffold_4 scaffold_5 scaffold_6 scaffold_7 scaffold_8 scaffold_9 scaffold_10 scaffold_11 scaffold_12 scaffold_13 scaffold_14"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -33,12 +34,14 @@ else
 	cd ${path3}
 fi
 
+echo ${chr_list} | tr ' ' '\n' > chr_list.txt
+
 grep -v \# ../../busco/*/*sol*/full_table.tsv | \
 awk -v OFS="\t" '{if ($2=="Complete") print $3,$4,$5,$1,100,$6}' > S1.bed
 
 path4=$(pwd | sed s/${genotype}\\/${sample}\\/.*/${i}/)
 grep -v \# ${path4}/ref/busco/*/*sol*/full_table.tsv | \
-awk -v OFS="\t" '{if ($2=="Complete") print $3,$4,$5,$1,100,$6}' | grep  > REF.bed
+awk -v OFS="\t" '{if ($2=="Complete") print $3,$4,$5,$1,100,$6}' | fgrep -w -f chr_list.txt > REF.bed
 
 cut -f4 S1.bed > tmp3
 cut -f4 REF.bed > tmp4
