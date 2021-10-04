@@ -67,7 +67,6 @@ fi
 #Iterate over assembly list and run tigmint-long
 for i in ${assembly_list}
 do
-
 	#set directory name
 	if [ -z ${input_dir} ]
 	then
@@ -88,7 +87,7 @@ do
 		cd ${path3}
 
 		#Look for fasta file, there can only be one!
-		if [ -z ${input} ] && [ ${input_dir} ]
+		if [ -z ${input} ]
 		then
 			echo "No input fasta provided, looking for fasta"
 			if ls ${path4}/*.fa >/dev/null 2>&1
@@ -140,10 +139,15 @@ do
 		long_part=cut${cut}.molecule.size${minsize}.trim${trim}.window${window}.span${span}.breaktigs
 		name2=${name}.reads.${long_part}
 		mv ${name2}.fa ${name}_tigmint.fa
-		mv ${name2}.bed ${name}_tigmint.bed
+		mv ${name2}.fa.bed ${name}_tigmint.fa.bed
 
 		cd ../
 		echo "tigmint-long on ${i} complete"
+		
+		if [ -z ${input_dir} ]
+		then
+			input=
+		fi
 	fi
 done
 
