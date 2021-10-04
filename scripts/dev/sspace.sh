@@ -21,7 +21,7 @@ min_contig=100 #Minimum contig length used for scaffolding. Filters out contigs 
 min_lengths=5 #Minimum number of links (read pairs) to compute scaffold (default -k 5)
 max_link_ratio=0.7  #Max link ratio between two contig pairs. Higher values less accurate (default -a 0.7)
 min_overlap=25 #Minimum overlap required between contigs to merge adjacent contigs in a scaffold (default -n 15)
-bowtie_gaps=1 #Maximum number of allowed gaps during mapping with Bowtie (default -g 0)
+bowtie_gaps=0 #Maximum number of allowed gaps during mapping with Bowtie (default -g 0)
 input= #input fasta, if left blank, will look for it in current directory, exclusive to input_dir
 input_dir="tigmint_long" #common dir name, e.g. pilon to look for assemblies, exclusive to input
 

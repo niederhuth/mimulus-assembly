@@ -1,8 +1,8 @@
 #!/bin/bash --login
-#SBATCH --time=24:00:00
+#SBATCH --time=3:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=1
 #SBATCH --mem=50GB
 #SBATCH --job-name allmaps
 #SBATCH --output=%x-%j.SLURMout
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
+threads=1
 distance=rank #cM or rank
 primers=TRUE #Paired primer sequences for genetic markers
 quick_synt=TRUE #Use synteny, by mapping transcript seqs, requires quick_synt_ref & quick_synt_transcripts
