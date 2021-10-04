@@ -138,8 +138,9 @@ do
 		-T ${threads} \
 		-p ${dot_file}
 
-		cd ../
 		mv standard_output.final.scaffolds.fasta ${input}_sspace.fa
+		rm r1.fastq r2.fastq
+		cd ../
 		echo "sspace on ${i} complete"
 		
 		if [ -z ${input_dir} ]
