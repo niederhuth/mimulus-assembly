@@ -19,7 +19,7 @@ markers=FALSE #Have not implemented this option
 synteny=FALSE #Have not implemented this option
 optical=FALSE #Have not implemented this option
 primer_max_dist=5000 #max distance for primers to be separated
-chr_list=
+chr_list="scaffold_1 scaffold_2 scaffold_3 scaffold_4 scaffold_5 scaffold_6 scaffold_7 scaffold_8 scaffold_9 scaffold_10 scaffold_11 scaffold_12 scaffold_13 scaffold_14"
 quick_synt_ref="IM62/ref/IM62-v2.fa"
 quick_synt_transcripts="IM62/ref/annotations/IM62-v2-cds-primary.fa"
 
@@ -178,6 +178,7 @@ then
 
 	#Build synteny.bed
 	python -m jcvi.assembly.syntenypath bed \
+		--switch \
 		ref.input.1x1.anchors \
 		-o synteny.bed
 
@@ -198,7 +199,8 @@ echo "Running allmaps path"
 python -m jcvi.assembly.allmaps path \
 	--cpus=${threads} \
 	--distance=${distance} \
-	allmaps.bed input.fa
+	--noplot \
+	allmaps.bed input.fa \
 
 #Cleanup
 mkdir fasta_other
