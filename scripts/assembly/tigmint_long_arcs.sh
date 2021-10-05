@@ -144,6 +144,11 @@ do
 
 		cd ../
 		echo "tigmint-long arcs on ${i} complete"
+
+		if [ ${input_dir} ]
+		then
+			input=
+		fi
 	fi
 done
 

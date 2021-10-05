@@ -144,7 +144,7 @@ do
 		cd ../
 		echo "tigmint-long on ${i} complete"
 		
-		if [ -z ${input_dir} ]
+		if [ ${input_dir} ]
 		then
 			input=
 		fi
