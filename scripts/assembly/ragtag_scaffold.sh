@@ -1,5 +1,5 @@
 #!/bin/bash --login
-#SBATCH --time=3:59:00
+#SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=10
-aligner="unimap"
+aligner="nucmer"
 min_len=1000
 merge_dist=100000
 min_gap=100
@@ -98,6 +98,7 @@ do
 		-i ${min_grouping_score} \
 		-a ${min_location_score} \
 		-s ${min_orient_score} ${gaps}\
+		-u \
 		${ref} ${input}
 done
 
