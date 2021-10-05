@@ -92,6 +92,7 @@ do
 	echo "Running ragtag scaffold"
 	ragtag.py scaffold \
 		-o ${i}_ragtag_scaffold \
+		--aligner ${aligner} \
 		-f ${min_len} \
 		-d ${merge_dist} \
 		-i ${min_grouping_score} \
