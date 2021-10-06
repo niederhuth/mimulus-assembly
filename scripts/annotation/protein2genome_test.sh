@@ -12,11 +12,11 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=1
-chunks=20
+chunks=40
 minintron=10
 maxintron=3000
 bestn=5
-ryo="no" #">%qi length=%ql alnlen=%qal\n>%ti length=%tl alnlen=%tal\n"
+ryo=">%qi length=%ql alnlen=%qal\n>%ti length=%tl alnlen=%tal\n"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
