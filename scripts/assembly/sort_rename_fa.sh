@@ -9,5 +9,6 @@ sort -k1,1rn |\
 cut -f 2- |\
 tr "\t" "\n" |\
 sed s/^\>/old_name\=/ |\
-awk -v i=10000 '/old_name\=/{print ">contig" ++i, $0; next}{print}'
+awk -v i=9000000 '/old_name\=/{print ">contig_" ++i, $0; next}{print}' |\
+sed s/contig_9/contig_0/
 
