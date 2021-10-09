@@ -15,6 +15,8 @@ engine="rmblast" #crossmatch, wublast, abblast, ncbi, rmblast, hmmer
 threads=10 #Actual cores used by RM are thread number multiplied by the cores for search engine used.
 			#These are: RMBlast=4 cores, ABBlast=4 cores, nhmmer=2 cores, crossmatch=1 core
 			#So 10 threads with RMBlast actually needs 40 cores!
+#Set what repeat library to use. This is currently set to a set of denovo TEs identified by EDTA
+repeats="$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}/${sample}\\/)/ref/edta/*.fa.mod.EDTA.TElib.fa" 
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -28,8 +30,6 @@ species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
 path2="repeatmasker"
-#Set what repeat library to use. This is currently set to a set of denovo TEs identified by EDTA
-repeats="$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}/${sample}\\/)/ref/edta/*.fa.mod.EDTA.TElib.fa" 
 
 #Look for fasta file, there can only be one!
 if ls *.fa >/dev/null 2>&1
