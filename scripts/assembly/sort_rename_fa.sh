@@ -8,7 +8,5 @@ awk -F '\t' '{printf("%d\t%s\n",length($2),$0);}' |\
 sort -k1,1rn |\
 cut -f 2- |\
 tr "\t" "\n" |\
-awk -v i=00001 '/^>/{print ">contig" ++i, $0; next}{print}' |\
-sed s/\ \>.*\:\:/\ /
-
+awk -v i=00001 '/^>/{print ">contig" ++i, $0; next}{print}' 
 
