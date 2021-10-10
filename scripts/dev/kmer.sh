@@ -28,8 +28,8 @@ species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
 path2="fastq/${datatype}/jellyfish"
-output1="$(echo ${reads} | sed s/.gz//).kmers"
-output2="$(echo ${reads} | sed s/.gz//).histo"
+output1="data.kmers"
+output2="data.histo"
 
 #Create output directory
 mkdir ${path2}
