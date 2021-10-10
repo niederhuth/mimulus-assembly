@@ -14,7 +14,6 @@ conda="${HOME}/miniconda3"
 threads=10
 mer_length=21
 hash_size="20G"
-reads="trimmed*"
 datatype="wgs"
 
 #Change to current directory
@@ -43,7 +42,7 @@ jellyfish count \
 	-s ${hash_size} \
 	-t ${threads} \
 	-o ${output} \
-	-C <(zcat ../${reads})
+	-C <(zcat ../trimmed.1.fastq.gz) <(zcat ../trimmed.2.fastq.gz)
 
 #Generate histogram
 echo "Creating kmer histogram"
