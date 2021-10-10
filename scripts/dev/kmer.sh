@@ -28,8 +28,6 @@ species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${genotype}\\/// | sed s/\\/.*//)
 path2="fastq/${datatype}/jellyfish"
-output1="data.kmers"
-output2="data.histo"
 
 #Create output directory
 mkdir ${path2}
@@ -41,14 +39,13 @@ jellyfish count \
 	-m ${mer_length} \
 	-s ${hash_size} \
 	-t ${threads} \
-	-o ${output} \
 	-C <(zcat ../trimmed.1.fastq.gz) <(zcat ../trimmed.2.fastq.gz)
 
 #Generate histogram
 echo "Creating kmer histogram"
 jellyfish histo \
 	-t ${threads} \
-	 ${output1} > ${output2}
+	 mer_counts.jf > reads.histo
 
 #Run Genomescope 2.0
 echo "Running GenomeScope 2.0"
