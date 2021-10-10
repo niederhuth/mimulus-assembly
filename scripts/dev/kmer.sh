@@ -50,7 +50,7 @@ jellyfish histo \
 #Run Genomescope 2.0
 echo "Running GenomeScope 2.0"
 genomescope2 \
-	-i ${output2} \
+	-i reads.histo \
 	-o output_dir \
 	-k $(mer_length)
 
