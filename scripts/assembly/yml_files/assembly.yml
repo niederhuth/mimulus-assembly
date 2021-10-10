@@ -2,7 +2,6 @@ name: assembly
 channels:
   - bioconda
   - conda-forge
-  - R
   - defaults
 dependencies:
   - _libgcc_mutex=0.1=conda_forge
@@ -18,10 +17,10 @@ dependencies:
   - bz2file=0.98=py_0
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.17.1=h7f98852_1
-  - ca-certificates=2021.5.30=ha878542_0
+  - ca-certificates=2021.10.8=ha878542_0
   - cachetools=4.2.2=pyhd8ed1ab_0
   - cairo=1.16.0=h6cf1ce9_1008
-  - certifi=2021.5.30=py39hf3d152e_0
+  - certifi=2021.10.8=py39hf3d152e_0
   - cffi=1.14.6=py39he32792d_0
   - curl=7.77.0=hea6ffbf_0
   - cycler=0.10.0=py_2
@@ -40,6 +39,7 @@ dependencies:
   - fribidi=1.0.10=h36c2ea0_0
   - gcc_impl_linux-64=9.3.0=h70c0ae5_19
   - gcc_linux-64=9.3.0=hf25ea35_33
+  - genomescope2=2.0=py39r40hdfd78af_4
   - gettext=0.19.8.1=h0b5b191_1005
   - gfortran_impl_linux-64=9.3.0=hc4a2995_19
   - gfortran_linux-64=9.3.0=hdc58fab_33
@@ -52,6 +52,8 @@ dependencies:
   - htslib=1.13=h9093b5e_0
   - icu=68.1=h58526e2_0
   - jbig=2.1=h7f98852_2003
+  - jellyfish=2.2.10=h6bb024c_1
+  - jemalloc=4.5.0=0
   - jpeg=9d=h36c2ea0_0
   - k8=0.2.5=h9a82719_1
   - kernel-headers_linux-64=2.6.32=he073ed8_14
@@ -67,6 +69,7 @@ dependencies:
   - libedit=3.1.20191231=he28a2e2_2
   - libev=4.33=h516909a_1
   - libffi=3.3=h58526e2_2
+  - libgcc=7.2.0=h69d50b8_2
   - libgcc-devel_linux-64=9.3.0=h7864c58_19
   - libgcc-ng=9.3.0=h2828fa1_19
   - libgfortran-ng=9.3.0=hff62375_19
@@ -121,6 +124,7 @@ dependencies:
   - python-dateutil=2.8.2=pyhd8ed1ab_0
   - python_abi=3.9=2_cp39
   - pytz=2021.1=pyhd8ed1ab_0
+  - r-argparse=2.1.1=r40hc72bb7e_0
   - r-assertthat=0.2.1=r40hc72bb7e_2
   - r-backports=1.2.1=r40hcfec24a_0
   - r-base=4.0.5=hb67fd72_2
@@ -133,10 +137,12 @@ dependencies:
   - r-evaluate=0.14=r40hc72bb7e_2
   - r-fansi=0.5.0=r40hcfec24a_0
   - r-farver=2.1.0=r40h03ef668_0
+  - r-findpython=1.0.7=r40hc72bb7e_0
   - r-ggplot2=3.3.5=r40hc72bb7e_0
   - r-glue=1.4.2=r40hcfec24a_0
   - r-gtable=0.3.0=r40hc72bb7e_3
   - r-isoband=0.2.5=r40h03ef668_0
+  - r-jsonlite=1.7.2=r40hcfec24a_0
   - r-labeling=0.4.2=r40hc72bb7e_0
   - r-lattice=0.20_44=r40hcfec24a_0
   - r-lifecycle=1.0.0=r40hc72bb7e_0
@@ -144,6 +150,7 @@ dependencies:
   - r-mass=7.3_54=r40hcfec24a_0
   - r-matrix=1.3_4=r40he454529_0
   - r-mgcv=1.8_36=r40he454529_0
+  - r-minpack.lm=1.2_1=r40h742201e_1007
   - r-munsell=0.5.0=r40hc72bb7e_1003
   - r-nlme=3.1_152=r40h859d828_0
   - r-pillar=1.6.2=r40hc72bb7e_0
