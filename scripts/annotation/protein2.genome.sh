@@ -94,26 +94,7 @@ do
 					--ryo "${ryo}" > ${outdir}/target_chunk_${a}_query_chunk_${b}
 				b=$(expr ${b} + 1)
 			fi
-<<<<<<< HEAD
-		else
-			echo "Running exonerate protein2genome ${outdir} chunk ${a} on ${fasta}"
-			exonerate \
-				--model protein2genome \
-				--bestn ${bestn} \
-				--minintron ${minintron} \
-				--maxintron ${maxintron} \
-				--targetchunkid ${a} \
-				--targetchunktotal ${chunks} \
-				--query ../${i} \
-				--target ../${fasta} \
-				--showtargetgff yes \
-				--showalignment no \
-				--showvulgar no \
-				--ryo "${ryo}" > ${outdir}/chunk_${a}
-		fi
-=======
 		done
->>>>>>> d0fade8a3553950436f936557229b2e7f1ee7fb2
 		a=$(expr ${a} + 1)
 	done
 done
