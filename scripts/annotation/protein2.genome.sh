@@ -63,8 +63,13 @@ do
 	do
 		if [ -z ${outdir}/chunk_${a} ]
 		then
-			echo "${outdir} chunk_${a} already complete, skipping to next chunk"
-			a=$(expr ${a} + 1)
+			if [ $(wc -l ${outdir}/chunk_${a} | cut -d ' ' -f1) > 10 ]
+			then
+				echo "${outdir} chunk_${a} already complete, skipping to next chunk"
+				a=$(expr ${a} + 1)
+			else
+				rm ${outdir}/chunk_${a}
+			fi
 		else
 			head ../${i}
 			head ../${fasta}
