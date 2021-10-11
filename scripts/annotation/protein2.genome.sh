@@ -71,8 +71,6 @@ do
 				rm ${outdir}/chunk_${a}
 			fi
 		else
-			head ../${i}
-			head ../${fasta}
 			echo "Running exonerate protein2genome ${outdir} chunk ${a} on ${fasta}"
 			exonerate \
 				--model protein2genome \
