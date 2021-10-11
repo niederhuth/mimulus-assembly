@@ -74,6 +74,7 @@ do
 				else
 					rm ${outdir}/target_chunk_${a}_query_chunk_${b}
 				fi
+			fi
 			if [ -z ${outdir}/target_chunk_${a}_query_chunk_${b} ]
 			then
 				echo "Aligning ${outdir} target_chunk_${a}_query_chunk_${b} on ${fasta}"
