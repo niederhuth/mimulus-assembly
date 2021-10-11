@@ -13,9 +13,10 @@ conda="${HOME}/miniconda3"
 #Set variables
 fasta=$(ls -l repeatmasker/*.fa.masked | sed s/.*\ //)
 proteins=$(ls -l proteins/*fa | sed s/.*\ //)
-chunks=20
+query_chunks=5
+target_chunks=10
 minintron=10
-maxintron=3000
+maxintron=5000
 bestn=5
 ryo=">%qi length=%ql alnlen=%qal\n>%ti length=%tl alnlen=%tal\n"
 
@@ -52,42 +53,48 @@ do
 	echo "Working on ${i} proteins"
 	outdir=$(echo ${i} | sed s/.*\\/// | sed s/\.fa//)
 	a=1
+	b=1
 	if [ -d ${outdir} ]
 	then
 		echo "${outdir} directory present, checking files"
 	else
 		mkdir ${outdir}
 	fi
-	
-	while [ ${a} -le ${chunks} ]
+	while [ ${a} -le ${target_chunks} ]
 	do
-		if [ -z ${outdir}/chunk_${a} ]
-		then
-			if [ $(wc -l ${outdir}/chunk_${a} | cut -d ' ' -f1) -gt 20 ]
+		while [ ${b} -le ${query_chunks} ]
+		do
+			if [ -z ${outdir}/target_chunk_${a}_query_chunk_${b} ]
 			then
-				echo "${outdir} chunk_${a} already complete, skipping to next chunk"
-				a=$(expr ${a} + 1)
-			else
-				rm ${outdir}/chunk_${a}
+				if [ $(wc -l ${outdir}/target_chunk_${a}_query_chunk_${b} | cut -d ' ' -f1) -gt 20 ]
+				then
+					echo "${outdir} target_chunk_${a}_query_chunk_${b} already complete" 
+					echo "Skipping to next chunk"
+					b=$(expr ${b} + 1)
+				else
+					rm ${outdir}/target_chunk_${a}_query_chunk_${b}
+				fi
+			if [ -z ${outdir}/target_chunk_${a}_query_chunk_${b} ]
+			then
+				echo "Aligning ${outdir} target_chunk_${a}_query_chunk_${b} on ${fasta}"
+				exonerate \
+					--model protein2genome \
+					--bestn ${bestn} \
+					--minintron ${minintron} \
+					--maxintron ${maxintron} \
+					--querychunkid ${b} \
+					--querychunktotal ${query_chunks} \
+					--targetchunkid ${a} \
+					--targetchunktotal ${target_chunks} \
+					--query ../${i} \
+					--target ../${fasta} \
+					--showtargetgff yes \
+					--showalignment no \
+					--showvulgar no \
+					--ryo "${ryo}" > ${outdir}/target_chunk_${a}_query_chunk_${b}
+				b=$(expr ${b} + 1)
 			fi
-		else
-			head ../${i}
-			head ../${fasta}
-			echo "Running exonerate protein2genome ${outdir} chunk ${a} on ${fasta}"
-			exonerate \
-				--model protein2genome \
-				--bestn ${bestn} \
-				--minintron ${minintron} \
-				--maxintron ${maxintron} \
-				--targetchunkid ${a} \
-				--targetchunktotal ${chunks} \
-				--query ../${i} \
-				--target ../${fasta} \
-				--showtargetgff yes \
-				--showalignment no \
-				--showvulgar no \
-				--ryo "${ryo}" > ${outdir}/chunk_${a}
-		fi
+		done
 		a=$(expr ${a} + 1)
 	done
 done
