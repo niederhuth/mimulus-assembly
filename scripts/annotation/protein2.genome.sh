@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-fasta="repeatmasker/*.fa.masked"
+fasta=$(ls -l repeatmasker/*.fa.masked | sed s/.*\ //)
 proteins=$(ls -l proteins/*fa | sed s/.*\ //)
 chunks=20
 minintron=10
@@ -35,7 +35,6 @@ path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
-version=$(ls ${sample}-v*.fa | sed s/.*\-v// | sed s/.fa//) 
 path2="exonerate"
 
 #Make & cd to directory
@@ -50,6 +49,7 @@ fi
 #Loop over protein sources and run exonerate
 for i in ${proteins}
 do
+	echo "Working on ${i} proteins"
 	outdir=$(echo ${i} | sed s/.*\\/// | sed s/\.fa//)
 	a=1
 	if [ -d ${outdir} ]
@@ -66,20 +66,22 @@ do
 			echo "${outdir} chunk_${a} already complete, skipping to next chunk"
 			a=$(expr ${a} + 1)
 		else
-			echo "Running exonerate protein2genome chunk ${a} on ${fasta}"
+			head ../${i}
+			head ../${fasta}
+			echo "Running exonerate protein2genome ${outdir} chunk ${a} on ${fasta}"
 			exonerate \
-			--model protein2genome \
-			--bestn ${bestn} \
-			--minintron ${minintron} \
-			--maxintron ${maxintron} \
-			--targetchunkid ${a} \
-			--targetchunktotal ${chunks} \
-			--query ../${i} \
-			--target ../${fasta} \
-			--showtargetgff yes \
-			--showalignment no \
-			--showvulgar no \
-			--ryo ${ryo} > ${outdir}/chunk_${a}
+				--model protein2genome \
+				--bestn ${bestn} \
+				--minintron ${minintron} \
+				--maxintron ${maxintron} \
+				--targetchunkid ${a} \
+				--targetchunktotal ${chunks} \
+				--query ../${i} \
+				--target ../${fasta} \
+				--showtargetgff yes \
+				--showalignment no \
+				--showvulgar no \
+				--ryo "${ryo}" > ${outdir}/chunk_${a}
 		fi
 		a=$(expr ${a} + 1)
 	done

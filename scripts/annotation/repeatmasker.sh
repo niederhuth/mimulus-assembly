@@ -16,7 +16,7 @@ threads=10 #Actual cores used by RM are thread number multiplied by the cores fo
 			#These are: RMBlast=4 cores, ABBlast=4 cores, nhmmer=2 cores, crossmatch=1 core
 			#So 10 threads with RMBlast actually needs 40 cores!
 #Set what repeat library to use. This is currently set to a set of denovo TEs identified by EDTA
-repeats="$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}/${sample}\\/)/ref/edta/*.fa.mod.EDTA.TElib.fa" 
+repeats="edta/*.fa.mod.EDTA.TElib.fa"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
