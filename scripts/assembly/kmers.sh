@@ -52,6 +52,6 @@ echo "Running GenomeScope 2.0"
 genomescope2 \
 	-i reads.histo \
 	-o output_dir \
-	-k $(mer_length)
+	-k ${mer_length}
 
 echo "Done"
