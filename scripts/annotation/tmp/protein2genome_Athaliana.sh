@@ -96,6 +96,7 @@ do
 				b=$(expr ${b} + 1)
 			fi
 		done
+		b=1
 		a=$(expr ${a} + 1)
 	done
 done
