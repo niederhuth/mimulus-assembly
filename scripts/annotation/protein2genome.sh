@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=500GB
-#SBATCH --job-name protein2genome
+#SBATCH --job-name protein2genome-Athaliana
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 fasta=$(ls -l repeatmasker/*.fa.masked | sed s/.*\ //)
-proteins=$(ls -l proteins/*fa | sed s/.*\ //)
+proteins=$(ls -l proteins/*.fa | sed s/.*\ //)
 query_chunks=5
 target_chunks=10
 minintron=10
@@ -96,6 +96,7 @@ do
 				b=$(expr ${b} + 1)
 			fi
 		done
+		b=1
 		a=$(expr ${a} + 1)
 	done
 done

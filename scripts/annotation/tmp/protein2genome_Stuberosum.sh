@@ -66,7 +66,7 @@ do
 		do
 			if [ -z ${outdir}/target_chunk_${a}_query_chunk_${b} ]
 			then
-				if [ $(wc -l ${outdir}/target_chunk_${a}_query_chunk_${b} | cut -d ' ' -f1) -lt 20 ]
+				if [ $(wc -l ${outdir}/target_chunk_${a}_query_chunk_${b} | cut -d ' ' -f1) -gt 20 ]
 				then
 					echo "${outdir} target_chunk_${a}_query_chunk_${b} already complete" 
 					echo "Skipping to next chunk"
