@@ -64,7 +64,7 @@ do
 	do
 		while [ ${b} -le ${query_chunks} ]
 		do
-			if [ -z ${outdir}/target_chunk_${a}_query_chunk_${b} ]
+			if [ -s ${outdir}/target_chunk_${a}_query_chunk_${b} ]
 			then
 				if [ $(wc -l ${outdir}/target_chunk_${a}_query_chunk_${b} | cut -d ' ' -f1) -gt 20 ]
 				then
@@ -75,7 +75,7 @@ do
 					rm ${outdir}/target_chunk_${a}_query_chunk_${b}
 				fi
 			fi
-			if [ ! -z ${outdir}/target_chunk_${a}_query_chunk_${b} ]
+			if [ ! -s ${outdir}/target_chunk_${a}_query_chunk_${b} ]
 			then
 				echo "Aligning ${outdir} target_chunk_${a}_query_chunk_${b} on ${fasta}"
 				exonerate \
