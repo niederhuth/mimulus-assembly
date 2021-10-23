@@ -71,33 +71,32 @@ do
 					echo "${outdir} target_chunk_${a}_query_chunk_${b} already complete" 
 					echo "Skipping to next chunk"
 					b=$(expr ${b} + 1)
-					if [ ${b} -gt ${query_chunks} ]
-					then
-						b=1
-					fi
 				else
 					rm ${outdir}/target_chunk_${a}_query_chunk_${b}
 				fi
 			fi
 			if [ ! -s ${outdir}/target_chunk_${a}_query_chunk_${b} ]
 			then
-				echo "Aligning ${outdir} target_chunk_${a}_query_chunk_${b} on ${fasta}"
-				exonerate \
-					--model protein2genome \
-					--bestn ${bestn} \
-					--minintron ${minintron} \
-					--maxintron ${maxintron} \
-					--querychunkid ${b} \
-					--querychunktotal ${query_chunks} \
-					--targetchunkid ${a} \
-					--targetchunktotal ${target_chunks} \
-					--query ../${i} \
-					--target ../${fasta} \
-					--showtargetgff yes \
-					--showalignment no \
-					--showvulgar no \
-					--ryo "${ryo}" > ${outdir}/target_chunk_${a}_query_chunk_${b}
-				b=$(expr ${b} + 1)
+				if [ ${b} -le ${query_chunks} ]
+				then
+					echo "Aligning ${outdir} target_chunk_${a}_query_chunk_${b} on ${fasta}"
+					exonerate \
+						--model protein2genome \
+						--bestn ${bestn} \
+						--minintron ${minintron} \
+						--maxintron ${maxintron} \
+						--querychunkid ${b} \
+						--querychunktotal ${query_chunks} \
+						--targetchunkid ${a} \
+						--targetchunktotal ${target_chunks} \
+						--query ../${i} \
+						--target ../${fasta} \
+						--showtargetgff yes \
+						--showalignment no \
+						--showvulgar no \
+						--ryo "${ryo}" > ${outdir}/target_chunk_${a}_query_chunk_${b}
+					b=$(expr ${b} + 1)
+				fi
 			fi
 		done
 		b=1
