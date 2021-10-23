@@ -71,7 +71,7 @@ do
 					echo "${outdir} target_chunk_${a}_query_chunk_${b} already complete" 
 					echo "Skipping to next chunk"
 					b=$(expr ${b} + 1)
-					if [ ${b} -gt ${target_chunks} ]
+					if [ ${b} -gt ${query_chunks} ]
 					then
 						b=1
 					fi
