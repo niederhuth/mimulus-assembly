@@ -44,8 +44,9 @@ adapters=$(awk -v FS="," \
 	-v a=${species} \
 	-v b=${genotype} \
 	-v c=${sample} \
-	-v d=${datatype} \
-	'{if ($1 == a && $2 == b && $3 == c && $5 == d) print $8}' \
+	-v d=${condition} \
+	-v e=${datatype} \
+	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $8}' \
 	${path1}/samples.csv)
 
 #Fastq files, these should not have to be changed, but should set automatically
