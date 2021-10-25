@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=40
-#SBATCH --mem=50GB
+#SBATCH --mem=510GB
 #SBATCH --job-name align-rna-SR-annotation
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
@@ -14,7 +14,11 @@ conda="${HOME}/miniconda3"
 threads=40
 fasta=$(ls -l *.fa | sed s/.*\ //)
 genomeSAindexNbases=13 #14 default
+IntronMin=10
+IntronMax=5000
+BAMsortRAM=7035318712
 datatype="rna"
+
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -193,7 +197,10 @@ then
 		--genomeDir STAR \
 		--readFilesIn ${t1} ${t2}\
 		--readFilesCommand zcat \
-		--outSAMtype BAM SortedByCoordinate
+		--alignIntronMin ${IntronMin} \
+		--alignIntronMax ${IntronMax} \
+		--outSAMtype BAM SortedByCoordinate \
+		--limitBAMsortRAM ${BAMsortRAM}
 elif [ ${PE} = "FALSE" ]
 then
 	echo "Running STAR for ${sample} against ${fasta}"
@@ -203,7 +210,10 @@ then
 		--genomeDir STAR \
 		--readFilesIn ${t1} \
 		--readFilesCommand zcat \
-		--outSAMtype BAM SortedByCoordinate
+		--alignIntronMin ${IntronMin} \
+		--alignIntronMax ${IntronMax} \
+		--outSAMtype BAM SortedByCoordinate \
+		--limitBAMsortRAM ${BAMsortRAM}
 fi
 
 echo "Done"

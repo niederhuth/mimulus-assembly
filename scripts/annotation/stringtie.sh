@@ -1,9 +1,9 @@
 #!/bin/bash --login
-#SBATCH --time=168:00:00
+#SBATCH --time=3:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=100GB
+#SBATCH --cpus-per-task=40
+#SBATCH --mem=50GB
 #SBATCH --job-name stringtie
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
@@ -11,20 +11,20 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
-bam="SRrna/*bam"
+threads=40
+bam="../SRrna/Aligned.sortedByCoord.out.bam" #Can be space separated list
 read_type="rf" #fr: fr-secondstrand, rf: fr-firststrand, lr: longread, mix: mix lr & shortread
 #To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
-trim=FALSE #use coverage based trimming of transcript ends
-min_multi_exon_reads=1.5 #min reads per bp cov for multi-exon transcript default: 1
-min_single_exon_reads=4.75 #min reads per bp cov for single-exon transcript default: 4.75, 1.5 for long-reads
-min_iso_frac=0.05 #minimum isoform fraction default: 0.01
-max_gap=50 #maximum gap allowed between read mappings default: 50, set to 0 for long-reads
-min_transcript_len=200 #minimum assembled transcript length default: 200
-min_anchor_len=10 #minimum anchor length for junctions default: 10
-min_junc_cov=1 #minimum junction coverage default: 1
-frac_multi_hit=0.95 #fraction of bundle allowed to be covered by multi-hit reads default: 1
-LR_splice_window=25 #window around possibly erroneous splice sites from long reads default: 25
+trim=TRUE #use coverage based trimming of transcript ends
+min_multi_exon_reads="1.5" #min reads per bp cov for multi-exon transcript default: 1
+min_single_exon_reads="4.75" #min reads per bp cov for single-exon transcript default: 4.75, 1.5 for long-reads
+min_iso_frac="0.05" #minimum isoform fraction default: 0.01
+max_gap="50" #maximum gap allowed between read mappings default: 50, set to 0 for long-reads
+min_transcript_len="200" #minimum assembled transcript length default: 200
+min_anchor_len="10" #minimum anchor length for junctions default: 10
+min_junc_cov="5" #minimum junction coverage default: 1
+frac_multi_hit="0.5" #fraction of bundle allowed to be covered by multi-hit reads default: 1
+LR_splice_window="25" #window around possibly erroneous splice sites from long reads default: 25
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -42,7 +42,7 @@ assembly=$(pwd | sed s/^.*\\///)
 path2="stringtie"
 
 #Add various settings
-settings="-p ${threads}"
+settings="-v -p ${threads}"
 if [ ${trim} = FALSE ]
 then
 	settings="${settings} -t"
@@ -62,29 +62,26 @@ then
 	settings="${settings} --mix -E ${LR_splice_window}"
 fi
 
-#Make and change directories
-if [ -d ${path2} ]
+#Make output dir and cd
+if [ ! -d ${path2} ]
 then
-	cd ${path2}
-else
 	mkdir ${path2}
-	cd ${path2}
 fi
+cd ${path2}
 
 #Run stringtie
 echo "Running stringtie"
-stringtie \
-	${bam} \
+stringtie ${bam} \
 	${settings} \
 	-c ${min_multi_exon_reads} \
-	-s ${min_single_exon_read} \
+	-s ${min_single_exon_reads} \
 	-f ${min_iso_frac} \
 	-g ${max_gap} \
 	-m ${min_transcript_len} \
 	-a ${min_anchor_len} \
 	-j ${min_junc_cov} \
 	-M ${frac_multi_hit} \
-	-o ./ \
+	-o ${path2} \
 	-l stringtie 
 
 echo "Done"
