@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=40
 #SBATCH --mem=50GB
-#SBATCH --job-name align-rna-annotation
+#SBATCH --job-name align-rna-SR-annotation
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -31,7 +31,7 @@ sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="annotation"
 assembly=$(pwd | sed s/^.*\\///)
 path2="$(pwd | sed s/annotation.*//)/fastq/${datatype}"
-path3="rnaseq"
+path3="SRrna"
 
 #Make & cd to directory
 if [ -d ${path3} ]
