@@ -14,6 +14,7 @@ conda="${HOME}/miniconda3"
 threads=40
 fasta=$(ls -l *.fa | sed s/.*\ //)
 genomeSAindexNbases=13 #14 default
+datatype="rna"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -67,7 +68,6 @@ adapters=$(awk -v FS="," \
 	${path1}/samples.csv)
 
 #Fastq files, these should not have to be changed, but should set automatically
-path2="fastq/${datatype}"
 r1="${path2}/combined.1.fastq.gz"
 r2="${path2}/combined.2.fastq.gz"
 t1="${path2}/trimmed.1.fastq.gz"
@@ -121,6 +121,17 @@ then
 		else
 			cat ${path2}/*_1.fastq.gz > $r1
 		fi
+	fi
+elif ls ${path2}/SRR*.fastq.gz >/dev/null 2>&1
+then
+	echo "Data is Single-end"
+	echo "Single-end ${datatype}? If this is wrong, double check and restart"
+	PE="FALSE"
+	if ls ${t1} >/dev/null 2>&1
+	then
+		echo "Trimmed reads found, skipping trimming"
+	else
+		cat ${path2}/SRR*.fastq.gz > $r1
 	fi
 else
 	echo "Data Missing"
