@@ -22,8 +22,8 @@ min_iso_frac="0.05" #minimum isoform fraction default: 0.01
 max_gap="50" #maximum gap allowed between read mappings default: 50, set to 0 for long-reads
 min_transcript_len="200" #minimum assembled transcript length default: 200
 min_anchor_len="10" #minimum anchor length for junctions default: 10
-min_junc_cov="5" #minimum junction coverage default: 1
-frac_multi_hit="0.5" #fraction of bundle allowed to be covered by multi-hit reads default: 1
+min_junc_cov="1" #minimum junction coverage default: 1
+frac_multi_hit="0.95" #fraction of bundle allowed to be covered by multi-hit reads default: 1
 LR_splice_window="25" #window around possibly erroneous splice sites from long reads default: 25
 
 #Change to current directory
