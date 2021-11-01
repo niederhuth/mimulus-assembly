@@ -14,7 +14,7 @@ cd exonerate_output
 
 for i in target_chunk_*_query_chunk_*
 do
-	sed '1,2d' tmp/${i}.tmp | grep -v "\-\-\ completed\ exonerate\ analysis" > ../tmp/${i}.tmp
+	sed '1,2d' ${i} | grep -v "\-\-\ completed\ exonerate\ analysis" > ../tmp/${i}.tmp
 done
 cd ..
 cat tmp/*tmp > ${a}
