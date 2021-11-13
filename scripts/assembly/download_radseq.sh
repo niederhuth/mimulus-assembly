@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #In general dont change this, unless using a similar datatype
 #This should match the dataype in the misc/samples.csv file
-datatype="wgs"
+datatype="radseq"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -54,10 +54,13 @@ do
 	#Loop through SRR list and download
 	cat ${i} | while read line
 	do
-		if [ ]
+		if [ ! -f ${line}.gz ]
 		then
-			fastq-dump --split-3 ${line}
-			gzip ${line}*
+			if [ ! -f ${line}_2.gz ]
+			then
+				fastq-dump --split-3 ${line}
+				gzip ${line}*
+			fi
 		fi
 	done
 	cd ../
