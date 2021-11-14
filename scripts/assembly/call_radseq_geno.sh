@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=25
 #SBATCH --mem=50GB
 #SBATCH --job-name call_radseq_geno
-#SBATCH --output=job_reports/%x-%j.SLURMout
+#SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -72,9 +72,14 @@ do
 		mv *bam.bai bam_files/
 	fi
 	#Call genotypes
-	bcftools mpileup --threads ${threads} --ignore-RG --fasta-ref ${fasta} bam_files/*.bam | \
-	bcftools call --threads ${threads2} -mv -o ${name}.vcf
+	if [ ! -s ${name}.vcf ]
+	then
+	echo "Calling variants with bcftools"
+		bcftools mpileup --threads ${threads} --ignore-RG --fasta-ref ../${fasta} bam_files/*.bam | \
+		bcftools call --threads ${threads2} -mv -o ${name}.vcf
+	fi
 	#Filter sites
+	echo "Filtering variants"
 	vcftools \
 		--vcf ${name}.vcf \
 		--out ${name} \
@@ -83,6 +88,7 @@ do
 		--maf ${maf} \
 		--max-missing ${max_missing}
 	#Modify genotypes
+	echo "Reformatting genotypes"
 	cat ${name}.recode.vcf | \
 	sed s/\\.\\/\\.\\:/NN\:/ | \
 	sed s/0\\/0\\:/AA\:/g | \
@@ -97,6 +103,7 @@ do
 	ncol=$(grep "#CHROM" ${name}.modified.recode.vcf | awk '{print NF; exit}')
 	#we start at column 10, where first sample is
 	a=10
+	echo "Outputing individual sample genotypes"
 	#Loop over each sample column and output a g_gile
 	until [ ${a} -gt ${ncol} ]
 	do
