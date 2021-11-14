@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=54
 #SBATCH --mem=80GB
-#SBATCH --job-name align_radseq
+#SBATCH --job-name align_radseq2
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=50
 threads2=4
-fasta=$(ls annotations/*-v1.fa | sed s/.*\ //)
+fasta="flye/medaka_racon_3/tigmint_long_pilon_2/pilon_2_tigmint.fa"
 
 #In general dont change this, unless using a similar datatype
 #This should match the dataype in the misc/samples.csv file
@@ -41,12 +41,12 @@ path3=${path1}/genetic_map/${datatype}
 ref=$(echo ${fasta} | sed s/.*\\///)
 
 #Make and cd to analysis directory
-if [ -d ${datatype} ]
+if [ -d ${datatype}_2 ]
 then
-	cd ${datatype}
+	cd ${datatype}_2
 else
-	mkdir ${datatype}
-	cd ${datatype}
+	mkdir ${datatype}_2
+	cd ${datatype}_2
 fi
 
 #Check for and copy fasta file
