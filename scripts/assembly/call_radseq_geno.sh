@@ -26,10 +26,6 @@ cd ${PBS_O_WORKDIR}
 #Export paths to conda
 export PATH="${conda}/envs/scaffolding/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:${LD_LIBRARY_PATH}"
-#Path to picard
-picard="${conda}/envs/variant-calling/share/picard-*/picard.jar"
-#Path to trimmomatic fastas 
-adapter_path="${conda}/envs/variant-calling/share/trimmomatic/adapters"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
