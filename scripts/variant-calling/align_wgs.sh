@@ -152,11 +152,20 @@ fi
 rm ${r1} ${r2}
 
 #Define Read Group
-ID=$(zcat ${t1} | head -1 | cut -d ':' -f 3,4 | tr ':' '.')
-PU=$(zcat ${t1} | head -1 | cut -d ':' -f 3,4,10 | tr ':' '.')
-SM=$(pwd | sed s/^.*\\///)
-PL="ILLUMINA"
-LB="lib1"
+if ls ${path3}/SRR*.fastq.gz >/dev/null 2>&1
+then
+	ID=$(zcat ${t1} | head -1 | cut -d ' ' -f1 | sed s/\@//)
+	PU=$(zcat ${t1} | head -1 | cut -d ' ' -f1 | sed s/\@//)
+	SM=$(pwd | sed s/^.*\\///)
+	PL="ILLUMINA"
+	LB="lib1"
+else
+	ID=$(zcat ${t1} | head -1 | cut -d ':' -f 3,4 | tr ':' '.')
+	PU=$(zcat ${t1} | head -1 | cut -d ':' -f 3,4,10 | tr ':' '.')
+	SM=$(pwd | sed s/^.*\\///)
+	PL="ILLUMINA"
+	LB="lib1"
+fi
 
 #Get list of genomes
 genomes=$(awk -v FS="," \

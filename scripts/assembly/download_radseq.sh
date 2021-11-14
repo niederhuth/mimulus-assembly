@@ -28,18 +28,19 @@ sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
 path2=$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}\\/${sample}/)
-path3=${path1}/genetic_map/radseq/
+path3=${path1}/genetic_map/${datatype}/
 
 
 #Make data directory
-if [ -d fastq/radseq ]
+if [ -d fastq/${datatype} ]
 then
-	cd fastq/radseq
+	cd fastq/${datatype}
 else
-	mkdir fastq/radseq
-	cd fastq/radseq
+	mkdir fastq/${datatype}
+	cd fastq/${datatype}
 fi
 
+#Loop through SRR list and download
 for i in ${path3}/*
 do
 	name=$(echo ${i} | sed s/^.*\\/// | sed s/_SRR.txt//)
@@ -51,7 +52,6 @@ do
 		mkdir ${name}
 		cd ${name}
 	fi
-	#Loop through SRR list and download
 	cat ${i} | while read line
 	do
 		if [ ! -f ${line}.gz ]
