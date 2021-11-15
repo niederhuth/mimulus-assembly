@@ -12,9 +12,10 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=20 #threads for mpileup
-threads=5 #threads for call
+threads2=5 #threads for call
 max_alleles=2 #Max allele count for filtering, recommend 2 for now
-maf=0.25 #Minor allele frequency, assuming this data is from F2s or F3s, so keeping high
+maf=0.20 #Minor allele frequency, assuming this data is from F2s or F3s, so keeping high
+max_non_ref_af=0.80 #Maximum non-ref allele frequencyi, use to eliminate allels without ref allele
 max_missing=0.25 #Max number of samples can be missing calls
 
 #In general dont change this, unless using a similar datatype
@@ -38,20 +39,20 @@ path2=$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}\\/${sample}/)
 path3=${path1}/genetic_map/${datatype}
 
 #Look for fasta file, there can only be one!
-if [ -z ${input} ]
+if [ -z ${fasta} ]
 then
 	echo "No input fasta provided, looking for fasta"
 	if ls *.fa >/dev/null 2>&1
 	then
-		input=$(ls *fa | sed s/.*\ //)
+		fasta=$(ls *fa | sed s/.*\ //)
 		echo "Fasta file ${input} found"
 	elif ls *.fasta >/dev/null 2>&1
 	then
-		input=$(ls *fasta | sed s/.*\ //)
+		fasta=$(ls *fasta | sed s/.*\ //)
 		echo "Fasta file ${input} found"
 	elif ls *.fna >/dev/null 2>&1
 	then
-		input=$(ls *fna | sed s/.*\ //)
+		fasta=$(ls *fna | sed s/.*\ //)
 		echo "Fasta file ${input} found"
 	else
 		echo "No fasta file found, please check and restart"
@@ -74,9 +75,9 @@ do
 	#Call genotypes
 	if [ ! -s ${name}.vcf ]
 	then
-	echo "Calling variants with bcftools"
-		bcftools mpileup --threads ${threads} --ignore-RG --fasta-ref ../${fasta} bam_files/*.bam | \
-		bcftools call --threads ${threads2} -mv -o ${name}.vcf
+		echo "Calling variants with bcftools"
+		bcftools mpileup --threads ${threads} --ignore-RG --fasta-ref ../${fasta} bam_files/*.bam |\
+		bcftools call --threads ${threads2} -m -v -o ${name}.vcf
 	fi
 	#Filter sites
 	echo "Filtering variants"
@@ -86,6 +87,7 @@ do
 		--recode \
 		--max-alleles ${max_alleles} \
 		--maf ${maf} \
+		--max-non-ref-af ${max_non_ref_af} \
 		--max-missing ${max_missing}
 	#Modify genotypes
 	echo "Reformatting genotypes"
@@ -94,27 +96,30 @@ do
 	sed s/0\\/0\\:/AA\:/g | \
 	sed s/0\\/1\\:/AB\:/g | \
 	sed s/1\\/1\\:/BB\:/g > ${name}.modified.recode.vcf
-	#Make g_files directory if not present
-	if [ ! -d g_files ]
+	if [ -s ${name}.recode.vcf ]
 	then
-		mkdir g_files
+	       #Make g_files directory if not present
+        	if [ ! -d g_files ]
+        	then
+                	mkdir g_files
+        	fi
+		#Get sample number from vcf
+		ncol=$(grep "#CHROM" ${name}.modified.recode.vcf | awk '{print NF; exit}')
+		#we start at column 10, where first sample is
+		a=10
+		echo "Outputing individual sample genotypes"
+		#Loop over each sample column and output a g_gile
+		until [ ${a} -gt ${ncol} ]
+		do
+			#Get sample for that column
+			sample=$(grep "#CHROM" ${vcf} | cut -f${a} | sed s/bam_files\\/// | sed s/.bam//)
+			#Cut the propter columsn and output g_file
+			cut -f1,2,${a} ${vcf} | grep -v \# | sed s/\:.*// |\
+			awk -v OFS="\t" -v x=${sample} '{print x,$0}' > g_files/g.${sample}.txt
+			#Add 1 to the column
+			a=$(expr ${a} + 1)
+		done
 	fi
-	#Get sample number from vcf
-	ncol=$(grep "#CHROM" ${name}.modified.recode.vcf | awk '{print NF; exit}')
-	#we start at column 10, where first sample is
-	a=10
-	echo "Outputing individual sample genotypes"
-	#Loop over each sample column and output a g_gile
-	until [ ${a} -gt ${ncol} ]
-	do
-		#Get sample for that column
-		sample=$(grep "#CHROM" ${vcf} | cut -f${a} | sed s/bam_files\\/// | sed s/.bam//)
-		#Cut the propter columsn and output g_file
-		cut -f1,2,${a} ${vcf} | grep -v \# | sed s/\:.*// |\
-		awk -v OFS="\t" -v x=${sample} '{print x,$0}' > g_files/g.${sample}.txt
-		#Add 1 to the column
-		a=$(expr ${a} + 1)
-	done
 	echo "Done processing ${name}"
 	cd ../
 done
