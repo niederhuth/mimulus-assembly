@@ -14,9 +14,9 @@ conda="${HOME}/miniconda3"
 threads=20 #threads for mpileup
 threads2=5 #threads for call
 max_alleles=2 #Max allele count for filtering, recommend 2 for now
-maf=0.2 #Minor allele frequency, assuming this data is from F2s or F3s, so keeping high
-max_non_ref_af=0.8 #Maximum non-ref allele frequencyi, use to eliminate allels without ref allele
-max_missing=0.25 #Max number of samples can be missing calls
+maf=0.1 #Minor allele frequency, assuming this data is from F2s or F3s, so keeping high
+max_non_ref_af=0.9 #Maximum non-ref allele frequencyi, use to eliminate allels without ref allele
+max_missing=0.2 #Max number of samples can be missing calls
 
 #In general dont change this, unless using a similar datatype
 #This should match the dataype in the misc/samples.csv file
@@ -100,10 +100,10 @@ do
 	then
 		vcf=${name}.modified.recode.vcf
 		#Make g_files directory if not present
-        if [ ! -d g_files ]
-        then
-        	mkdir g_files
-        fi
+		if [ ! -d g_files ]
+		then
+			mkdir g_files
+		fi
 		#Get sample number from vcf
 		ncol=$(grep "#CHROM" ${name}.modified.recode.vcf | awk '{print NF; exit}')
 		#we start at column 10, where first sample is
