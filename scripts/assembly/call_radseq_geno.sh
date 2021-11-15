@@ -96,13 +96,14 @@ do
 	sed s/0\\/0\\:/AA\:/g | \
 	sed s/0\\/1\\:/AB\:/g | \
 	sed s/1\\/1\\:/BB\:/g > ${name}.modified.recode.vcf
-	if [ -s ${name}.recode.vcf ]
+	if [ -s ${name}.modified.recode.vcf ]
 	then
-	       #Make g_files directory if not present
-        	if [ ! -d g_files ]
-        	then
-                	mkdir g_files
-        	fi
+		vcf=${name}.modified.recode.vcf
+		#Make g_files directory if not present
+        if [ ! -d g_files ]
+        then
+        	mkdir g_files
+        fi
 		#Get sample number from vcf
 		ncol=$(grep "#CHROM" ${name}.modified.recode.vcf | awk '{print NF; exit}')
 		#we start at column 10, where first sample is
