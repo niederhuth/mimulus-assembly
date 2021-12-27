@@ -24,14 +24,12 @@ export PATH="${conda}/envs/scaffolding/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:${LD_LIBRARY_PATH}"
 
 #The following shouldn't need to be changed, but should set automatically
-path1=$(pwd | sed s/data.*/misc/)
+path1=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
-path2=$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}\\/${sample}/)
-path3=${path1}/genetic_map/${datatype}
 
 #Create bad_marks.txt
 touch bad_marks.txt
@@ -39,6 +37,6 @@ touch bad_marks.txt
 #
 for i in 
 do
-	python ${path}/dev/GOOGA/hmm_scaff_likelihood.py ${i/.txt//}
+	python ${path2}/dev/GOOGA/hmm_scaff_likelihood.py ${i/.txt//}
 done
 

@@ -21,14 +21,14 @@ rbp = 0.1/1000000.0  # recombination rate per bp (morgans / megabase)
 
 def calc_v0(e_rates): 
 	def scipy_ln_like0(x):
-		return -LL(x)
+		return(-LL(x))
 	bounds = [ (zy,0.5), (zy,0.5), (zy,1.0-zy) ]
 	best, val, d = optimize.fmin_l_bfgs_b(scipy_ln_like0, e_rates, approx_grad=True, bounds=bounds)
 	solution = list(best)
 	ln_l = -scipy_ln_like0(solution)
 	solution.append(ln_l)
 	#zbob=ln_like0(parents,famStr,RRL,RAL,AAL,FLnum,1, list(best),matplant)
-	return solution
+	return(solution)
 
 
 def foward_backward(obs, states, start_p,transition_probability,er):
@@ -60,7 +60,7 @@ def foward_backward(obs, states, start_p,transition_probability,er):
 		normalizer = max(beta[t]['AA'],beta[t]['AB'],beta[t]['BB'])
 		for y in states:
 			beta[t][y] = beta[t][y]/normalizer
-	return alpha,beta,LLobs
+	return(alpha,beta,LLobs)
 
 
 def emission_probability(genotype,calledG,x): #cc [AA,AB,BB,NN]
@@ -89,7 +89,7 @@ def emission_probability(genotype,calledG,x): #cc [AA,AB,BB,NN]
 			prob = beta/2
 		elif genotype == 'BB':
 			prob = 1-e1-e2
-	return prob
+	return(prob)
 	
  
 def LL(x):
@@ -118,7 +118,7 @@ def LL(x):
 		else:
 			llx=0.0
 		Total_LL+=llx
-	return Total_LL
+	return(Total_LL)
 
 
 ####################
