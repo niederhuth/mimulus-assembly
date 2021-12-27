@@ -43,8 +43,8 @@ then
 		#Get sample for that column
 		sample=$(grep "#CHROM" ${vcf} | cut -f${a} | sed s/bam_files\\/// | sed s/.bam//)
 		#Cut the propter columsn and output g_file
-		cut -f1,2,${a} ${vcf} | grep -v \# | sed s/\:.*// |\
-		awk -v OFS="\t" -v x=${sample} '{print x,$0}' > g_files/g.${sample}.txt
+		cut -f1,2,${a} ${vcf} | grep -v \# | sed s/A:.*/A/ | sed s/B:.*/A/ | sed s/NN:.*/NN/ |\
+		awk -v OFS="\t" -v x=${sample} '{print x,$0}' > g_files/${sample}_genotype.txt
 		#Add 1 to the column
 		a=$(expr ${a} + 1)
 	done
