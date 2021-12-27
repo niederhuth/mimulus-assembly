@@ -32,6 +32,7 @@ condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
 
 #Create bad_marks.txt
+cd g_files
 touch bad_marks.txt
 
 #Loop over each genotype file and calculate error rates
