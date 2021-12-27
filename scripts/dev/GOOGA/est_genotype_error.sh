@@ -38,37 +38,37 @@ touch bad_marks.txt
 #Loop over each genotype file and calculate error rates
 for i in *_genotype.txt
 do
-	python ${path2}/dev/GOOGA/hmm_scaff_likelihood.py ${i/_genotype.txt/} >> error_rates_1.txt
+	python ${path1}/dev/GOOGA/hmm_scaff_likelihood.py ${i/_genotype.txt/} >> error_rates_1.txt
 done
 
 #Filter samples based on max error rate
 awk -v a=${max_error} '{ if ($2<a && $3<a && $4<a) print $1}' error_rates_1.txt >> low_error_samples.txt
 
 #1st linkage map
-python ${path2}/dev/GOOGA/hmm_intrascaff_rates.py error_rates_1.txt $(head -1 low_error_samples.txt)_genotype.txt low_error_samples.txt MLE_iscaff_1.txt bad_marks.txt
+python ${path1}/dev/GOOGA/hmm_intrascaff_rates.py error_rates_1.txt $(head -1 low_error_samples.txt)_genotype.txt low_error_samples.txt MLE_iscaff_1.txt bad_marks.txt
 
 #Filter markers
 
 #2nd linkage map
-python ${path2}/dev/GOOGA/hmm_intrascaff_rates.py error_rates_1.txt $(head -1 low_error_samples.txt)_genotype.txt low_error_samples.txt MLE_iscaff_2.txt bad_marks.txt​
+python ${path1}/dev/GOOGA/hmm_intrascaff_rates.py error_rates_1.txt $(head -1 low_error_samples.txt)_genotype.txt low_error_samples.txt MLE_iscaff_2.txt bad_marks.txt​
 
 #Loop over each genotype file and recalculate error rates
 for i in *_genotype.txt
 do
-	python ${path2}/dev/GOOGA/hmm_scaff_likelihood.py ${i/_genotype.txt/} >> error_rates_2.txt
+	python ${path1}/dev/GOOGA/hmm_scaff_likelihood.py ${i/_genotype.txt/} >> error_rates_2.txt
 done
 
 #Filter samples based on max error rate
-awk -v a=${max_error} '{ if ($2<a && $3<a && $4<a) print $1}' error_rates_1.txt >> low_error_samples_2.txt
+awk -v a=${max_error} '{ if ($3<a && $4<a && $5<a) print $1}' error_rates_1.txt >> low_error_samples_2.txt
 
 #3rd linkage map
-python ${path2}/dev/GOOGA/hmm_intrascaff_rates.py error_rates_2.txt $(head -1 low_error_samples_2.txt)_genotype.txt low_error_samples_2.txt MLE_iscaff_3.txt bad_marks.txt​
+python ${path1}/dev/GOOGA/hmm_intrascaff_rates.py error_rates_2.txt $(head -1 low_error_samples_2.txt)_genotype.txt low_error_samples_2.txt MLE_iscaff_3.txt bad_marks.txt​
 
 #Something
 
 #genotype each scaffold?
 for i in 
 do
-	python {path2}/dev/GOOGA/genotyp_pp.py ${i} low_error_samples_2.txt all_samples.txt MLE_iscaff_3.txt
+	python {path1}/dev/GOOGA/genotyp_pp.py ${i} low_error_samples_2.txt all_samples.txt MLE_iscaff_3.txt
 done
 
