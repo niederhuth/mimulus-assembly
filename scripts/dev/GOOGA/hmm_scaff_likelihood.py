@@ -21,8 +21,7 @@ rbp = 0.1/1000000.0  # recombination rate per bp (morgans / megabase)
 
 def calc_v0(e_rates): 
 	def scipy_ln_like0(x):
-		return(-LL(x))
-		
+		return(-LL(x))	
 	bounds = [ (zy,0.5), (zy,0.5), (zy,1.0-zy) ]
 	best, val, d = optimize.fmin_l_bfgs_b(scipy_ln_like0, e_rates, approx_grad=True, bounds=bounds)
 	solution = list(best)
