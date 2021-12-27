@@ -46,7 +46,7 @@ def foward_backward(obs, states, start_p,transition_probability,er):
 		lnFactor+=log(normalizer)
 		for y in states:
 			alpha[t][y] = alpha[t][y]/normalizer
-	# Likelihood of observed states
+	#Likelihood of observed states
 	LLobs=lnFactor+log(alpha[len(obs)-1]['AA']+alpha[len(obs)-1]['AB']+alpha[len(obs)-1]['BB'])
 	beta=[{} for j in range(len(obs))] # backward:: beta[j][X] is probability that true genotye is X at marker j (starts at 0)
 	for y in states:
@@ -118,22 +118,19 @@ def LL(x):
 		else:
 			llx=0.0
 		Total_LL+=llx
-	#print x,Total_LL
 	return Total_LL
 
 
-####################################################################################################
-### Main Program
+####################
+### Main Program ###
 
 states = ('AA','AB','BB')
 start_probability = {'AA':0.25,'AB':0.5,'BB':0.25}
 
-inZ = open("bad.marks.txt","rU")
+inZ = open("bad_marks.txt","rU")
 badmark={}
 for line_idx, line in enumerate(inZ):
-	cols = line.replace('\n', '').split('\t') 
-
-# 103a	100000	
+	cols = line.replace('\n', '').split('\t') 	
 	key=cols[0]+"_"+cols[1]
 	badmark[key]=1
 
