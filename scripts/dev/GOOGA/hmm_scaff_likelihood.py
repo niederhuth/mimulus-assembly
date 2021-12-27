@@ -22,6 +22,7 @@ rbp = 0.1/1000000.0  # recombination rate per bp (morgans / megabase)
 def calc_v0(e_rates): 
 	def scipy_ln_like0(x):
 		return(-LL(x))
+		
 	bounds = [ (zy,0.5), (zy,0.5), (zy,1.0-zy) ]
 	best, val, d = optimize.fmin_l_bfgs_b(scipy_ln_like0, e_rates, approx_grad=True, bounds=bounds)
 	solution = list(best)
@@ -127,7 +128,7 @@ def LL(x):
 states = ('AA','AB','BB')
 start_probability = {'AA':0.25,'AB':0.5,'BB':0.25}
 
-inZ = open("bad_marks.txt","rU")
+inZ = open("bad_marks.txt","r")
 badmark={}
 for line_idx, line in enumerate(inZ):
 	cols = line.replace('\n', '').split('\t') 	
@@ -140,7 +141,7 @@ v1scaffs={}
 Gcalls={}
 cscaff=''
 calls_total=0
-src  =open("g."+plantID+".txt", "rU")
+src=open(plantID+"_genotype.txt", "r")
 for line_idx, line in enumerate(src):
 	cols = line.replace('\n', '').split('\t') 
 # isg480	1	400000	AB
