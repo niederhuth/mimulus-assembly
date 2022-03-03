@@ -2,7 +2,7 @@
 threads=20 #threads for mpileup
 threads2=5 #threads for call
 max_alleles=3 #Max allele count for filtering
-min_alleles=3 #Min allele count for filtering 
+min_alleles=2 #Min allele count for filtering 
 maf=0.1 #Minor allele frequency, assuming this data is from F2s or F3s, so keeping high
 max_non_ref_af=1 #Maximum non-ref allele frequency, 1 should allow completely non-ref alleles
 max_missing=0.2 #Max number of samples can be missing calls
@@ -16,9 +16,9 @@ vcftools \
 	--remove-indels \
 	--max-alleles ${max_alleles} \
 	--min-alleles ${min_alleles} \
+	--max-missing ${max_missing} \
 	--maf ${maf} \
-	--max-non-ref-af ${max_non_ref_af} \
-	--max-missing ${max_missing}
+	#--max-non-ref-af ${max_non_ref_af}
 #Modify genotypes
 echo "Reformatting genotypes"
 cat ${name}.recode.vcf | \
