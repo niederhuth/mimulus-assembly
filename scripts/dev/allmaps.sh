@@ -2,7 +2,7 @@
 #SBATCH --time=3:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=10
 #SBATCH --mem=50GB
 #SBATCH --job-name allmaps
 #SBATCH --output=%x-%j.SLURMout
@@ -14,7 +14,7 @@ conda="${HOME}/miniconda3"
 threads=10
 distance=rank #cM or rank
 primers=TRUE #Paired primer sequences for genetic markers
-primer_sets="Lowery_et_al" #List of primers & associated genetic map
+primer_sets="Lowry_et_al" #List of primers & associated genetic map
 primer_max_dist=5000 #max distance for primers to be separated
 quick_synt=TRUE #Use synteny, by mapping transcript seqs, requires quick_synt_refs & chr_list
 quick_synt_ref="TOL NONTOL" #List of genomes to use for quick_synt, these are assumed to be of same species
@@ -37,7 +37,8 @@ sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
 path2=$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}\\/${sample}/)
-path3=$(pwd | sed s/${species}\\/.*/${species}/)
+path3="allmaps"
+path4=$(pwd | sed s/${species}\\/.*/${species}/)
 
 #Look for fasta file, there can only be one!
 if [ -z ${input} ]
@@ -66,10 +67,14 @@ fi
 if [ -d ${path3} ]
 then
 	cd ${path3}
-	cp ../${input} input.fa
 else
 	mkdir ${path3}
 	cd ${path3}
+fi
+
+#Copy input fasta
+if [ ! -s input.fa ]
+then
 	cp ../${input} input.fa
 fi
 
@@ -107,11 +112,11 @@ then
 				-S ${i}_primers/primers.sam
 
 			#Format primers.bed
-			for i  in $(sed '1d' ${path1}/genetic_map/${i}_genetic_map.csv)
+			for a in $(sed '1d' ${path1}/genetic_map/${i}_genetic_map.csv)
 			do
-				M=$(echo ${i} | cut -d ',' -f1)
-				LG=$(echo ${i} | cut -d ',' -f2)
-				GP=$(echo ${i} | cut -d ',' -f3)
+				M=$(echo ${a} | cut -d ',' -f1)
+				LG=$(echo ${a} | cut -d ',' -f2)
+				GP=$(echo ${a} | cut -d ',' -f3)
 				F=$(grep ${M}_F ${i}_primers/primers.sam | cut -f1,3,4)
 				Fchr=$(echo ${F} | cut -d ' ' -f2)
 				Fpos=$(echo ${F} | cut -d ' ' -f3)
@@ -125,10 +130,12 @@ then
 						echo "Primers ${M} properly paired"
 						if [ ${Fpos} -gt ${Rpos} ]
 						then
-							echo "${Fchr},${Rpos},${Fpos},LG${LG}:${GP}" | tr ',' '\t' >> ${i}_primers/primers.bed
+							echo "${Fchr},${Rpos},${Fpos},LG${LG}:${GP}" | \
+							tr ',' '\t' >> ${i}_primers/primers.bed
 						elif [ ${Fpos} -lt ${Rpos} ]
 						then
-							echo "${Fchr},${Fpos},${Rpos},"LG"${LG}:${GP}" | tr ',' '\t' >> ${i}_primers/primers.bed
+							echo "${Fchr},${Fpos},${Rpos},"LG"${LG}:${GP}" | \
+							tr ',' '\t' >> ${i}_primers/primers.bed
 						fi
 					else
 						echo "Primers ${M} improperly paired, skipping"
@@ -136,11 +143,13 @@ then
 				elif [[ -n ${F} ]]
 				then
 					echo "${M} forward primer only"
-					echo "${Fchr},${Fpos},$(expr ${Fpos} + 1),LG${LG}:${GP}" | tr ',' '\t' >> ${i}_primers/primers.bed
+					echo "${Fchr},${Fpos},$(expr ${Fpos} + 1),LG${LG}:${GP}" | \
+					tr ',' '\t' >> ${i}_primers/primers.bed
 				elif [[ -n ${R} ]]
 				then
 					echo "${M} reverse primer only"
-					echo "${Rchr},${Fpos},$(expr ${Rpos} + 1),LG${LG}:${GP}" | tr ',' '\t' >> ${i}_primers/primers.bed
+					echo "${Rchr},${Fpos},$(expr ${Rpos} + 1),LG${LG}:${GP}" | \
+					tr ',' '\t' >> ${i}_primers/primers.bed
 				else
 					echo "Primers ${M} missing data" >> ${i}_primers/missing_primers.txt
 				fi
@@ -163,14 +172,17 @@ then
 			echo "quick_synt_${ref}/${ref}_synteny.bed already exists, skipping"
 			echo "To repeat this step, delete quick_synt_${ref}/${ref}_synteny.bed and resubmit"
 		else
-			#Copy over quick_synt_ref
+			#Copy over data
 			mkdir quick_synt_${ref}
-			cp ${path3}/${ref}/ref/${ref}-v*.fa quick_synt_${ref}/${ref}.fa
-			cp ${path3}/${ref}/ref/annotations/${ref}-v*-cds-primary.fa quick_synt_${ref}/${ref}-cds-primary.fa
+			cp ${path4}/${ref}/ref/${ref}-v*.fa quick_synt_${ref}/ref.fa
+			cp ${path4}/${ref}/ref/annotations/${ref}-v*-cds-primary.fa quick_synt_${ref}/ref-cds-primary.fa
+			cp input.fa quick_synt_${ref}/input.fa
 			for i in input ref
 			do
 				#Map transcripts to fasta
-				minimap2 -x splice ${i}.fa ${path4}/${quick_synt_transcripts} > quick_synt_${ref}/${i}.paf 
+				minimap2 \
+					-x splice quick_synt_${ref}/${i}.fa \
+					quick_synt_${ref}/ref-cds-primary.fa > quick_synt_${ref}/${i}.paf 
 
 				#Convert to bed file
 				awk -v OFS="\t" '{print $6,$8,$9,$1,100,$5}' quick_synt_${ref}/${i}.paf > quick_synt_${ref}/${i}_aln.bed
@@ -186,7 +198,8 @@ then
 			if [ ${chr_list} ]
 			then
 				echo ${chr_list} | tr ' ' '\n' > quick_synt_${ref}/chr_list.txt
-				fgrep -w -f quick_synt_${ref}/chr_list.txt quick_synt_${ref}/ref.bed | cut -f4 > quick_synt_${ref}/anchor_list
+				fgrep -w -f quick_synt_${ref}/chr_list.txt quick_synt_${ref}/ref.bed | \
+				cut -f4 > quick_synt_${ref}/anchor_list
 			else
 				cut -f4 quick_synt_${ref}/ref.bed > quick_synt_${ref}/anchor_list
 			fi
@@ -200,6 +213,9 @@ then
 				--switch \
 				quick_synt_${ref}/ref.input.1x1.anchors \
 				-o quick_synt_${ref}/${ref}_synteny.bed
+			
+			#Cleanup
+			rm quick_synt_${ref}/input.fa quick_synt_${ref}/ref-cds-primary.fa quick_synt_${ref}/ref.fa
 		fi
 		#Add to list of data for allmaps
 		position_data="${position_data} quick_synt_${ref}/${ref}_synteny.bed "
