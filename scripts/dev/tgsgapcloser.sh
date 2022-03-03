@@ -71,10 +71,19 @@ if [[ ${racon} = "FALSE" && ${pilon} = "FALSE" ]]
 	options="--ne"
 fi
 
+#Make and cd to workign directory
+if [ -d tgsgapcloser ]
+then
+	cd tgsgapcloser
+else
+	mkdir tgsgapcloser
+	cd tgsgapcloser
+fi
+
 #Run tgsgapcloser
 echo "Running tgsgapcloser"
 tgsgapcloser \
-	--scaff ${input} \
+	--scaff ../${input} \
 	--reads ${reads} \
 	--output tgsgapcloser \
 	${options}
