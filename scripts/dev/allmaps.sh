@@ -73,7 +73,7 @@ else
 fi
 
 #Copy input fasta
-if [ ! -s input.fa ]
+if [[ ! -s input.fa ]]
 then
 	cp ../${input} input.fa
 fi
@@ -82,7 +82,7 @@ fi
 if [ ${primers} = "TRUE" ]
 then
 	#Make bowtie index
-	if [ -s bowtie_index/input.rev.2.ebwt ]
+	if [[ -s bowtie_index/input.rev.2.ebwt ]]
 	then
 		echo "bowtie2 index found"
 	else
