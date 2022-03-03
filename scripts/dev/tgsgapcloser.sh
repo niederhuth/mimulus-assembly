@@ -68,6 +68,7 @@ then
 	options="${options} --ngs ${ngs} --pilon ${conda}/envs/test/bin/pilon --samtools ${conda}/envs/test/bin/samtools"
 fi
 if [[ ${racon} = "FALSE" && ${pilon} = "FALSE" ]]
+then
 	options="--ne"
 fi
 
