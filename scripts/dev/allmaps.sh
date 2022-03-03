@@ -16,7 +16,7 @@ distance=rank #cM or rank
 primers=TRUE #Paired primer sequences for genetic markers
 primer_sets="Lowry_et_al" #List of primers & associated genetic map
 primer_max_dist=5000 #max distance for primers to be separated
-quick_synt=TRUE #Use synteny, by mapping transcript seqs, requires quick_synt_refs & chr_list
+quick_synt=TRUE #Use synteny, by mapping transcript seqs, requires quick_synt_refs
 quick_synt_ref="TOL NONTOL" #List of genomes to use for quick_synt, these are assumed to be of same species
 chr_list="Chr_01 Chr_02 Chr_03 Chr_04 Chr_05 Chr_06 Chr_07 Chr_08 Chr_09 Chr_10 Chr_11 Chr_12 Chr_13 Chr_14"
 markers=FALSE #Have not implemented this option
@@ -195,7 +195,7 @@ then
 			done
 
 			#Filter out only chromosomes in chr_list, make anchor_list
-			if [ ${chr_list} ]
+			if [[ ${chr_list} ]]
 			then
 				echo ${chr_list} | tr ' ' '\n' > quick_synt_${ref}/chr_list.txt
 				fgrep -w -f quick_synt_${ref}/chr_list.txt quick_synt_${ref}/ref.bed | \
