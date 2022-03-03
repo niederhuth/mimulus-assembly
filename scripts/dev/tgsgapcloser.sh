@@ -13,9 +13,11 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20 #doesn't seem to want to use more than 6
 datatype="ont" #ont or pb
-racon=FALSE
+racon=TRUE
+racon_rounds=1
 pilon=FALSE
-ngs=
+pilon_round=2
+ngs="wgs/"
 input= #input fasta, if left blank, will look for it in current directory, mutually exclusive with input_dir
 
 #Change to current directory
@@ -23,6 +25,8 @@ cd ${PBS_O_WORKDIR}
 #Export paths to conda
 export PATH="${conda}/envs/test/bin:$PATH"
 export LD_LIBRARY_PATH="${conda}/envs/test/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/polishing/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/polishing/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
@@ -61,11 +65,11 @@ fi
 options="--thread ${threads} --tgstype ${datatype}"
 if [ ${racon} = "TRUE" ]
 then
-	options="${options} --racon ${conda}/envs/test/bin/racon"
+	options="${options} --racon ${conda}/envs/test/bin/racon --r_round ${racon_rounds}"
 fi
 if [ ${pilon} = "TRUE" ]
 then
-	options="${options} --ngs ${ngs} --pilon ${conda}/envs/test/bin/pilon --samtools ${conda}/envs/test/bin/samtools"
+	options="${options} --ngs ${ngs} --pilon ${conda}/envs/test/bin/pilon --samtools ${conda}/envs/test/bin/samtools --p_round ${pilon_round}"
 fi
 if [[ ${racon} = "FALSE" && ${pilon} = "FALSE" ]]
 then
@@ -101,7 +105,4 @@ echo "Done"
 #                                           200bp for pb by default.
 #          --chunk     <chunk_num>          split candidate into chunks to error-correct separately.
 #          --pilon_mem <t_num>              memory used for pilon , 300G for default.
-#          --p_round   <pilon_round>        pilon error-correction round num . 3 by default.
-#          --r_round   <racon_round>        racon error-correction round num . 1 by default.
-#          --g_check                        gapsize diff check , none by default.
 
