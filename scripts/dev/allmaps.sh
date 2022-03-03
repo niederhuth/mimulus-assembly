@@ -11,22 +11,17 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=1
+threads=10
 distance=rank #cM or rank
 primers=TRUE #Paired primer sequences for genetic markers
-quick_synt=TRUE #Use synteny, by mapping transcript seqs, requires quick_synt_ref & quick_synt_transcripts
+primer_sets="Lowery_et_al" #List of primers & associated genetic map
+primer_max_dist=5000 #max distance for primers to be separated
+quick_synt=TRUE #Use synteny, by mapping transcript seqs, requires quick_synt_refs & chr_list
+quick_synt_ref="TOL NONTOL" #List of genomes to use for quick_synt, these are assumed to be of same species
+chr_list="Chr_01 Chr_02 Chr_03 Chr_04 Chr_05 Chr_06 Chr_07 Chr_08 Chr_09 Chr_10 Chr_11 Chr_12 Chr_13 Chr_14"
 markers=FALSE #Have not implemented this option
 synteny=FALSE #Have not implemented this option
 optical=FALSE #Have not implemented this option
-primer_max_dist=5000 #max distance for primers to be separated
-chr_list="Chr_01 Chr_02 Chr_03 Chr_04 Chr_05 Chr_06 Chr_07 Chr_08 Chr_09 Chr_10 Chr_11 Chr_12 Chr_13 Chr_14"
-#chr_list="scaffold_1 scaffold_2 scaffold_3 scaffold_4 scaffold_5 scaffold_6 scaffold_7 scaffold_8 scaffold_9 scaffold_10 scaffold_11 scaffold_12 scaffold_13 scaffold_14"
-#quick_synt_ref="TOL/ref/TOL-v5.fa"
-quick_synt_ref="NONTOL/ref/NONTOL-v4.fa"
-#quick_synt_ref="IM62/ref/IM62-v2.fa"
-#quick_synt_transcripts="TOL/ref/annotations/TOL-v5-cds-primary.fa"
-quick_synt_transcripts="NONTOL/ref/annotations/NONTOL-v4-cds-primary.fa"
-#quick_synt_transcripts="IM62/ref/annotations/IM62-v2-cds-primary.fa"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -42,7 +37,7 @@ sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
 path2=$(pwd | sed s/${genotype}\\/${sample}\\/.*/${genotype}\\/${sample}/)
-path3=allmaps
+path3=$(pwd | sed s/${species}\\/.*/${species}/)
 
 #Look for fasta file, there can only be one!
 if [ -z ${input} ]
@@ -84,116 +79,131 @@ then
 	#Make bowtie index
 	if [ -s bowtie_index/input.rev.2.ebwt ]
 	then
-		echo "bowtie index found"
+		echo "bowtie2 index found"
 	else
-		echo "Building bowtie index"
-		mkdir bowtie_index
-		bowtie-build input.fa bowtie_index/input
+		echo "Building bowtie2 index"
+		mkdir bowtie2_index
+		bowtie2-build input.fa bowtie2_index/input
 	fi
+	for i in ${primer_sets}
+	do
+		if [ -s ${i}_primers/primers.bed ]
+		then
+			echo "${i}_primers/primers.bed already exists, skipping"
+			echo "To repeat this step, delete ${i}_primers/primers.bed and resubmit"
+		else
+			mkdir ${i}_primers
+			#Align primers
+			echo "Aligning primer data with bowtie"
+			bowtie2 \
+				--sam-nohead \
+				--no-unal \
+				--very-sensitive \
+				-f \
+				-X ${primer_max_dist} \
+				-x bowtie2_index/input \
+				-1 ${path1}/genetic_map/${i}_forward_primers.fa \
+				-2 ${path1}/genetic_map/${i}_reverse_primers.fa \
+				-S ${i}_primers/primers.sam
 
-	#Align primers
-	echo "Aligning primer data with bowtie"
-	bowtie \
-		--sam-nohead \
-		--no-unal \
-		-f \
-		-X ${primer_max_dist} \
-		-x bowtie_index/input \
-		-1 ${path1}/genetic_map/Marker_forward_primers.fa \
-		-2 ${path1}/genetic_map/Marker_reverse_primers.fa \
-		-S primers.sam
-
-	#Format primers.bed
-        for i  in $(sed '1d' ${path1}/genetic_map/genetic_map.csv)
-        do
-                M=$(echo ${i} | cut -d ',' -f1)
-                LG=$(echo ${i} | cut -d ',' -f2)
-                GP=$(echo ${i} | cut -d ',' -f3)
-                F=$(grep ${M}_F primers.sam | cut -f1,3,4)
-                Fchr=$(echo ${F} | cut -d ' ' -f2)
-                Fpos=$(echo ${F} | cut -d ' ' -f3)
-                R=$(grep ${M}_R primers.sam | cut -f1,3,4)
-                Rchr=$(echo ${R} | cut -d ' ' -f2)
-                Rpos=$(echo ${R} | cut -d ' ' -f3)
-                if [[ -n ${F} && -n ${R} ]]
-                then
-                        if [ ${Fchr} == ${Rchr} ]
-                        then
-                                echo "Primers ${M} properly paired"
-                                if [ ${Fpos} -gt ${Rpos} ]
-                                then
-                                        echo "${Fchr},${Rpos},${Fpos},LG${LG}:${GP}" | tr ',' '\t' >> primers.bed
-                                elif [ ${Fpos} -lt ${Rpos} ]
-                                then
-                                        echo "${Fchr},${Fpos},${Rpos},"LG"${LG}:${GP}" | tr ',' '\t' >> primers.bed
-                                fi
-                        else
-                                echo "Primers ${M} improperly paired, skipping"
-                        fi
-                elif [[ -n ${F} ]]
-                then
-                        echo "${M} forward primer only"
-                        echo "${Fchr},${Fpos},$(expr ${Fpos} + 1),LG${LG}:${GP}" | tr ',' '\t' >> primers.bed
-                elif [[ -n ${R} ]]
-                then
-                        echo "${M} reverse primer only"
-                        echo "${Rchr},${Fpos},$(expr ${Rpos} + 1),LG${LG}:${GP}" | tr ',' '\t' >> primers.bed
-                else
-                        echo "Primers ${M} missing data" >> missing_primers.txt
-                fi
-                F=""
-                R=""
-        done
-
-	#Add to list of data for allmaps
-	position_data="${position_data} primers.bed"
+			#Format primers.bed
+			for i  in $(sed '1d' ${path1}/genetic_map/${i}_genetic_map.csv)
+			do
+				M=$(echo ${i} | cut -d ',' -f1)
+				LG=$(echo ${i} | cut -d ',' -f2)
+				GP=$(echo ${i} | cut -d ',' -f3)
+				F=$(grep ${M}_F ${i}_primers/primers.sam | cut -f1,3,4)
+				Fchr=$(echo ${F} | cut -d ' ' -f2)
+				Fpos=$(echo ${F} | cut -d ' ' -f3)
+				R=$(grep ${M}_R ${i}_primers/primers.sam | cut -f1,3,4)
+				Rchr=$(echo ${R} | cut -d ' ' -f2)
+				Rpos=$(echo ${R} | cut -d ' ' -f3)
+				if [[ -n ${F} && -n ${R} ]]
+				then
+					if [ ${Fchr} == ${Rchr} ]
+					then
+						echo "Primers ${M} properly paired"
+						if [ ${Fpos} -gt ${Rpos} ]
+						then
+							echo "${Fchr},${Rpos},${Fpos},LG${LG}:${GP}" | tr ',' '\t' >> ${i}_primers/primers.bed
+						elif [ ${Fpos} -lt ${Rpos} ]
+						then
+							echo "${Fchr},${Fpos},${Rpos},"LG"${LG}:${GP}" | tr ',' '\t' >> ${i}_primers/primers.bed
+						fi
+					else
+						echo "Primers ${M} improperly paired, skipping"
+					fi
+				elif [[ -n ${F} ]]
+				then
+					echo "${M} forward primer only"
+					echo "${Fchr},${Fpos},$(expr ${Fpos} + 1),LG${LG}:${GP}" | tr ',' '\t' >> ${i}_primers/primers.bed
+				elif [[ -n ${R} ]]
+				then
+					echo "${M} reverse primer only"
+					echo "${Rchr},${Fpos},$(expr ${Rpos} + 1),LG${LG}:${GP}" | tr ',' '\t' >> ${i}_primers/primers.bed
+				else
+					echo "Primers ${M} missing data" >> ${i}_primers/missing_primers.txt
+				fi
+				F=""
+				R=""
+			done
+		fi
+		#Add to list of data for allmaps
+		position_data="${position_data} ${i}_primers/primers.bed"
+	done
 fi
 
 #Quick Synteny data
 if [ ${quick_synt} = "TRUE" ]
 then
-	path4=$(pwd | sed s/${species}\\/.*/${species}/)
-	#Copy over quick_synt_ref
-	cp ${path4}/${quick_synt_ref} ref.fa
-	for i in input ref
+	for ref in ${quick_synt_ref}
 	do
-		#Map transcripts to fasta
-		minimap2 -x splice ${i}.fa ${path4}/${quick_synt_transcripts} > ${i}.paf 
+		if [ -s quick_synt_${ref}/${ref}_synteny.bed ]
+		then
+			echo "quick_synt_${ref}/${ref}_synteny.bed already exists, skipping"
+			echo "To repeat this step, delete quick_synt_${ref}/${ref}_synteny.bed and resubmit"
+		else
+			#Copy over quick_synt_ref
+			mkdir quick_synt_${ref}
+			cp ${path3}/${ref}/ref/${ref}-v*.fa quick_synt_${ref}/${ref}.fa
+			cp ${path3}/${ref}/ref/annotations/${ref}-v*-cds-primary.fa quick_synt_${ref}/${ref}-cds-primary.fa
+			for i in input ref
+			do
+				#Map transcripts to fasta
+				minimap2 -x splice ${i}.fa ${path4}/${quick_synt_transcripts} > quick_synt_${ref}/${i}.paf 
 
-		#Convert to bed file
-		awk -v OFS="\t" '{print $6,$8,$9,$1,100,$5}' ${i}.paf > ${i}_aln.bed
+				#Convert to bed file
+				awk -v OFS="\t" '{print $6,$8,$9,$1,100,$5}' quick_synt_${ref}/${i}.paf > quick_synt_${ref}/${i}_aln.bed
 
-		#Retain only unique alignments
-		cut -f4 ${i}_aln.bed | sort | uniq -c | sed 's/^ *//' | \
-		awk -v FS=" " '{if ($1 == 1) print $2}' > tmp
-		fgrep -f tmp ${i}_aln.bed > ${i}.bed
-		rm tmp
+				#Retain only unique alignments
+				cut -f4 quick_synt_${ref}/${i}_aln.bed | sort | uniq -c | sed 's/^ *//' | \
+				awk -v FS=" " '{if ($1 == 1) print $2}' > quick_synt_${ref}/tmp
+				fgrep -f quick_synt_${ref}/tmp quick_synt_${ref}/${i}_aln.bed > quick_synt_${ref}/${i}.bed
+				rm quick_synt_${ref}/tmp
+			done
+
+			#Filter out only chromosomes in chr_list, make anchor_list
+			if [ ${chr_list} ]
+			then
+				echo ${chr_list} | tr ' ' '\n' > quick_synt_${ref}/chr_list.txt
+				fgrep -w -f quick_synt_${ref}/chr_list.txt quick_synt_${ref}/ref.bed | cut -f4 > quick_synt_${ref}/anchor_list
+			else
+				cut -f4 quick_synt_${ref}/ref.bed > quick_synt_${ref}/anchor_list
+			fi
+
+			#Make anchors
+			fgrep -f quick_synt_${ref}/anchor_list quick_synt_${ref}/input.bed | cut -f4 | \
+			awk -v OFS="\t" '{print $1,$1,100}' > quick_synt_${ref}/ref.input.1x1.anchors
+
+			#Build synteny.bed
+			python -m jcvi.assembly.syntenypath bed \
+				--switch \
+				quick_synt_${ref}/ref.input.1x1.anchors \
+				-o quick_synt_${ref}/${ref}_synteny.bed
+		fi
+		#Add to list of data for allmaps
+		position_data="${position_data} quick_synt_${ref}/${ref}_synteny.bed "
 	done
-
-	#Filter out only chromosomes in chr_list, make anchor_list
-	if [ ${chr_list} ]
-	then
-		echo ${chr_list} | tr ' ' '\n' > chr_list.txt
-		fgrep -w -f chr_list.txt ref.bed | cut -f4 > anchor_list
-	else
-		cut -f4 ref.bed > anchor_list
-	fi
-
-	#Make anchors
-	fgrep -f anchor_list input.bed | cut -f4 | \
-	awk -v OFS="\t" '{print $1,$1,100}' > ref.input.1x1.anchors
-
-	#Build synteny.bed
-	python -m jcvi.assembly.syntenypath bed \
-		--switch \
-		ref.input.1x1.anchors \
-		-o synteny.bed
-
-	#Clean up fasta files
-	rm ref.fa
-
-	#Add to list of data for allmaps
-	position_data="${position_data} synteny.bed "
 fi
 
 #Merge files and create weights file
