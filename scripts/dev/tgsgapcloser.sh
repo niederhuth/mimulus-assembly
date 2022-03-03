@@ -91,8 +91,8 @@ fi
 #Run tgsgapcloser
 echo "Running tgsgapcloser"
 tgsgapcloser \
-	--min_idy ${min_identity}
-	--min_match ${min_match}
+	--min_idy ${min_identity} \
+	--min_match ${min_match} \
 	--scaff ../${input} \
 	--reads ${reads} \
 	--output tgsgapcloser \
