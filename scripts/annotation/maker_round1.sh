@@ -63,6 +63,12 @@ else
 	cd ${path2}
 fi
 
+#Copy over rmlib
+if [ ! -s TElib.fa ]
+then
+	cp ../edta/*.fa.mod.EDTA.TElib.fa TElib.fa
+fi
+
 #Run maker
 mpiexec -n ${mpi} maker \
 	-genome ../${fasta} \

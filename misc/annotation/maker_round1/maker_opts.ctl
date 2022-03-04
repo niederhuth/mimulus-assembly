@@ -24,7 +24,7 @@ protein_gff=../exonerate/protein_alignments.gff  #aligned protein homology evide
 
 #-----Repeat Masking (leave values blank to skip repeat masking)
 model_org= #select a model organism for RepBase masking in RepeatMasker
-rmlib=../edta/*.fa.mod.EDTA.TElib.fa #provide an organism specific repeat library in fasta format for RepeatMasker
+rmlib=TElib.fa #provide an organism specific repeat library in fasta format for RepeatMasker
 repeat_protein= #provide a fasta file of transposable element proteins for RepeatRunner
 rm_gff= #pre-identified repeat elements from an external GFF3 file
 prok_rm=0 #forces MAKER to repeatmask prokaryotes (no reason to change this), 1 = yes, 0 = no

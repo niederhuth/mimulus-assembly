@@ -15,6 +15,7 @@ threads=20 #doesn't seem to want to use more than 6
 datatype="ont" #ont or pb
 min_identity=0.3 #minimum identity for filter reads: 0.3 for ont by default/0.2 for pb by default.
 min_match=300 #min match length for filter reads: 300bp for ont by default/200bp for pb by default.
+chunk_number=10 #number of chunks to use
 racon=TRUE
 racon_rounds=1
 pilon=FALSE
@@ -66,11 +67,11 @@ fi
 options="--thread ${threads} --tgstype ${datatype}"
 if [ ${racon} = "TRUE" ]
 then
-	options="${options} --racon ./ --r_round ${racon_rounds}"
+	options="${options} --racon ./ --r_round ${racon_rounds} --chunk ${chunks}"
 fi
 if [ ${pilon} = "TRUE" ]
 then
-	options="${options} --ngs ${ngs} --pilon ./ --samtools ./ --java ./ --p_round ${pilon_round} --pilon_mem ${pilon_mem}"
+	options="${options} --ngs ${ngs} --pilon ./ --samtools ./ --java ./ --p_round ${pilon_round} --pilon_mem ${pilon_mem} --chunk ${chunks}"
 fi
 if [[ ${racon} = "FALSE" && ${pilon} = "FALSE" ]]
 then
