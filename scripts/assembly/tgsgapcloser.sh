@@ -18,7 +18,7 @@ min_match=300 #min match length for filter reads: 300bp for ont by default/200bp
 racon=TRUE
 racon_rounds=1
 pilon=FALSE
-ngs="wgs/"
+ngs="wgs/" #Have not implemented yet!
 pilon_round=2
 pilon_mem="300G" #memory used for pilon , 300G for default.
 input= #input fasta, if left blank, will look for it in current directory, mutually exclusive with input_dir
@@ -26,10 +26,8 @@ input= #input fasta, if left blank, will look for it in current directory, mutua
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/test/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/test/lib:$LD_LIBRARY_PATH"
-export PATH="${conda}/envs/polishing/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/polishing/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/scaffolding/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/scaffolding/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
