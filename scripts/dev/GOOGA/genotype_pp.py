@@ -2,6 +2,7 @@
 import sys
 from math import exp,log
 
+
 def foward_backward(obs, states, start_p,transition_probability,er):
 	alpha=[{} for j in range(len(obs))] # forward:: alpha[j][X] is probability that true genotye is X at marker j (starts at 0)
 	beta= [{} for j in range(len(obs))] # backward:: beta[j][X] is probability that true genotye is X at marker j (starts at 0)
@@ -36,7 +37,7 @@ def foward_backward(obs, states, start_p,transition_probability,er):
 			for y in states:
 				alpha[t][y] = alpha[t][y]/normalizer
 		LLobs=lnFactor+log(alpha[len(obs)-1]['AA']+alpha[len(obs)-1]['BB'])	
-	return LLobs,alpha,beta
+	return(LLobs,alpha,beta)
 
 
 def emission_probability(genotype,calledG,ER): # cc [ AA,AB,BB,NN ] 
@@ -68,7 +69,7 @@ def emission_probability(genotype,calledG,ER): # cc [ AA,AB,BB,NN ]
 	elif Cross_type == 1:
 		e2 = ER[0] 
 		if calledG == 'NN':
-			return 1.0
+			return(1.0)
 		elif calledG == 'AA':
 			if genotype == 'AA':
 				prob = 1 - e2 
@@ -79,11 +80,11 @@ def emission_probability(genotype,calledG,ER): # cc [ AA,AB,BB,NN ]
 				prob = e2 
 			elif genotype == 'BB':
 				prob = 1-e2
-	return prob
+	return(prob)
 
 
-
-######################################## Main program
+####################
+### Main Program ###
 
 LG = sys.argv[1]
 error_rate_file = sys.argv[2]
@@ -109,9 +110,6 @@ MINFO=[]
 cc=0
 inY = open(map_file,"rU")  # relevant map
 for line_idx, line in enumerate(inY): 
-# 11	224041	0.0224242323879
-# 11	634494	0.0527302850596
-# map.1.txt	79_0	0.014655172413793
 	cols = line.replace('\n', '').split('\t')
 	if cols[0]==LG:
 		Position[cols[0]+"_"+cols[1]]=cc
@@ -132,7 +130,6 @@ for idx1, line in enumerate(srx):
 	src = open("g."+plantID+".txt", "rU")
 	for line_idx, line in enumerate(src):
 		cols = line.replace('\n', '').split('\t') 
-	# isg480	1	400000	AB
 		if plantID != cols[0]:
 			print("Whoa")
 		if line_idx == 0:

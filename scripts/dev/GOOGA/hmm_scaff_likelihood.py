@@ -21,14 +21,14 @@ rbp = 0.1/1000000.0  # recombination rate per bp (morgans / megabase)
 
 def calc_v0(e_rates): 
 	def scipy_ln_like0(x):
-		return -LL(x)
+		return(-LL(x))	
 	bounds = [ (zy,0.5), (zy,0.5), (zy,1.0-zy) ]
 	best, val, d = optimize.fmin_l_bfgs_b(scipy_ln_like0, e_rates, approx_grad=True, bounds=bounds)
 	solution = list(best)
 	ln_l = -scipy_ln_like0(solution)
 	solution.append(ln_l)
 	#zbob=ln_like0(parents,famStr,RRL,RAL,AAL,FLnum,1, list(best),matplant)
-	return solution
+	return(solution)
 
 
 def foward_backward(obs, states, start_p,transition_probability,er):
@@ -46,7 +46,7 @@ def foward_backward(obs, states, start_p,transition_probability,er):
 		lnFactor+=log(normalizer)
 		for y in states:
 			alpha[t][y] = alpha[t][y]/normalizer
-	# Likelihood of observed states
+	#Likelihood of observed states
 	LLobs=lnFactor+log(alpha[len(obs)-1]['AA']+alpha[len(obs)-1]['AB']+alpha[len(obs)-1]['BB'])
 	beta=[{} for j in range(len(obs))] # backward:: beta[j][X] is probability that true genotye is X at marker j (starts at 0)
 	for y in states:
@@ -60,7 +60,7 @@ def foward_backward(obs, states, start_p,transition_probability,er):
 		normalizer = max(beta[t]['AA'],beta[t]['AB'],beta[t]['BB'])
 		for y in states:
 			beta[t][y] = beta[t][y]/normalizer
-	return alpha,beta,LLobs
+	return(alpha,beta,LLobs)
 
 
 def emission_probability(genotype,calledG,x): #cc [AA,AB,BB,NN]
@@ -89,7 +89,7 @@ def emission_probability(genotype,calledG,x): #cc [AA,AB,BB,NN]
 			prob = beta/2
 		elif genotype == 'BB':
 			prob = 1-e1-e2
-	return prob
+	return(prob)
 	
  
 def LL(x):
@@ -118,22 +118,19 @@ def LL(x):
 		else:
 			llx=0.0
 		Total_LL+=llx
-	#print x,Total_LL
-	return Total_LL
+	return(Total_LL)
 
 
-####################################################################################################
-### Main Program
+####################
+### Main Program ###
 
 states = ('AA','AB','BB')
 start_probability = {'AA':0.25,'AB':0.5,'BB':0.25}
 
-inZ = open("bad.marks.txt","rU")
+inZ = open("bad_marks.txt","r")
 badmark={}
 for line_idx, line in enumerate(inZ):
-	cols = line.replace('\n', '').split('\t') 
-
-# 103a	100000	
+	cols = line.replace('\n', '').split('\t') 	
 	key=cols[0]+"_"+cols[1]
 	badmark[key]=1
 
@@ -143,7 +140,7 @@ v1scaffs={}
 Gcalls={}
 cscaff=''
 calls_total=0
-src  =open("g."+plantID+".txt", "rU")
+src=open(plantID+"_genotype.txt", "r")
 for line_idx, line in enumerate(src):
 	cols = line.replace('\n', '').split('\t') 
 # isg480	1	400000	AB

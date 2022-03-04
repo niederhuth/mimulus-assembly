@@ -15,7 +15,7 @@ threads=20 #threads for mpileup
 threads2=5 #threads for call
 max_alleles=2 #Max allele count for filtering, recommend 2 for now
 maf=0.1 #Minor allele frequency, assuming this data is from F2s or F3s, so keeping high
-max_non_ref_af=0.9 #Maximum non-ref allele frequencyi, use to eliminate allels without ref allele
+max_non_ref_af=0.9 #Maximum non-ref allele frequency, use to eliminate positions without ref allele
 max_missing=0.2 #Max number of samples can be missing calls
 
 #In general dont change this, unless using a similar datatype
@@ -117,7 +117,7 @@ do
 			sample=$(grep "#CHROM" ${vcf} | cut -f${a} | sed s/bam_files\\/// | sed s/.bam//)
 			#Cut the propter columsn and output g_file
 			cut -f1,2,${a} ${vcf} | grep -v \# | sed s/\:.*// |\
-			awk -v OFS="\t" -v x=${sample} '{print x,$0}' > g_files/g.${sample}.txt
+			awk -v OFS="\t" -v x=${sample} '{print x,$0}' > g_files/${sample}_genotype.txt
 			#Add 1 to the column
 			a=$(expr ${a} + 1)
 		done
