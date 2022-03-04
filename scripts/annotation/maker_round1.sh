@@ -1,6 +1,6 @@
 #!/bin/bash --login
 #SBATCH --time=168:00:00
-#SBATCH --ntasks=4
+#SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=100GB
 #SBATCH --job-name maker_round1
@@ -70,9 +70,9 @@ then
 fi
 
 #Run maker
-mpiexec -n ${mpi} maker \
+#mpiexec -n ${mpi} maker \
+maker \
 	-genome ../${fasta} \
-	-cpus ${blast_threads} \
 	${path1}/annotation/maker_round1/*
 
 echo "Done"
