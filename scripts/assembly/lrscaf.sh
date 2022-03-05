@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=40
 datatype="ont"
-reads="fastq/ont/clean.fastq.gz"
+reads="clean.fastq.gz"
 input="" #Input assembly, if left blank, will search for fasta file
 
 #Change to current directory
@@ -99,7 +99,7 @@ else
 		-t ${threads} \
 		-x ${preset} \
 		../${input} \
-		${path2}/fastq/${datatype}/clean.fastq.gz > mapping.paf
+		${path2}/fastq/${datatype}/${reads} > mapping.paf
 fi
 
 if [ -d logs ]

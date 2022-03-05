@@ -11,8 +11,18 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
-datatype="ont"
+threads=20 #doesn't seem to want to use more than 6
+datatype="ont" #ont or pb
+min_identity=0.3 #minimum identity for filter reads: 0.3 for ont by default/0.2 for pb by default.
+min_match=300 #min match length for filter reads: 300bp for ont by default/200bp for pb by default.
+chunk_number=10 #number of chunks to use
+racon=TRUE
+racon_rounds=1
+pilon=FALSE
+ngs="wgs/" #Have not implemented yet!
+pilon_round=2
+pilon_mem="300G" #memory used for pilon , 300G for default.
+input= #input fasta, if left blank, will look for it in current directory, mutually exclusive with input_dir
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -28,7 +38,7 @@ sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 assembly=$(pwd | sed s/^.*\\///)
 path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
-path3="tgsgapcloser"
+reads="${path2}/fastq/${datatype}/clean.fastq.gz"
 
 #Look for fasta file, there can only be one!
 if [ -z ${input} ]
@@ -53,23 +63,39 @@ else
 	echo "Input fasta: ${input}"
 fi
 
-#Make and cd to output directory
-if [ -d ${path3} ]
+#Set options
+options="--thread ${threads} --tgstype ${datatype}"
+if [ ${racon} = "TRUE" ]
 then
-	cd ${path3}
-else
-	mkdir ${path3}
-	cd ${path3}
+	options="${options} --racon ./ --r_round ${racon_rounds} --chunk ${chunks}"
+fi
+if [ ${pilon} = "TRUE" ]
+then
+	options="${options} --ngs ${ngs} --pilon ./ --samtools ./ --java ./ --p_round ${pilon_round} --pilon_mem ${pilon_mem} --chunk ${chunks}"
+fi
+if [[ ${racon} = "FALSE" && ${pilon} = "FALSE" ]]
+then
+	options="--ne"
 fi
 
-#Run TGS-GapCloser
-echo "Running TGS-GapCloser"
+#Make and cd to workign directory
+if [ -d tgsgapcloser ]
+then
+	cd tgsgapcloser
+else
+	mkdir tgsgapcloser
+	cd tgsgapcloser
+fi
+
+#Run tgsgapcloser
+echo "Running tgsgapcloser"
 tgsgapcloser \
+	--min_idy ${min_identity} \
+	--min_match ${min_match} \
 	--scaff ../${input} \
-	--reads ${path2}/fastq/${datatype}/clean.fastq.gz \
+	--reads ${reads} \
 	--output tgsgapcloser \
-	--ne \
-	--tgstype ${datatype} \
-	--thread ${threads} \
+	${options}
 
 echo "Done"
+
