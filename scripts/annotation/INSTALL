@@ -21,8 +21,15 @@ cd gmes_linux_64
 perl change_path_in_perl_scripts.pl ~/miniconda3/envs/maker/bin/
 and copy contents to miniconda3/envs/maker/bin/
 
-#Maker without MPI
+#Maker with MPI
 #Install condo environment - has most of prerequisites
 conda env create -f maker_mpi.yml
 conda activate maker
 #
+
+
+mkdir build
+cd build
+unset F90
+unset F90FLAGS
+../mpich-4.0.1/configure FFLAGS=-fallow-argument-mismatch FCFLAGS=-fallow-argument-mismatch --prefix=/mnt/home/niederhu/miniconda3/envs/maker_mpi/bin/ 2>&1 | tee c.txt
