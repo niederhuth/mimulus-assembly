@@ -14,7 +14,7 @@ exonerate=/mnt/home/niederhu/miniconda3/envs/maker/bin/exonerate #location of ex
 
 #-----Ab-initio Gene Prediction Algorithms
 snap=/mnt/home/niederhu/miniconda3/envs/maker/bin/snap #location of snap executable
-gmhmme3=/mnt/home/niederhu/miniconda3/envs/maker/bin/gmhmme3 #location of eukaryotic genemark executable
+gmhmme3= #location of eukaryotic genemark executable
 gmhmmp= #location of prokaryotic genemark executable
 augustus=/mnt/home/niederhu/miniconda3/envs/maker/bin/augustus #location of augustus executable
 fgenesh= #location of fgenesh executable
@@ -23,4 +23,4 @@ tRNAscan-SE=/mnt/home/niederhu/miniconda3/envs/maker/bin/tRNAscan-SE #location o
 snoscan=/mnt/home/niederhu/miniconda3/envs/maker/bin/snoscan #location of snoscan executable
 
 #-----Other Algorithms
-probuild=/mnt/home/niederhu/miniconda3/envs/maker/bin/probuild #location of probuild executable (required for genemark)
+probuild= #location of probuild executable (required for genemark)
