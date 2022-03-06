@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=40
 #SBATCH --mem=50GB
 #SBATCH --job-name stringtie
-#SBATCH --output=../job_reports/%x-%j.SLURMout
+#SBATCH --output=%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -16,14 +16,14 @@ bam="../SRrna/Aligned.sortedByCoord.out.bam" #Can be space separated list
 read_type="rf" #fr: fr-secondstrand, rf: fr-firststrand, lr: longread, mix: mix lr & shortread
 #To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
 trim=TRUE #use coverage based trimming of transcript ends
-min_multi_exon_reads="1.5" #min reads per bp cov for multi-exon transcript default: 1
+min_multi_exon_reads="1" #min reads per bp cov for multi-exon transcript default: 1
 min_single_exon_reads="4.75" #min reads per bp cov for single-exon transcript default: 4.75, 1.5 for long-reads
-min_iso_frac="0.05" #minimum isoform fraction default: 0.01
+min_iso_frac="0.01" #minimum isoform fraction default: 0.01
 max_gap="50" #maximum gap allowed between read mappings default: 50, set to 0 for long-reads
 min_transcript_len="200" #minimum assembled transcript length default: 200
 min_anchor_len="10" #minimum anchor length for junctions default: 10
 min_junc_cov="1" #minimum junction coverage default: 1
-frac_multi_hit="0.95" #fraction of bundle allowed to be covered by multi-hit reads default: 1
+frac_multi_hit="1" #fraction of bundle allowed to be covered by multi-hit reads default: 1
 LR_splice_window="25" #window around possibly erroneous splice sites from long reads default: 25
 
 #Change to current directory
