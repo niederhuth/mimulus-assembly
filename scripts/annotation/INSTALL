@@ -1,15 +1,21 @@
+#Maker without MPI
+#Install condo environment - has most of prerequisites
 conda env create -f maker.yml
 
-Download genemark-ES http://exon.gatech.edu/GeneMark/license_download.cgi
-unzip and copy contents to miniconda3/envs/maker/bin/
+#I
 Download maker https://www.yandell-lab.org/software/maker.html
 unzip
 cd maker/src
 perl Build.pl
 ./Build install
 cd ..
-cp bin/* miniconda3/envs/maker/bin/
-cp lib/* miniconda3/envs/maker/lib/
-cp -R src miniconda3/envs/maker/
-cp -R perl miniconda3/envs/maker/
+cp bin/* ~/miniconda3/envs/maker/bin/
+cp -R lib/* ~/miniconda3/envs/maker/lib/
+cp -R src ~/miniconda3/envs/maker/
+cp -R perl ~/miniconda3/envs/maker/
 
+Download genemark-ES http://exon.gatech.edu/GeneMark/license_download.cgi
+unzip 
+cd gmes_linux_64
+perl change_path_in_perl_scripts.pl ~/miniconda3/envs/maker/bin/
+and copy contents to miniconda3/envs/maker/bin/

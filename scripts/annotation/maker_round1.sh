@@ -26,9 +26,9 @@ export AUGUSTUS_CONFIG_PATH="${conda}/envs/maker/config/"
 #export REPEATMASKER_MATRICES_DIR=
 
 #Set temporary directories for large memory operations
-export TMPDIR=$(pwd | sed s/data.*/data/)
-export TMP=$(pwd | sed s/data.*/data/)
-export TEMP=$(pwd | sed s/data.*/data/)
+export TMPDIR=$(pwd)
+export TMP=$(pwd)
+export TEMP=$(pwd)
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
