@@ -84,5 +84,8 @@ stringtie ${bam} \
 	-o ${path2} \
 	-l stringtie 
 
+#Convert to gff
+gffread stringtie > stringtie.gff
+
 echo "Done"
 
