@@ -3,11 +3,11 @@ genome= #genome sequence (fasta file or fasta embeded in GFF3 file)
 organism_type=eukaryotic #eukaryotic or prokaryotic. Default is eukaryotic
 
 #-----Re-annotation Using MAKER Derived GFF3
-maker_gff= #MAKER derived GFF3 file
+maker_gff=rm.gff #MAKER derived GFF3 file
 est_pass=0 #use ESTs in maker_gff: 1 = yes, 0 = no
 altest_pass=0 #use alternate organism ESTs in maker_gff: 1 = yes, 0 = no
 protein_pass=0 #use protein alignments in maker_gff: 1 = yes, 0 = no
-rm_pass=0 #use repeats in maker_gff: 1 = yes, 0 = no
+rm_pass=1 #use repeats in maker_gff: 1 = yes, 0 = no
 model_pass=0 #use gene models in maker_gff: 1 = yes, 0 = no
 pred_pass=0 #use ab-initio predictions in maker_gff: 1 = yes, 0 = no
 other_pass=0 #passthrough anyything else in maker_gff: 1 = yes, 0 = no
@@ -24,7 +24,7 @@ protein_gff=../exonerate/protein_alignments.gff  #aligned protein homology evide
 
 #-----Repeat Masking (leave values blank to skip repeat masking)
 model_org= #select a model organism for RepBase masking in RepeatMasker
-rmlib=TElib.fa #provide an organism specific repeat library in fasta format for RepeatMasker
+rmlib= #provide an organism specific repeat library in fasta format for RepeatMasker
 repeat_protein= #provide a fasta file of transposable element proteins for RepeatRunner
 rm_gff= #pre-identified repeat elements from an external GFF3 file
 prok_rm=0 #forces MAKER to repeatmask prokaryotes (no reason to change this), 1 = yes, 0 = no
