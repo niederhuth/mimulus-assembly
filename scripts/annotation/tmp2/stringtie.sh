@@ -18,7 +18,7 @@ read_type="rf" #fr: fr-secondstrand, rf: fr-firststrand, lr: longread, mix: mix 
 trim=TRUE #use coverage based trimming of transcript ends
 min_multi_exon_reads="1" #min reads per bp cov for multi-exon transcript default: 1
 min_single_exon_reads="4.75" #min reads per bp cov for single-exon transcript default: 4.75, 1.5 for long-reads
-min_iso_frac="0.05" #minimum isoform fraction default: 0.01
+min_iso_frac="0.01" #minimum isoform fraction default: 0.01
 max_gap="50" #maximum gap allowed between read mappings default: 50, set to 0 for long-reads
 min_transcript_len="200" #minimum assembled transcript length default: 200
 min_anchor_len="10" #minimum anchor length for junctions default: 10
@@ -81,26 +81,8 @@ stringtie ${bam} \
 	-a ${min_anchor_len} \
 	-j ${min_junc_cov} \
 	-M ${frac_multi_hit} \
-	-o ${path2}.gtf \
+	-o ${path2} \
 	-l stringtie 
-
-<<<<<<< HEAD
-#Convert gtf to gff3
-echo "Converting gtf to gff3"
-gffread ${path2}.gtf -o tmp.gff
-
-#Sort the gff file. Maybe unnecessary, but just in case
-echo "Sorting gff file"
-gff3_sort -g tmp.gff -og ${path2}.gff
-
-#Modify gff for maker
-echo "Modifying for maker"
-cat ${path2}.gff | sed -i 's/transcript/expressed_sequence_match/g' | \
-sed -i 's/exon/match_part/g' > ${path2}_maker_input.gff
-=======
-#Convert to gff
-gffread stringtie > stringtie.gff
->>>>>>> bc0f01680f9777faafa616acb452f1a78d0eabc9
 
 echo "Done"
 
