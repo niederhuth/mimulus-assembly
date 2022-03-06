@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=200GB
 #SBATCH --job-name maker_round1
-#SBATCH --output=../job_reports/%x-%j.SLURMout
+#SBATCH --output=%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -72,7 +72,7 @@ export TEMP=$(pwd)
 if [ ! -s repeatmasker.gff ]
 then
 	#Repeatmasker gff file is in gff2 and has non-unique IDs, which maker hates, so we have to fix this
-	sed '1,3d' ../repeatmasker/${fasta}.out.gff3 | sed s/Target\ \"/Repeat=/ | sed s/\".*// | \
+	sed '1,3d' ../repeatmasker/${fasta}.out.gff | sed s/Target\ \"/Repeat=/ | sed s/\".*// | \
 	awk -v OFS="\t" '{a+=1}{print $1,$2,$3,$4,$5,".",$7,$8,"ID="a";"$9}' > repeatmasker.gff
 fi
 
