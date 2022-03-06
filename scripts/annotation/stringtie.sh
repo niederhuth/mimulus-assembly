@@ -81,8 +81,21 @@ stringtie ${bam} \
 	-a ${min_anchor_len} \
 	-j ${min_junc_cov} \
 	-M ${frac_multi_hit} \
-	-o ${path2} \
+	-o ${path2}.gtf \
 	-l stringtie 
+
+#Convert gtf to gff3
+echo "Converting gtf to gff3"
+gffread ${path2}.gtf -o tmp.gff
+
+#Sort the gff file. Maybe unnecessary, but just in case
+echo "Sorting gff file"
+gff3_sort -g tmp.gff -og ${path2}.gff
+
+#Modify gff for maker
+echo "Modifying for maker"
+cat ${path2}.gff | sed -i 's/transcript/expressed_sequence_match/g' | \
+sed -i 's/exon/match_part/g' > ${path2}_maker_input.gff
 
 echo "Done"
 
