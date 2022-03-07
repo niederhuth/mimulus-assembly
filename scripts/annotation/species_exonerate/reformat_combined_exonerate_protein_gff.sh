@@ -19,4 +19,5 @@ gff3_sort -g tmp.gff -og ${name}.gff
 rm tmp.gff
 
 #Modify for maker
-cat ${name}.gff | sed 's/mRNA/protein_match/g' | sed 's/exon/match_part/g' > ${name}_maker_input.gff
+cat ${name}.gff | sed 's/mRNA/protein_match/g' | \
+sed 's/exon/match_part/g' | sed s/protein2genome/protein_gff\:protein2genome/ > ${name}_maker_input.gff
