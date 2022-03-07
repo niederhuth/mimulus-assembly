@@ -1,9 +1,9 @@
 #!/bin/bash --login
-#SBATCH --time=24:00:00
+#SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=40
-#SBATCH --mem=510GB
+#SBATCH --cpus-per-task=44
+#SBATCH --mem=100GB
 #SBATCH --job-name align-rna-SR-annotation
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
@@ -11,12 +11,10 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=40
+threads=40 #for HISAT2
+threads2=4 #for samtools sort
 fasta=$(ls -l *.fa | sed s/.*\ //)
-genomeSAindexNbases=13 #14 default
-IntronMin=10
-IntronMax=5000
-BAMsortRAM=7035318712
+options="--rna-strandness F --very-sensitive"
 datatype="rna"
 
 
@@ -35,63 +33,117 @@ genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="annotation"
 assembly=$(pwd | sed s/^.*\\///)
-path2="$(pwd | sed s/annotation.*//)/fastq/${datatype}"
-path3="SRrna"
+path2="SRrna"
 
 #Make & cd to directory
-if [ -d ${path3} ]
+if [ -d ${path2} ]
 then
-	cd ${path3}
+	cd ${path2}
 else
-	mkdir ${path3}
-	cd ${path3}
+	mkdir ${path2}
+	cd ${path2}
 fi
 
-#Make STAR index
-if [ ! -d STAR ]
+#Make HISAT2 index
+if [ -d hisat2_index ]
 then
-	echo "Making STAR index"
-	STAR \
-		--runThreadN ${threads} \
-		--runMode genomeGenerate \
-		--genomeDir STAR/ \
-		--genomeFastaFiles ../${fasta} \
-		--genomeSAindexNbases ${genomeSAindexNbases}
-else
-	echo "STAR index found"
+	mkdir hisat2_index
 fi
 
-#Adapter fasta, set automatically from misc/samples.csv
-adapters=$(awk -v FS="," \
+if [ -s hisat2_index/${fasta}.8.ht2 ]
+then
+	echo "Making HISAT2 index"
+	hisat2-build ../${fasta} hisat2_index/${fasta}.8.ht2
+else
+	echo "HISAT2 index found"
+fi
+
+#Get list of datasets
+datasets=$(awk -v FS="," \
 	-v a=${species} \
 	-v b=${genotype} \
 	-v c=${sample} \
-	-v d=${condition} \
-	-v e=${datatype} \
-	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $8}' \
+	'{if ($1 == a && $2 == b && $3 == c) print $5}' \
 	${path1}/samples.csv)
 
-#Fastq files, these should not have to be changed, but should set automatically
-r1="${path2}/combined.1.fastq.gz"
-r2="${path2}/combined.2.fastq.gz"
-t1="${path2}/trimmed.1.fastq.gz"
-t2="${path2}/trimmed.2.fastq.gz"
-t3="${path2}/trimmed.1.single.fastq.gz"
-t4="${path2}/trimmed.2.single.fastq.gz"
-if ls ${path2}/*_R1_001.fastq.gz >/dev/null 2>&1
-then
-	if ls ${path2}/*_R2_001.fastq.gz >/dev/null 2>&1
+for i in ${datasets}
+do
+	species2=$(echo ${i} | sed s/_.*//)
+	genotype2=$(echo ${i} | sed s/${species2}_// | sed s/_.*//)
+	sample2=$(echo ${i} | sed s/.*_//)
+	path3=$(pwd | sed s/data\\/.*/data\\/${i}/ | sed s/_/\\//g)
+	path4="${path3}/fastq/${datatype}/annotation"
+	bam="${species2}_${genotype2}_${sample2}.bam"
+
+	echo "Working on data ${species2} ${genotype2} ${sample2}"
+
+	#Adapter fasta, set automatically from misc/samples.csv
+	adapters=$(awk -v FS="," \
+		-v a=${species2} \
+		-v b=${genotype2} \
+		-v c=${sample2} \
+		-v d=${condition} \
+		-v e=${datatype} \
+		'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $8}' \
+		${path1}/annotation/annotation_sources.csv)
+
+	#Fastq files, these should not have to be changed, but should set automatically
+	r1="${path4}/combined.1.fastq.gz"
+	r2="${path4}/combined.2.fastq.gz"
+	t1="${path4}/trimmed.1.fastq.gz"
+	t2="${path4}/trimmed.2.fastq.gz"
+	t3="${path4}/trimmed.1.single.fastq.gz"
+	t4="${path4}/trimmed.2.single.fastq.gz"
+	if ls ${path4}/*_R1_001.fastq.gz >/dev/null 2>&1
 	then
-		echo "Data is Paired-end"
-		PE="TRUE"
-		if ls ${t1} >/dev/null 2>&1
+		if ls ${path4}/*_R2_001.fastq.gz >/dev/null 2>&1
 		then
-			echo "Trimmed reads found, skipping trimming"
+			echo "Data is Paired-end"
+			PE="TRUE"
+			if ls ${t1} >/dev/null 2>&1
+			then
+				echo "Trimmed reads found, skipping trimming"
+			else
+				cat ${path4}/*_R1_001.fastq.gz > $r1
+				cat ${path4}/*_R2_001.fastq.gz > $r2
+			fi
 		else
-			cat ${path2}/*_R1_001.fastq.gz > $r1
-			cat ${path2}/*_R2_001.fastq.gz > $r2
+			echo "Data is Single-end"
+			echo "Single-end ${datatype}? If this is wrong, double check and restart"
+			PE="FALSE"
+			if ls ${t1} >/dev/null 2>&1
+			then
+				echo "Trimmed reads found, skipping trimming"
+			else
+				cat ${path4}/*_R1_001.fastq.gz > $r1
+			fi
 		fi
-	else
+	elif ls ${path4}/*_1.fastq.gz >/dev/null 2>&1
+	then
+		if ls ${path4}/*_2.fastq.gz >/dev/null 2>&1	
+		then
+			echo "Data is Paired-end"
+			PE="TRUE"
+			if ls ${t1} >/dev/null 2>&1
+			then
+				echo "Trimmed reads found, skipping trimming"
+			else
+				cat ${path4}/*_1.fastq.gz > $r1
+				cat ${path4}/*_2.fastq.gz > $r2
+			fi
+		else
+			echo "Data is Single-end"
+			echo "Single-end ${datatype}? If this is wrong, double check and restart"
+			PE="FALSE"
+			if ls ${t1} >/dev/null 2>&1
+			then
+				echo "Trimmed reads found, skipping trimming"
+			else
+				cat ${path4}/*_1.fastq.gz > $r1
+			fi
+		fi
+	elif ls ${path4}/SRR*.fastq.gz >/dev/null 2>&1
+	then
 		echo "Data is Single-end"
 		echo "Single-end ${datatype}? If this is wrong, double check and restart"
 		PE="FALSE"
@@ -99,121 +151,89 @@ then
 		then
 			echo "Trimmed reads found, skipping trimming"
 		else
-			cat ${path2}/*_R1_001.fastq.gz > $r1
-		fi
-	fi
-elif ls ${path2}/*_1.fastq.gz >/dev/null 2>&1
-then
-	if ls ${path2}/*_2.fastq.gz >/dev/null 2>&1	
-	then
-		echo "Data is Paired-end"
-		PE="TRUE"
-		if ls ${t1} >/dev/null 2>&1
-		then
-			echo "Trimmed reads found, skipping trimming"
-		else
-			cat ${path2}/*_1.fastq.gz > $r1
-			cat ${path2}/*_2.fastq.gz > $r2
+			cat ${path4}/SRR*.fastq.gz > $r1
 		fi
 	else
-		echo "Data is Single-end"
-		echo "Single-end ${datatype}? If this is wrong, double check and restart"
-		PE="FALSE"
-		if ls ${t1} >/dev/null 2>&1
-		then
-			echo "Trimmed reads found, skipping trimming"
-		else
-			cat ${path2}/*_1.fastq.gz > $r1
-		fi
+		echo "Data Missing"
 	fi
-elif ls ${path2}/SRR*.fastq.gz >/dev/null 2>&1
-then
-	echo "Data is Single-end"
-	echo "Single-end ${datatype}? If this is wrong, double check and restart"
-	PE="FALSE"
+
+	#Trim & QC reads
 	if ls ${t1} >/dev/null 2>&1
 	then
-		echo "Trimmed reads found, skipping trimming"
+		if [ ${PE} = "TRUE" ]
+		then
+			echo "To rerun this step, please delete ${t1} & ${t2} and resubmit"
+			fastq="${t1} ${t2}"
+		else
+			echo "To rerun this step, please delete ${t1} and resubmit"
+			fastq=${t1}
+		fi
 	else
-		cat ${path2}/SRR*.fastq.gz > $r1
+		if [ ${PE} = "TRUE" ]
+		then
+			echo "Running trimmomatic PE"
+			trimmomatic PE \
+				-threads ${threads} \
+				-phred33 \
+				-trimlog ${path4}/trim_log.txt \
+				-summary ${path4}/trim_summary.txt \
+				${r1} ${r2} ${t1} ${t3} ${t2} ${t4} \
+				ILLUMINACLIP:${adapter_path}/${adapters}.fa:2:30:10:4:TRUE \
+				MINLEN:30
+			echo "Running fastqc"
+			mkdir ${path4}/fastqc
+			fastqc -t ${threads} -o ${path4}/fastqc/ ${t1} ${t2} ${r1} ${r2}
+			#Note that I am currently ignoring any unpaired reads
+			fastq="${t1} ${t2}"
+		elif [ ${PE} = "FALSE" ]
+		then
+			echo "Running trimmomatic SE"
+			trimmomatic SE \
+				-threads ${threads} \
+				-phred33 \
+				-trimlog ${path4}/trim_log.txt \
+				-summary ${path4}/trim_summary.txt \
+				${r1} ${t1} \
+				ILLUMINACLIP:${adapter_path}/${adapters}.fa:2:30:10:4:TRUE \
+				MINLEN:30 
+			echo "Running fastqc"
+			mkdir ${path4}/fastqc
+			fastqc -t ${threads} -o ${path4}/fastqc/ ${t1} ${r1}
+			fastq=${t1}
+		fi
 	fi
-else
-	echo "Data Missing"
-fi
 
-#Trim & QC reads
-if ls ${t1} >/dev/null 2>&1
-then
-	if [ ${PE} = "TRUE" ]
+	#Align with HISAT2
+	if [ -s ${bam} ]
 	then
-		echo "To rerun this step, please delete ${t1} & ${t2} and resubmit"
-		fastq="${t1} ${t2}"
+		echo "${bam} found."
+		echo "To rerun this stem, please delete ${bam} and resubmit."
 	else
-		echo "To rerun this step, please delete ${t1} and resubmit"
-		fastq=${t1}
+		if [ ${PE} = "TRUE" ]
+		then
+			echo "Running HISAT2 for ${species2} ${genotype2} ${sample2} against ${fasta}"
+			hisat2 ${options} \
+				-p ${threads} \
+				--dta \
+				--no-mixed \
+				--no-discordant \
+				-x hisat2_index/${fasta} \
+				-1 ${t1} \
+				-2 ${t2} | \
+				samtools view -@ ${threads2} -bSh | \
+				samtools sort -@ ${threads2} > ${bam}
+		elif [ ${PE} = "FALSE" ]
+		then
+			echo "Running HISAT2 for ${species2} ${genotype2} ${sample2} against ${fasta}"
+			hisat2 ${options} \
+				-p ${threads} \
+				--dta \
+				-x hisat2_index/${fasta} \
+				-U ${t1} | \
+				samtools view -@ ${threads2} -bSh | \
+				samtools sort -@ ${threads2} > ${bam}		
+		fi
 	fi
-else
-	if [ ${PE} = "TRUE" ]
-	then
-		echo "Running trimmomatic PE"
-		trimmomatic PE \
-			-threads ${threads} \
-			-phred33 \
-			-trimlog ${path2}/trim_log.txt \
-			-summary ${path2}/trim_summary.txt \
-			${r1} ${r2} ${t1} ${t3} ${t2} ${t4} \
-			ILLUMINACLIP:${adapter_path}/${adapters}.fa:2:30:10:4:TRUE \
-			MINLEN:30
-		echo "Running fastqc"
-		mkdir ${path2}/fastqc
-		fastqc -t ${threads} -o ${path2}/fastqc/ ${t1} ${t2} ${r1} ${r2}
-		#Note that I am currently ignoring any unpaired reads
-		fastq="${t1} ${t2}"
-	elif [ ${PE} = "FALSE" ]
-	then
-		echo "Running trimmomatic SE"
-		trimmomatic SE \
-			-threads ${threads} \
-			-phred33 \
-			-trimlog ${path2}/trim_log.txt \
-			-summary ${path2}/trim_summary.txt \
-			${r1} ${t1} \
-			ILLUMINACLIP:${adapter_path}/${adapters}.fa:2:30:10:4:TRUE \
-			MINLEN:30 
-		echo "Running fastqc"
-		mkdir ${path2}/fastqc
-		fastqc -t ${threads} -o ${path2}/fastqc/ ${t1} ${r1}
-		fastq=${t1}
-	fi
-fi
-
-#Align with STAR
-if [ ${PE} = "TRUE" ]
-then
-	echo "Running STAR for ${sample} against ${fasta}"
-	STAR \
-		--runThreadN ${threads} \
-		--runMode alignReads \
-		--genomeDir STAR \
-		--readFilesIn ${t1} ${t2}\
-		--readFilesCommand zcat \
-		--alignIntronMin ${IntronMin} \
-		--alignIntronMax ${IntronMax} \
-		--outSAMtype BAM SortedByCoordinate \
-		--limitBAMsortRAM ${BAMsortRAM}
-elif [ ${PE} = "FALSE" ]
-then
-	echo "Running STAR for ${sample} against ${fasta}"
-	STAR \
-		--runThreadN ${threads} \
-		--runMode alignReads \
-		--genomeDir STAR \
-		--readFilesIn ${t1} \
-		--readFilesCommand zcat \
-		--alignIntronMin ${IntronMin} \
-		--alignIntronMax ${IntronMax} \
-		--outSAMtype BAM SortedByCoordinate \
-		--limitBAMsortRAM ${BAMsortRAM}
-fi
+done
 
 echo "Done"
