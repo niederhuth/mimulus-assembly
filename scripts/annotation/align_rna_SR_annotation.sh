@@ -72,7 +72,7 @@ do
 	genotype2=$(echo ${i} | sed s/${species2}_// | sed s/_.*//)
 	sample2=$(echo ${i} | sed s/.*_//)
 	path3=$(pwd | sed s/data\\/.*/data\\/${i}/ | sed s/_/\\//g)
-	path4="${path3}/fastq/${datatype}/annotation"
+	path4="${path3}/fastq/${datatype}"
 	bam="${species2}_${genotype2}_${sample2}.bam"
 
 	echo "Working on data ${species2} ${genotype2} ${sample2}"
