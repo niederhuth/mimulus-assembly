@@ -19,7 +19,15 @@ done
 cd ..
 cat tmp/*tmp > ${a}
 
-perl ${path1}/annotation/reformat_exonerate_protein_gff.pl --input_gff ${a} --output_gff ${a}.gff
+#Reformat exonerate output
+perl ${path1}/annotation/reformat_exonerate_protein_gff.pl --input_gff ${a} --output_gff tmp.gff
+
+#Sort the gff file
+gff3_sort -g tmp.gff -og ${a}.gff
+rm tmp.gff
+
+#Rename for maker
+cat ${a}.gff | sed 's/mRNA/protein_match/g' | sed 's/exon/match_part/g' > ${a}_maker_input.gff
 
 rm -R tmp
 

@@ -1,8 +1,21 @@
 #Maker without MPI
 #Install condo environment - has most of prerequisites
 conda env create -f maker.yml
+<<<<<<< HEAD
+
+wget https://www.mpich.org/static/downloads/4.0.1/mpich-4.0.1.tar.gz
+tar -xzvf mpich-4.0.1.tar.gz
+cd mpich-4.0.1
+unset F90
+unset F90FLAGS
+./configure FFLAGS=-fallow-argument-mismatch FCFLAGS=-fallow-argument-mismatch
+
+Download genemark-ES http://exon.gatech.edu/GeneMark/license_download.cgi
+unzip and copy contents to miniconda3/envs/maker/bin/
+=======
 conda activate maker
 #Install maker
+>>>>>>> bc0f01680f9777faafa616acb452f1a78d0eabc9
 Download maker https://www.yandell-lab.org/software/maker.html
 tar -xzvf 
 cd maker/src
@@ -13,6 +26,8 @@ cp bin/* ~/miniconda3/envs/maker/bin/
 cp -R lib/* ~/miniconda3/envs/maker/lib/
 cp -R src ~/miniconda3/envs/maker/
 cp -R perl ~/miniconda3/envs/maker/
+<<<<<<< HEAD
+=======
 #
 
 Download genemark-ES http://exon.gatech.edu/GeneMark/license_download.cgi
@@ -27,6 +42,7 @@ conda env create -f maker_mpi.yml
 conda activate maker
 #
 
+>>>>>>> bc0f01680f9777faafa616acb452f1a78d0eabc9
 
 mkdir build
 cd build
