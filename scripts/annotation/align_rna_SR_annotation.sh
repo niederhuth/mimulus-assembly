@@ -45,12 +45,12 @@ else
 fi
 
 #Make HISAT2 index
-if [ -d hisat2_index ]
+if [ ! -d hisat2_index ]
 then
 	mkdir hisat2_index
 fi
 
-if [ -s hisat2_index/${fasta}.8.ht2 ]
+if [ ! -s hisat2_index/${fasta}.8.ht2 ]
 then
 	echo "Making HISAT2 index"
 	hisat2-build ../${fasta} hisat2_index/${fasta}.8.ht2
@@ -64,7 +64,7 @@ datasets=$(awk -v FS="," \
 	-v b=${genotype} \
 	-v c=${sample} \
 	'{if ($1 == a && $2 == b && $3 == c) print $5}' \
-	${path1}/samples.csv)
+	${path1}/annotation/annotation_sources.csv)
 
 for i in ${datasets}
 do
@@ -85,7 +85,7 @@ do
 		-v d=${condition} \
 		-v e=${datatype} \
 		'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $8}' \
-		${path1}/annotation/annotation_sources.csv)
+		${path1}/samples.csv)
 
 	#Fastq files, these should not have to be changed, but should set automatically
 	r1="${path4}/combined.1.fastq.gz"
