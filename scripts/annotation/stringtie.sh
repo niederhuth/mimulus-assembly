@@ -12,8 +12,10 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=40
-bam= #Can be space separated list
-read_type="rf" #fr: fr-secondstrand, rf: fr-firststrand, lr: longread, mix: mix lr & shortread
+SRread=TRUE 
+LRread=FALSE
+combine_bams=FALSE #use all bam files for same run or separate runs
+SR_read_type="rf" #fr: fr-secondstrand, rf: fr-firststrand
 #To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
 trim=TRUE #use coverage based trimming of transcript ends
 min_multi_exon_reads="1" #min reads per bp cov for multi-exon transcript default: 1
@@ -41,27 +43,6 @@ condition="annotation"
 assembly=$(pwd | sed s/^.*\\///)
 path2="stringtie"
 
-#Add various settings
-settings="-v -p ${threads}"
-if [ ${trim} = FALSE ]
-then
-	settings="${settings} -t"
-fi
-#Adjust setting based on read type
-if [ ${read_type} = "rf" ]
-then
-	settings="${settings} --rf"
-elif [ ${read_type} = "fr" ]
-then
-	settings="${settings} --fr"
-elif [${read_type} = "lr" ]
-then
-	settings="${settings} -L -E ${LR_splice_window}"
-elif [${read_type} = "mix" ]
-then
-	settings="${settings} --mix -E ${LR_splice_window}"
-fi
-
 #Make output dir and cd
 if [ ! -d ${path2} ]
 then
@@ -70,43 +51,148 @@ fi
 cd ${path2}
 
 #Get list of datasets
-datasets=$(awk -v FS="," \
-	-v a=${species} \
-	-v b=${genotype} \
-	-v c=${sample} \
-	'{if ($1 == a && $2 == b && $3 == c) print $5}' \
-	${path1}/annotation/annotation_sources.csv)
+if [ ${SRread} = TRUE ]
+then
+	SR_datasets="$(awk -v FS="," \
+		-v a=${species} \
+		-v b=${genotype} \
+		-v c=${sample} \
+		'{if ($1 == a && $2 == b && $3 == c) print $5}' \
+		${path1}/annotation/annotation_sources.csv)"
+	#Loop over and assemble list of bam files
+	for i in ${SR_datasets}
+	do
+		SR_bam_list="${bam_list} ../SRrna/${species2}_${genotype2}_${sample2}.bam"
+	done
+fi
+if [ ${LRread} = TRUE ]
+then
+	LR_datasets="$(awk -v FS="," \
+		-v a=${species} \
+		-v b=${genotype} \
+		-v c=${sample} \
+		'{if ($1 == a && $2 == b && $3 == c) print $6}' \
+		${path1}/annotation/annotation_sources.csv)"
+	#Loop over and assemble list of bam files
+	for i in ${LR_datasets}
+	do
+		LR_bam_list="${bam_list} ../LRrna/${species2}_${genotype2}_${sample2}.bam"
+	done
+fi
 
+#Add various settings
+settings="-v -p ${threads}"
+if [ ${trim} = FALSE ]
+then
+	settings="${settings} -t"
+fi
+if [ combine_bams = TRUE ]
+then
+	if [[ ${SRread} = TRUE && ${LRread} = TRUE ]]
+	then
+		settings="${SR_bam_list} ${LR_bam_list} ${settings} --mix -E ${LR_splice_window} -o combined.gtf"
+	fi
+	if [[ ${SRread} = TRUE && ${LRread} = FALSE ]]
+	then
+		if [ ${read_type} = "rf" ]
+		then
+			settings="${SR_bam_list} ${settings} --rf -o SR_combined.gtf"
+		elif [ ${read_type} = "fr" ]
+		then
+			settings="${SR_bam_list} ${settings} --fr -o SR_combined.gtf"
+		fi
+	fi
+	if [[ ${SRread} = FALSE && ${LRread} = TRUE ]]
+	then
+		settings="${LR_bam_list} ${settings} -L -E ${LR_splice_window} -o LR_combined.gtf"
+	fi
+	#Run stringtie
+	echo "Running stringtie"
+	stringtie \
+		${settings} \
+		-c ${min_multi_exon_reads} \
+		-s ${min_single_exon_reads} \
+		-f ${min_iso_frac} \
+		-g ${max_gap} \
+		-m ${min_transcript_len} \
+		-a ${min_anchor_len} \
+		-j ${min_junc_cov} \
+		-M ${frac_multi_hit} \
+		-l stringtie
+fi
+if [ combine_bams = TRUE ]
+then
+	if [[ ${SRread} = TRUE ]]
+	then
+		if [ ${read_type} = "rf" ]
+		then
+			settings2="${settings} --rf"
+		elif [ ${read_type} = "fr" ]
+		then
+			settings2="${settings} --fr"
+		fi
+		for i in ${SR_bam_list}
+		do
+			output=$(echo ${i} | sed s/.*SRrna\\/// | sed s/.bam//)
+			echo "Running Stringtie on ${output}"
+			#Run stringtie
+			echo "Running stringtie"
+			stringtie \
+			${settings2} \
+			-c ${min_multi_exon_reads} \
+			-s ${min_single_exon_reads} \
+			-f ${min_iso_frac} \
+			-g ${max_gap} \
+			-m ${min_transcript_len} \
+			-a ${min_anchor_len} \
+			-j ${min_junc_cov} \
+			-M ${frac_multi_hit} \
+			-l stringtie \
+			-o ${output}.gtf
+		done
+	fi
+	if [[ ${LRread} = TRUE ]]
+	then
+		settings2="${settings} -L -E ${LR_splice_window}"
+		for i in ${LR_bam_list}
+		do
+			output=$(echo ${i} | sed s/.*LRrna\\/// | sed s/.bam//)
+			echo "Running Stringtie on ${output}"
+			#Run stringtie
+			echo "Running stringtie"
+			stringtie \
+			${settings2} \
+			-c ${min_multi_exon_reads} \
+			-s ${min_single_exon_reads} \
+			-f ${min_iso_frac} \
+			-g ${max_gap} \
+			-m ${min_transcript_len} \
+			-a ${min_anchor_len} \
+			-j ${min_junc_cov} \
+			-M ${frac_multi_hit} \
+			-l stringtie \
+			-o ${output}.gtf
+		done
+	fi
+fi
 
+#Convert to gff3 and reformat for maker
+for i in *gtf
+do
+	ouptut2=$(echo ${i} | sed s/.gtf//)
+	#Convert gtf to gff3
+	echo "Converting ${i} to gff3"
+	gffread ${i} -o tmp.gff
 
+	#Sort the gff file. Maybe unnecessary, but just in case
+	echo "Sorting gff file"
+	gff3_sort -g tmp.gff -og ${output2}.gff
 
-#Run stringtie
-echo "Running stringtie"
-stringtie ${bam} \
-	${settings} \
-	-c ${min_multi_exon_reads} \
-	-s ${min_single_exon_reads} \
-	-f ${min_iso_frac} \
-	-g ${max_gap} \
-	-m ${min_transcript_len} \
-	-a ${min_anchor_len} \
-	-j ${min_junc_cov} \
-	-M ${frac_multi_hit} \
-	-o ${path2}.gtf \
-	-l stringtie 
-
-#Convert gtf to gff3
-echo "Converting gtf to gff3"
-gffread ${path2}.gtf -o tmp.gff
-
-#Sort the gff file. Maybe unnecessary, but just in case
-echo "Sorting gff file"
-gff3_sort -g tmp.gff -og ${path2}.gff
-
-#Modify gff for maker
-echo "Modifying for maker"
-cat ${path2}.gff | sed -i 's/transcript/expressed_sequence_match/g' | \
-sed -i 's/exon/match_part/g' | sed s/StringTie/est_gff\:est2genome/ > ${path2}_maker_input.gff
+	#Modify gff for maker
+	echo "Modifying for maker"
+	cat ${output2}.gff | sed -i 's/transcript/expressed_sequence_match/g' | \
+	sed -i 's/exon/match_part/g' | sed s/StringTie/est_gff\:est2genome/ > ${output2}_maker_input.gff
+done
 
 echo "Done"
 
