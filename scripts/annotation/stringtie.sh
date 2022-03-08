@@ -130,10 +130,10 @@ then
 	echo "combine_bams is turned off"
 	if [[ ${SRread} = TRUE ]]
 	then
-		if [ ${read_type} = "rf" ]
+		if [ "${read_type}" = "rf" ]
 		then
 			settings2="${settings} --rf"
-		elif [ ${read_type} = "fr" ]
+		elif [ "${read_type}" = "fr" ]
 		then
 			settings2="${settings} --fr"
 		fi
