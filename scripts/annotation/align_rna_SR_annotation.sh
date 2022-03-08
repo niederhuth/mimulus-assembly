@@ -53,7 +53,7 @@ fi
 if [ ! -s hisat2_index/${fasta}.8.ht2 ]
 then
 	echo "Making HISAT2 index"
-	hisat2-build ../${fasta} hisat2_index/${fasta}.8.ht2
+	hisat2-build ../${fasta} hisat2_index/${fasta}
 else
 	echo "HISAT2 index found"
 fi

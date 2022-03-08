@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=200GB
 #SBATCH --job-name maker_round1
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
