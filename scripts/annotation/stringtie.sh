@@ -64,6 +64,7 @@ then
 	do
 		SR_bam_list="${bam_list} ../SRrna/${species2}_${genotype2}_${sample2}.bam"
 	done
+	echo ${SR_bam_list}
 fi
 if [ ${LRread} = TRUE ]
 then
@@ -78,6 +79,7 @@ then
 	do
 		LR_bam_list="${bam_list} ../LRrna/${species2}_${genotype2}_${sample2}.bam"
 	done
+	echo ${LR_bam_list}
 fi
 
 #Add various settings
