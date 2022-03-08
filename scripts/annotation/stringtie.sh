@@ -62,7 +62,7 @@ then
 	#Loop over and assemble list of bam files
 	for i in ${SR_datasets}
 	do
-		SR_bam_list="${bam_list} ../SRrna/${species2}_${genotype2}_${sample2}.bam"
+		SR_bam_list="${bam_list} ../SRrna/${i}.bam"
 	done
 	echo ${SR_bam_list}
 fi
@@ -77,7 +77,7 @@ then
 	#Loop over and assemble list of bam files
 	for i in ${LR_datasets}
 	do
-		LR_bam_list="${bam_list} ../LRrna/${species2}_${genotype2}_${sample2}.bam"
+		LR_bam_list="${bam_list} ../LRrna/${i}.bam"
 	done
 	echo ${LR_bam_list}
 fi
