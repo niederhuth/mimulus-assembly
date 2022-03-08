@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=40
 #SBATCH --mem=50GB
 #SBATCH --job-name stringtie
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
