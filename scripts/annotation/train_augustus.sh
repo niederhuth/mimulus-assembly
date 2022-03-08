@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 fasta= #input fasta, if left blank, will look for it in current directory
-blast_threads=10 #Leave 1 for MPI
+input_gff="../maker_round1/maker_round1.gff"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -80,7 +80,7 @@ export TEMP=$(pwd)
 #-x number    Max AED to allow 0.5 is default
 #-n           No filtering.  Accept all.
 echo ""
-echo "maker2zff -x 0.2 -l 200  $MAKER_GFF_FILE_W_FASTA"
+echo "maker2zff -x 0.2 -l 200 $MAKER_GFF_FILE_W_FASTA"
 maker2zff \
 	-c 0.5 \
 	-e 0.5 \
@@ -89,7 +89,7 @@ maker2zff \
 	-t 0 \
 	-l 200 \
 	-x 0.2 \
-	$MAKER_GFF_FILE_W_FASTA
+	${input_gff}
 
 #fathom
 #-validate [-quiet]
@@ -103,10 +103,14 @@ maker2zff \
 #-compare-genes <predictions> [-details]
 #-score-genes <hmm> [-errors-ok]
 #-filter-genes <hmm> -min-score <float> -min-length <int>
+echo ""
 echo "fathom genome.ann genome.dna -categorize 1000"
-fathom genome.ann genome.dna -categorize 1000
+fathom \
+	genome.ann \
+	genome.dna \
+	-categorize 1000
 
-NUMFOUND="`grep -c '>' uni.ann`"
+NUMFOUND="`grep -c x'>' uni.ann`"
 
 if [ ${NUMFOUND} -gt 499 ]
 then
@@ -151,10 +155,9 @@ randomSplit.pl ${WORKING_DIR}/augustus.gb ${NUMSPLIT}
 #Run autoAug.pl.  
 #This script is provided in the AUGUSTUS installation.
 #Modify the path here, or ensure that autoAug.pl is in your $PATH.
-
 echo "autoAug.pl --species=$AUGUSTUS_SPECIES_NAME --genome=${WORKING_DIR}/genbank_gene_seqs.fasta --trainingset=${WORKING_DIR}/augustus.gb.train --cdna=$CDNA_FASTA --noutr"
 autoAug.pl \
-	--species=$AUGUSTUS_SPECIES_NAME \
+	--species=${AUGUSTUS_SPECIES_NAME} \
 	--genome=${WORKING_DIR}/genbank_gene_seqs.fasta \
 	--trainingset=${WORKING_DIR}/augustus.gb.train \
 	--cdna=$CDNA_FASTA \
@@ -179,7 +182,7 @@ echo "cd $WORKING_DIR"
 cd $WORKING_DIR
 echo "autoAug.pl --species=$AUGUSTUS_SPECIES_NAME --genome=${WORKING_DIR}/genbank_gene_seqs.fasta --useexisting --hints=${WORKING_DIR}/autoAug/hints/hints.E.gff  -v -v -v  --index=1"
 autoAug.pl \
-	--species=$AUGUSTUS_SPECIES_NAME \
+	--species=${AUGUSTUS_SPECIES_NAME} \
 	--genome=${WORKING_DIR}/genbank_gene_seqs.fasta \
 	--useexisting \
 	--hints=${WORKING_DIR}/autoAug/hints/hints.E.gff  \

@@ -185,7 +185,7 @@ fi
 #Convert to gff3 and reformat for maker
 for i in *gtf
 do
-	ouptut2=$(echo ${i} | sed s/.gtf//)
+	output2=$(echo ${i} | sed s/.gtf//)
 	#Convert gtf to gff3
 	echo "Converting ${i} to gff3"
 	gffread ${i} -o tmp.gff
