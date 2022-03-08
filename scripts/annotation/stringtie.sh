@@ -89,7 +89,7 @@ then
 	settings="${settings} -t"
 fi
 #Run stringtie with bam files combined
-if [ combine_bams = TRUE ]
+if [ ${combine_bams} = TRUE ]
 then
 	echo "combine_bams is turned on"
 	if [[ ${SRread} = TRUE && ${LRread} = TRUE ]]
@@ -125,7 +125,7 @@ then
 		-l stringtie
 fi
 #Run stringtie on each bam file separately
-if [ combine_bams = FALSE ]
+if [ ${combine_bams} = FALSE ]
 then
 	echo "combine_bams is turned off"
 	if [[ ${SRread} = TRUE ]]
