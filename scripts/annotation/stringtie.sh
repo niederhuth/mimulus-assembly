@@ -62,6 +62,7 @@ then
 	#Loop over and assemble list of bam files
 	for i in ${SR_datasets}
 	do
+		echo ${i}
 		SR_bam_list="${bam_list} ../SRrna/${i}.bam"
 	done
 	echo ${SR_bam_list}
@@ -91,6 +92,7 @@ fi
 #Run stringtie with bam files combined
 if [ combine_bams = TRUE ]
 then
+	echo "combine_bams is turned on"
 	if [[ ${SRread} = TRUE && ${LRread} = TRUE ]]
 	then
 		settings="${SR_bam_list} ${LR_bam_list} ${settings} --mix -E ${LR_splice_window} -o combined.gtf"
@@ -126,6 +128,7 @@ fi
 #Run stringtie on each bam file separately
 if [ combine_bams = FALSE ]
 then
+	echo "combine_bams is turned off"
 	if [[ ${SRread} = TRUE ]]
 	then
 		if [ ${read_type} = "rf" ]
@@ -141,7 +144,7 @@ then
 			echo "Running Stringtie on ${output}"
 			#Run stringtie
 			echo "Running stringtie"
-			stringtie \
+			stringtie ${i} \
 			${settings2} \
 			-c ${min_multi_exon_reads} \
 			-s ${min_single_exon_reads} \
@@ -164,7 +167,7 @@ then
 			echo "Running Stringtie on ${output}"
 			#Run stringtie
 			echo "Running stringtie"
-			stringtie \
+			stringtie ${i} \
 			${settings2} \
 			-c ${min_multi_exon_reads} \
 			-s ${min_single_exon_reads} \
