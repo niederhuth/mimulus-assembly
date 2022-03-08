@@ -88,6 +88,7 @@ if [ ${trim} = FALSE ]
 then
 	settings="${settings} -t"
 fi
+#Run stringtie with bam files combined
 if [ combine_bams = TRUE ]
 then
 	if [[ ${SRread} = TRUE && ${LRread} = TRUE ]]
@@ -122,7 +123,8 @@ then
 		-M ${frac_multi_hit} \
 		-l stringtie
 fi
-if [ combine_bams = TRUE ]
+#Run stringtie on each bam file separately
+if [ combine_bams = FALSE ]
 then
 	if [[ ${SRread} = TRUE ]]
 	then
