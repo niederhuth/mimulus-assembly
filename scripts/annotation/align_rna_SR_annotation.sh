@@ -66,13 +66,14 @@ datasets=$(awk -v FS="," \
 	'{if ($1 == a && $2 == b && $3 == c) print $5}' \
 	${path1}/annotation/annotation_sources.csv)
 
+#Iterate over each dataset, trim, and align
 for i in ${datasets}
 do
 	species2=$(echo ${i} | sed s/_.*//)
 	genotype2=$(echo ${i} | sed s/${species2}_// | sed s/_.*//)
 	sample2=$(echo ${i} | sed s/.*_//)
-	path3=$(pwd | sed s/data\\/.*/data\\/${i}/ | sed s/_/\\//g)
-	path4="${path3}/fastq/${datatype}"
+	path3=$(pwd | sed s/data\\/.*/data/)
+	path4="${path3}/${species2}/${genotype2}/${sample2}/fastq/${datatype}"
 	bam="${species2}_${genotype2}_${sample2}.bam"
 
 	echo "Working on data ${species2} ${genotype2} ${sample2}"

@@ -1,4 +1,4 @@
-species,genotype,sample,proteins(species_genotype_sample),transcripts (species_genotype_sample)
-Mguttatus,S1,S1,Mguttatus_IM62,Mguttatus_S1_S1 Mguttatus_L1_L1
-Mguttatus,L1,L1,Mguttatus_IM62,Mguttatus_L1_L1 Mguttatus_S1_S1
+species,genotype,sample,proteins(species_genotype_sample),short_read(species_genotype_sample),long_read(species_genotype_sample),
+Mguttatus,S1,S1,Mguttatus_IM62,Mguttatus_S1_S1 Mguttatus_L1_L1,,
+Mguttatus,L1,L1,Mguttatus_IM62,Mguttatus_L1_L1 Mguttatus_S1_S1,,
 

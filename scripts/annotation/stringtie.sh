@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=40
-bam="../SRrna/Aligned.sortedByCoord.out.bam" #Can be space separated list
+bam= #Can be space separated list
 read_type="rf" #fr: fr-secondstrand, rf: fr-firststrand, lr: longread, mix: mix lr & shortread
 #To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
 trim=TRUE #use coverage based trimming of transcript ends
@@ -68,6 +68,17 @@ then
 	mkdir ${path2}
 fi
 cd ${path2}
+
+#Get list of datasets
+datasets=$(awk -v FS="," \
+	-v a=${species} \
+	-v b=${genotype} \
+	-v c=${sample} \
+	'{if ($1 == a && $2 == b && $3 == c) print $5}' \
+	${path1}/annotation/annotation_sources.csv)
+
+
+
 
 #Run stringtie
 echo "Running stringtie"
