@@ -13,10 +13,8 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=40 #for HISAT2
 threads2=4 #for samtools sort
-fasta=$(ls -l *.fa | sed s/.*\ //)
 options="--rna-strandness F --very-sensitive"
-datatype="rna"
-
+fasta= #input fasta, if left blank, will look for it in current directory
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -32,8 +30,26 @@ species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="annotation"
+datatype="rna"
 assembly=$(pwd | sed s/^.*\\///)
 path2="SRrna"
+
+#Look for fasta file, there can only be one!
+if ls *.fa >/dev/null 2>&1
+then
+	fasta=$(ls *fa | sed s/.*\ //)
+	echo "Fasta file ${fasta} found"
+elif ls *.fasta >/dev/null 2>&1
+then
+	fasta=$(ls *fasta | sed s/.*\ //)
+	echo "Fasta file ${fasta} found"
+elif ls *.fna >/dev/null 2>&1
+then
+	fasta=$(ls *fna | sed s/.*\ //)
+	echo "Fasta file ${fasta} found"
+else
+	echo "No fasta file found, please check and restart"
+fi
 
 #Make & cd to directory
 if [ -d ${path2} ]

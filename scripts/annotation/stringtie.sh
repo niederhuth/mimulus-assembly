@@ -196,8 +196,8 @@ do
 
 	#Modify gff for maker
 	echo "Modifying for maker"
-	cat ${output2}.gff | sed -i 's/transcript/expressed_sequence_match/g' | \
-	sed -i 's/exon/match_part/g' | sed s/StringTie/est_gff\:est2genome/ > ${output2}_maker_input.gff
+	cat ${output2}.gff | sed 's/transcript/expressed_sequence_match/g' | \
+	sed 's/exon/match_part/g' | sed s/StringTie/est_gff\:est2genome/ > ${output2}_maker_input.gff
 done
 
 echo "Done"
