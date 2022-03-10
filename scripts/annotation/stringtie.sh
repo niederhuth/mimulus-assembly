@@ -111,7 +111,7 @@ then
 		settings="${LR_bam_list} ${settings} -L -E ${LR_splice_window} -o LR_combined.gtf"
 	fi
 	#Run stringtie
-	echo "Running stringtie"
+	echo "Running stringtie on combined bam files"
 	stringtie \
 		${settings} \
 		-c ${min_multi_exon_reads} \
@@ -140,9 +140,8 @@ then
 		for i in ${SR_bam_list}
 		do
 			output=$(echo ${i} | sed s/.*SRrna\\/// | sed s/.bam//)
-			echo "Running Stringtie on ${output}"
 			#Run stringtie
-			echo "Running stringtie"
+			echo "Running Stringtie on ${output}"
 			stringtie ${i} \
 			${settings2} \
 			-c ${min_multi_exon_reads} \
@@ -163,9 +162,8 @@ then
 		for i in ${LR_bam_list}
 		do
 			output=$(echo ${i} | sed s/.*LRrna\\/// | sed s/.bam//)
-			echo "Running Stringtie on ${output}"
 			#Run stringtie
-			echo "Running stringtie"
+			echo "Running Stringtie on ${output}"
 			stringtie ${i} \
 			${settings2} \
 			-c ${min_multi_exon_reads} \

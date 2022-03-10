@@ -223,8 +223,8 @@ do
 	#Align with HISAT2
 	if [ -s ${bam} ]
 	then
-		echo "${bam} found."
-		echo "To rerun this stem, please delete ${bam} and resubmit."
+		echo "${bam} found. Skipping alignment."
+		echo "To rerun this step, please delete ${bam} and resubmit."
 	else
 		if [ ${PE} = "TRUE" ]
 		then
