@@ -193,6 +193,7 @@ do
 	#Sort the gff file. Maybe unnecessary, but just in case
 	echo "Sorting gff file"
 	gff3_sort -g tmp.gff -og ${output2}.gff
+	rm tmp.gff
 
 	#Modify gff for maker
 	echo "Modifying for maker"
