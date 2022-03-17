@@ -111,6 +111,7 @@ then
 		settings="${LR_bam_list} ${settings} -L -E ${LR_splice_window} -o LR_combined.gtf"
 	fi
 	#Run stringtie
+	echo ${settings}
 	echo "Running stringtie on combined bam files"
 	stringtie \
 		${settings} \
@@ -132,18 +133,19 @@ then
 	then
 		if [ "${read_type}" = "rf" ]
 		then
-			settings2="${settings} --rf"
+			settings="${settings} --rf"
 		elif [ "${read_type}" = "fr" ]
 		then
-			settings2="${settings} --fr"
+			settings="${settings} --fr"
 		fi
 		for i in ${SR_bam_list}
 		do
+			echo ${settings}
 			output=$(echo ${i} | sed s/.*SRrna\\/// | sed s/.bam//)
 			#Run stringtie
 			echo "Running Stringtie on ${output}"
 			stringtie ${i} \
-			${settings2} \
+			${settings} \
 			-c ${min_multi_exon_reads} \
 			-s ${min_single_exon_reads} \
 			-f ${min_iso_frac} \
