@@ -102,7 +102,6 @@ then
 		echo "Using only short reads"
 		if [ ${SR_read_type} = "rf" ]
 		then
-			echo "This worked"
 			settings="${SR_bam_list} ${settings} --rf -o SR_combined.gtf"
 		elif [ ${SR_read_type} = "fr" ]
 		then

@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=40 #for minimap2
 threads2=4 #for samtools sort
-options="-C5 -B4 -O6,24" #Additional options
+options="" #Additional options
 input_data="*.fasta.gz" 
 fasta= #input fasta, if left blank, will look for it in current directory
 
