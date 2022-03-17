@@ -81,7 +81,6 @@ do
 	echo "Working on data ${species2} ${genotype2} ${sample2} ${datatype}"
 
 	#Set various options
-	#-C5 -O6,24 -B4
 	options="-t ${threads} --secondary=no ${options}"
 	if [ ${datatype} = "pb-rna" ]
 	then

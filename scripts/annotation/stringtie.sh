@@ -11,12 +11,12 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
+#To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
 threads=40
 SRread=TRUE 
 LRread=FALSE
 combine_bams=TRUE #use all bam files for same run or separate runs
 SR_read_type="rf" #fr: fr-secondstrand, rf: fr-firststrand
-#To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
 trim=TRUE #use coverage based trimming of transcript ends
 min_multi_exon_reads="1" #min reads per bp cov for multi-exon transcript default: 1
 min_single_exon_reads="4.75" #min reads per bp cov for single-exon transcript default: 4.75, 1.5 for long-reads
