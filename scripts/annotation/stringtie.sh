@@ -13,11 +13,11 @@ conda="${HOME}/miniconda3"
 #Set variables
 #To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
 threads=40
-SRread=TRUE 
+SRread=TRUE
 LRread=FALSE
 combine_bams=TRUE #use all bam files for same run or separate runs
 SR_read_type="rf" #fr: fr-secondstrand, rf: fr-firststrand
-trim=TRUE #use coverage based trimming of transcript ends
+trim=FALSE #use coverage based trimming of transcript ends
 min_multi_exon_reads="1" #min reads per bp cov for multi-exon transcript default: 1
 min_single_exon_reads="4.75" #min reads per bp cov for single-exon transcript default: 4.75, 1.5 for long-reads
 min_iso_frac="0.01" #minimum isoform fraction default: 0.01
@@ -94,21 +94,24 @@ then
 	echo "combine_bams is turned on"
 	if [[ ${SRread} = TRUE && ${LRread} = TRUE ]]
 	then
+		echo "Using both short & long reads"
 		settings="${SR_bam_list} ${LR_bam_list} ${settings} --mix -E ${LR_splice_window} -o combined.gtf"
 	fi
 	if [[ ${SRread} = TRUE && ${LRread} = FALSE ]]
 	then
-		if [ "${read_type}" = "rf" ]
+		echo "Using only short reads"
+		if [ ${SR_read_type} = "rf" ]
 		then
 			echo "This worked"
 			settings="${SR_bam_list} ${settings} --rf -o SR_combined.gtf"
-		elif [ "${read_type}" = "fr" ]
+		elif [ ${SR_read_type} = "fr" ]
 		then
 			settings="${SR_bam_list} ${settings} --fr -o SR_combined.gtf"
 		fi
 	fi
 	if [[ ${SRread} = FALSE && ${LRread} = TRUE ]]
 	then
+		echo "Using only long reads"
 		settings="${LR_bam_list} ${settings} -L -E ${LR_splice_window} -o LR_combined.gtf"
 	fi
 	#Run stringtie
@@ -130,12 +133,13 @@ fi
 if [ ${combine_bams} = FALSE ]
 then
 	echo "combine_bams is turned off"
-	if [[ ${SRread} = TRUE ]]
+	if [ ${SRread} = TRUE ]
 	then
-		if [ "${read_type}" = "rf" ]
+		echo "Running stringtie on short reads"
+		if [ ${SR_read_type} = "rf" ]
 		then
 			settings="${settings} --rf"
-		elif [ ${read_type} = "fr" ]
+		elif [ ${SR_read_type} = "fr" ]
 		then
 			settings="${settings} --fr"
 		fi
@@ -159,16 +163,17 @@ then
 			-o ${output}.gtf
 		done
 	fi
-	if [[ ${LRread} = TRUE ]]
+	if [ ${LRread} = TRUE ]
 	then
-		settings2="${settings} -L -E ${LR_splice_window}"
+		echo "Running stringtie on long reads"
+		settings="${settings} -L -E ${LR_splice_window}"
 		for i in ${LR_bam_list}
 		do
 			output=$(echo ${i} | sed s/.*LRrna\\/// | sed s/.bam//)
 			#Run stringtie
 			echo "Running Stringtie on ${output}"
 			stringtie ${i} \
-			${settings2} \
+			${settings} \
 			-c ${min_multi_exon_reads} \
 			-s ${min_single_exon_reads} \
 			-f ${min_iso_frac} \
