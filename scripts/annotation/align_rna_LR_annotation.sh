@@ -14,6 +14,7 @@ conda="${HOME}/miniconda3"
 threads=40 #for minimap2
 threads2=4 #for samtools sort
 options="-C5 -B4 -O6,24" #Additional options
+input_data="fasta.gz" 
 fasta= #input fasta, if left blank, will look for it in current directory
 
 #Change to current directory
@@ -21,8 +22,6 @@ cd ${PBS_O_WORKDIR}
 #Export paths to conda
 export PATH="${conda}/envs/transcript-assembly/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/transcript-assembly/lib:${LD_LIBRARY_PATH}"
-#Path to trimmomatic fastas 
-adapter_path="${conda}/envs/transcript-assembly/share/trimmomatic/adapters"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
@@ -76,6 +75,7 @@ do
 	datatype=$(echo ${i} | sed s/.*_//) 
 	path3=$(pwd | sed s/data\\/.*/data/)
 	path4="${path3}/${species2}/${genotype2}/${sample2}/fastq/${datatype}"
+	reads="${path4}/*.${input_data}"
 	bam="${species2}_${genotype2}_${sample2}_${datatype}.bam"
 
 	echo "Working on data ${species2} ${genotype2} ${sample2} ${datatype}"
@@ -109,7 +109,7 @@ do
 		minimap2 \
 			${options} \
    			${fasta} \
-   			${input} \
+   			${reads} \
    			samtools view -@ ${threads2} -bSh | \
 			samtools sort -@ ${threads2} > ${bam}
 	fi
