@@ -109,7 +109,7 @@ do
 		minimap2 \
 			${options} \
    			${fasta} \
-   			${reads} \
+   			${reads} | \
    			samtools view -@ ${threads2} -bSh | \
 			samtools sort -@ ${threads2} > ${bam}
 	fi
