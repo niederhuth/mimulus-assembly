@@ -14,7 +14,7 @@ conda="${HOME}/miniconda3"
 threads=40 #for minimap2
 threads2=4 #for samtools sort
 options="-C5 -B4 -O6,24" #Additional options
-input_data="combined.fasta.gz" 
+input_data="*.fasta.gz" 
 fasta= #input fasta, if left blank, will look for it in current directory
 
 #Change to current directory
@@ -81,9 +81,9 @@ do
 	echo "Working on data ${species2} ${genotype2} ${sample2} ${datatype}"
 
 	#Set various options
-	#-C5 -O6,24 -B4 \
+	#-C5 -O6,24 -B4
 	options="-t ${threads} --secondary=no ${options}"
-	if [ ${datatype} = "-ax splice" ]
+	if [ ${datatype} = "pb-rna" ]
 	then
 		options="${options} -ax splice:hq -uf"
 		echo "Datatype is ${datatype}, setting options to minimap2 ${options}"
