@@ -71,11 +71,11 @@ for i in ${datasets}
 do
 	species2=$(echo ${i} | sed s/_.*//)
 	genotype2=$(echo ${i} | sed s/${species2}_// | sed s/_.*//)
-	sample2=$(echo ${i} | sed s/.*${genotype2}_// | sed s/_.*//)
+	sample2=$(echo ${i} | sed s/${species2}_${genotype2}_// | sed s/_.*//)
 	datatype=$(echo ${i} | sed s/.*_//) 
 	path3=$(pwd | sed s/data\\/.*/data/)
 	path4="${path3}/${species2}/${genotype2}/${sample2}/fastq/${datatype}"
-	reads="${path4}/*.${input_data}"
+	reads="${path4}/${input_data}"
 	bam="${species2}_${genotype2}_${sample2}_${datatype}.bam"
 
 	echo "Working on data ${species2} ${genotype2} ${sample2} ${datatype}"
@@ -105,12 +105,12 @@ do
 		echo "${bam} found. Skipping alignment."
 		echo "To rerun this step, please delete ${bam} and resubmit."
 	else
-		echo 
+		echo "Aligning reads with minimap2"
 		minimap2 \
 			${options} \
-   			${fasta} \
-   			${reads} | \
-   			samtools view -@ ${threads2} -bSh | \
+			../${fasta} \
+			${reads} | \
+			samtools view -@ ${threads2} -bSh | \
 			samtools sort -@ ${threads2} > ${bam}
 	fi
 done
