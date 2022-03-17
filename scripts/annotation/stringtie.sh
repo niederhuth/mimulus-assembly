@@ -100,6 +100,7 @@ then
 	then
 		if [ "${read_type}" = "rf" ]
 		then
+			echo "This worked"
 			settings="${SR_bam_list} ${settings} --rf -o SR_combined.gtf"
 		elif [ "${read_type}" = "fr" ]
 		then
@@ -134,7 +135,7 @@ then
 		if [ "${read_type}" = "rf" ]
 		then
 			settings="${settings} --rf"
-		elif [ "${read_type}" = "fr" ]
+		elif [ ${read_type} = "fr" ]
 		then
 			settings="${settings} --fr"
 		fi
