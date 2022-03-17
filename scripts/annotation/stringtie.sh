@@ -14,8 +14,8 @@ conda="${HOME}/miniconda3"
 #To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
 threads=40
 reformat_for_maker=TRUE #Convert gtf to gff for maker
-SRread=TRUE
-LRread=FALSE
+SRread=TRUE #Run stringtie on short-read data
+LRread=FALSE #Run stringtie on long-read data
 combine_bams=TRUE #use all bam files for same run or separate runs
 SR_read_type="rf" #fr: fr-secondstrand, rf: fr-firststrand
 trim=FALSE #use coverage based trimming of transcript ends
