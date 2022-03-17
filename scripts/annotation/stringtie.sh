@@ -13,6 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 #To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
 threads=40
+reformat_for_maker=TRUE #Convert gtf to gff for maker
 SRread=TRUE
 LRread=FALSE
 combine_bams=TRUE #use all bam files for same run or separate runs
@@ -188,23 +189,26 @@ then
 fi
 
 #Convert to gff3 and reformat for maker
-for i in *gtf
-do
-	output2=$(echo ${i} | sed s/.gtf//)
-	#Convert gtf to gff3
-	echo "Converting ${i} to gff3"
-	gffread ${i} -o tmp.gff
+if [ ${reformat_for_maker} = TRUE ]
+then
+	for i in *gtf
+	do
+		output2=$(echo ${i} | sed s/.gtf//)
+		#Convert gtf to gff3
+		echo "Converting ${i} to gff3"
+		gffread ${i} -o tmp.gff
 
-	#Sort the gff file. Maybe unnecessary, but just in case
-	echo "Sorting gff file"
-	gff3_sort -g tmp.gff -og ${output2}.gff
-	rm tmp.gff
+		#Sort the gff file. Maybe unnecessary, but just in case
+		echo "Sorting gff file"
+		gff3_sort -g tmp.gff -og ${output2}.gff
+		rm tmp.gff
 
-	#Modify gff for maker
-	echo "Modifying for maker"
-	cat ${output2}.gff | sed 's/transcript/expressed_sequence_match/g' | \
-	sed 's/exon/match_part/g' | sed s/StringTie/est_gff\:est2genome/ > ${output2}_maker_input.gff
-done
+		#Modify gff for maker
+		echo "Modifying for maker"
+		cat ${output2}.gff | sed 's/transcript/expressed_sequence_match/g' | \
+		sed 's/exon/match_part/g' | sed s/StringTie/est_gff\:est2genome/ > ${output2}_maker_input.gff
+	done
+fi
 
 echo "Done"
 
