@@ -98,10 +98,10 @@ then
 	fi
 	if [[ ${SRread} = TRUE && ${LRread} = FALSE ]]
 	then
-		if [ ${read_type} = "rf" ]
+		if [ "${read_type}" = "rf" ]
 		then
 			settings="${SR_bam_list} ${settings} --rf -o SR_combined.gtf"
-		elif [ ${read_type} = "fr" ]
+		elif [ "${read_type}" = "fr" ]
 		then
 			settings="${SR_bam_list} ${settings} --fr -o SR_combined.gtf"
 		fi
