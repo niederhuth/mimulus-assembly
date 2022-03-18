@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=40 #for HISAT2
 threads2=4 #for samtools sort
-options="--rna-strandness F --very-sensitive"
+options="--rna-strandness R --very-sensitive" #R/RF for dUTP fr-firststrand F/FR for fr-secondstrand
 fasta= #input fasta, if left blank, will look for it in current directory
 
 #Change to current directory

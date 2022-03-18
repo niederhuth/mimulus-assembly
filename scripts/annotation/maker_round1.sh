@@ -69,6 +69,7 @@ export TMP=$(pwd)
 export TEMP=$(pwd)
 
 #Copy over and reformat repeatmasker gff
+~/miniconda3/envs/EDTA/share/RepeatMasker/util/rmOutToGFF3.pl repeatmasker/S1-v1.fa.out
 if [ ! -s repeatmasker.gff ]
 then
 	#Repeatmasker gff file is in gff2 and has non-unique IDs, which maker hates, so we have to fix this
