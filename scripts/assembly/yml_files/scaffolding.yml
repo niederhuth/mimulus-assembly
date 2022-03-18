@@ -15,6 +15,7 @@ dependencies:
   - biopython=1.79=py36h8f6f2f9_0
   - boto3=1.5.11=py36_0
   - botocore=1.5.92=py36_0
+  - bowtie2=2.4.5=py36hd4290be_0
   - brewer2mpl=1.4.1=py_3
   - bwa=0.7.17=h7132678_9
   - bzip2=1.0.8=h7f98852_4
@@ -165,6 +166,7 @@ dependencies:
   - sortedcontainers=2.4.0=pyhd8ed1ab_0
   - sqlite=3.37.0=h9cd32fc_0
   - statsmodels=0.9.0=py36h3010b51_1000
+  - tbb=2020.2=h4bd325d_4
   - tgsgapcloser=1.0.3=h5b5514e_2
   - tigmint=1.2.5=py36h7281c5b_1
   - tk=8.6.12=h27826a3_0

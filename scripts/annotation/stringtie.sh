@@ -2,8 +2,8 @@
 #SBATCH --time=3:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=40
-#SBATCH --mem=50GB
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=500GB
 #SBATCH --job-name stringtie
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 #To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
-threads=40
+threads=1
 reformat_for_maker=TRUE #Convert gtf to gff for maker
 SRread=TRUE #Run stringtie on short-read data
 LRread=FALSE #Run stringtie on long-read data
@@ -34,6 +34,11 @@ cd ${PBS_O_WORKDIR}
 #Export paths to conda
 export PATH="${conda}/envs/transcript-assembly/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/transcript-assembly/lib:${LD_LIBRARY_PATH}"
+
+#Set temporary directories for large memory operations
+export TMPDIR=$(pwd)
+export TMP=$(pwd)
+export TEMP=$(pwd)
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
