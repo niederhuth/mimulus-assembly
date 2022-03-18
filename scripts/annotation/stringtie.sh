@@ -2,8 +2,8 @@
 #SBATCH --time=3:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
-#SBATCH --mem=500GB
+#SBATCH --cpus-per-task=20
+#SBATCH --mem=200GB
 #SBATCH --job-name stringtie
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 #To mimic --conservative set min_multi_exon_reads=1.5, min_iso_frac=0.05, trim=FALSE
-threads=1
+threads=20
 reformat_for_maker=TRUE #Convert gtf to gff for maker
 SRread=TRUE #Run stringtie on short-read data
 LRread=FALSE #Run stringtie on long-read data
