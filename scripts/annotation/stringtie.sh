@@ -15,19 +15,21 @@ conda="${HOME}/miniconda3"
 threads=20
 reformat_for_maker=TRUE #Convert gtf to gff for maker
 SRread=TRUE #Run stringtie on short-read data
-LRread=FALSE #Run stringtie on long-read data
-combine_bams=TRUE #use all bam files for same run or separate runs
+LRread=TRUE #Run stringtie on long-read data
 SR_read_type="rf" #fr: fr-secondstrand, rf: fr-firststrand (dUTP method)
 trim=FALSE #use coverage based trimming of transcript ends
 min_multi_exon_reads="1" #min reads per bp cov for multi-exon transcript default: 1
-min_single_exon_reads="4.75" #min reads per bp cov for single-exon transcript default: 4.75, 1.5 for long-reads
+min_single_exon_reads_SR="4.75" #min reads per bp cov for single-exon transcript from SR data, default: 4.75 for short reads
+min_single_exon_reads_LR="1.5" #min reads per bp cov for single-exon transcript from LR data, default: 1.5 for long-reads
 min_iso_frac="0.01" #minimum isoform fraction default: 0.01
-max_gap="50" #maximum gap allowed between read mappings default: 50, set to 0 for long-reads
+max_gap_SR="50" #maximum gap allowed between read mappings default for SR data: 50 for short reads
+max_gap_LR="0" #maximum gap allowed between read mappings default for LR data: 0 for long-reads
 min_transcript_len="200" #minimum assembled transcript length default: 200
 min_anchor_len="10" #minimum anchor length for junctions default: 10
 min_junc_cov="1" #minimum junction coverage default: 1
 frac_multi_hit="1" #fraction of bundle allowed to be covered by multi-hit reads default: 1
 LR_splice_window="25" #window around possibly erroneous splice sites from long reads default: 25
+combine_bams=FALSE #use all bam files for same run or separate runs, right now I do not recommend doing this
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -101,23 +103,23 @@ then
 	if [[ ${SRread} = TRUE && ${LRread} = TRUE ]]
 	then
 		echo "Using both short & long reads"
-		settings="${SR_bam_list} ${LR_bam_list} ${settings} --mix -E ${LR_splice_window} -o combined.gtf"
+		settings="${SR_bam_list} ${LR_bam_list} ${settings} --mix -o combined.gtf"
 	fi
 	if [[ ${SRread} = TRUE && ${LRread} = FALSE ]]
 	then
 		echo "Using only short reads"
 		if [ ${SR_read_type} = "rf" ]
 		then
-			settings="${SR_bam_list} ${settings} --rf -o SR_combined.gtf"
+			settings="${SR_bam_list} ${settings} --rf  -g ${max_gap_SR} -s ${min_single_exon_reads_SR} -o SR_combined.gtf" 
 		elif [ ${SR_read_type} = "fr" ]
 		then
-			settings="${SR_bam_list} ${settings} --fr -o SR_combined.gtf"
+			settings="${SR_bam_list} ${settings} --fr  -g ${max_gap_SR} -s ${min_single_exon_reads_SR} -o SR_combined.gtf"
 		fi
 	fi
 	if [[ ${SRread} = FALSE && ${LRread} = TRUE ]]
 	then
 		echo "Using only long reads"
-		settings="${LR_bam_list} ${settings} -L -E ${LR_splice_window} -o LR_combined.gtf"
+		settings="${LR_bam_list} ${settings} -L -E ${LR_splice_window} -g ${max_gap_LR} -s ${min_single_exon_reads_LR} -o LR_combined.gtf"
 	fi
 	#Run stringtie
 	echo ${settings}
@@ -125,9 +127,7 @@ then
 	stringtie \
 		${settings} \
 		-c ${min_multi_exon_reads} \
-		-s ${min_single_exon_reads} \
 		-f ${min_iso_frac} \
-		-g ${max_gap} \
 		-m ${min_transcript_len} \
 		-a ${min_anchor_len} \
 		-j ${min_junc_cov} \
@@ -157,9 +157,9 @@ then
 			stringtie ${i} \
 			${settings} \
 			-c ${min_multi_exon_reads} \
-			-s ${min_single_exon_reads} \
+			-s ${min_single_exon_reads_SR} \
 			-f ${min_iso_frac} \
-			-g ${max_gap} \
+			-g ${max_gap_SR} \
 			-m ${min_transcript_len} \
 			-a ${min_anchor_len} \
 			-j ${min_junc_cov} \
@@ -180,9 +180,9 @@ then
 			stringtie ${i} \
 			${settings} \
 			-c ${min_multi_exon_reads} \
-			-s ${min_single_exon_reads} \
+			-s ${min_single_exon_reads_LR} \
 			-f ${min_iso_frac} \
-			-g ${max_gap} \
+			-g ${max_gap_LR} \
 			-m ${min_transcript_len} \
 			-a ${min_anchor_len} \
 			-j ${min_junc_cov} \
