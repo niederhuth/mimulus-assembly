@@ -15,12 +15,12 @@ other_pass=0 #passthrough anyything else in maker_gff: 1 = yes, 0 = no
 #-----EST Evidence (for best results provide a file for at least one)
 est= #set of ESTs or assembled mRNA-seq in fasta format
 altest= #EST/cDNA sequence file in fasta format from an alternate organism
-est_gff=../stringtie/stringtie_maker_input.gff #aligned ESTs or mRNA-seq from an external GFF3 file
+est_gff=est_maker_input.gff #aligned ESTs or mRNA-seq from an external GFF3 file
 altest_gff= #aligned ESTs from a closly relate species in GFF3 format
 
 #-----Protein Homology Evidence (for best results provide a file for at least one)
 protein=  #protein sequence file in fasta format (i.e. from mutiple organisms)
-protein_gff=../exonerate/protein_alignments_maker_input.gff  #aligned protein homology evidence from an external GFF3 file
+protein_gff=protein_alignments_maker_input.gff  #aligned protein homology evidence from an external GFF3 file
 
 #-----Repeat Masking (leave values blank to skip repeat masking)
 model_org= #select a model organism for RepBase masking in RepeatMasker
