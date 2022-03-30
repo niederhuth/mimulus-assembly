@@ -79,6 +79,7 @@ then
 	${conda}/envs/maker/share/RepeatMasker/util/rmOutToGFF3.pl ../repeatmasker/${fasta}.out | \
 	sed s/RepeatMasker/repeatmasker/ | \
 	sed s/dispersed_repeat/match/ | \
+	grep -v \# | \
  	awk -v OFS="\t" '{a+=1}{print $1,$2,$3,$4,$5,".",$7,$8,"ID="a";"$9}' > repeatmasker.gff
 else
 	echo "repeatmasker gff found"
