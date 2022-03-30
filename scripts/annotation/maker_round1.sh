@@ -151,7 +151,7 @@ else
 fi
 
 #Run maker
-name=$(echo ${fasta} | sed s/.*//)
+name=$(echo ${fasta} | sed s/\\.f*//)
 echo "Running Maker Round 1 on "
 maker \
 	-q \
