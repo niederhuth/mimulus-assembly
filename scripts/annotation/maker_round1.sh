@@ -97,7 +97,7 @@ then
 	do
 		echo "Adding ${i} protein alginments"
 		cat ../exonerate/${i}/{$i} >> protein_alignments
-	fi
+	done
 	#Convert to gff
 	perl ${path1}/annotation/reformat_exonerate_protein_gff.pl \
 		--input_gff protein_alignments \
@@ -142,7 +142,7 @@ then
 	do
 		echo "Adding ${i} est alginments"
 		cat ../stringtie/${i}_maker_input.gff >> tmp.gff
-	fi
+	done
 	#Sort the gff file
 	gff3_sort -g tmp.gff -og est_maker_input.gff
 	rm tmp.gff
