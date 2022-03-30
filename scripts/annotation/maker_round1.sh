@@ -96,7 +96,7 @@ then
 	for i in ${protein_sources}
 	do
 		echo "Adding ${i} protein alginments"
-		cat ../exonerate/${i}/{$i} >> protein_alignments
+		cat ../exonerate/${i}/${i} >> protein_alignments
 	done
 	#Convert to gff
 	perl ${path1}/annotation/reformat_exonerate_protein_gff.pl \
