@@ -73,9 +73,7 @@ if [ ! -s repeatmasker.gff ]
 then
 	#Repeatmasker gff file is in gff2 and has non-unique IDs, which maker hates, so we have to fix this
 	${conda}/envs/maker/share/RepeatMasker/util/rmOutToGFF3.pl ../repeatmasker/${fasta}.out | \
-
-	sed '1,3d' ../repeatmasker/${fasta}.out.gff | sed s/Target\ \"/Repeat=/ | sed s/\".*// | \
-	awk -v OFS="\t" '{a+=1}{print $1,$2,$3,$4,$5,".",$7,$8,"ID="a";"$9}' > repeatmasker.gff
+	sed s/RepeatMasker/repeatmasker/ | sed s/dispersed_repeat/match/ > repeatmasker.gff
 fi
 
 #Run maker
