@@ -151,12 +151,17 @@ else
 fi
 
 #Run maker
-echo "Running Maker Round 1"
+name=$(echo ${fasta} | sed s/.*//)
+echo "Running Maker Round 1 on "
 maker \
 	-q \
 	-genome ../${fasta} \
 	-cpus ${blast_threads} \
 	${path1}/annotation/maker_round1/*
+
+#Get gff & fasta files
+gff3_merge -d ${name}.output/${name}_datastore_index.log
+fasta_merge -d ${name}.output/${name}_datastore_index.log
 
 echo "Done"
 
