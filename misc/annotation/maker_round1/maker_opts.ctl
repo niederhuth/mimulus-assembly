@@ -15,12 +15,12 @@ other_pass=0 #passthrough anyything else in maker_gff: 1 = yes, 0 = no
 #-----EST Evidence (for best results provide a file for at least one)
 est= #set of ESTs or assembled mRNA-seq in fasta format
 altest= #EST/cDNA sequence file in fasta format from an alternate organism
-est_gff=../stringtie/stringtie_maker_input.gff #aligned ESTs or mRNA-seq from an external GFF3 file
+est_gff=est_maker_input.gff #aligned ESTs or mRNA-seq from an external GFF3 file
 altest_gff= #aligned ESTs from a closly relate species in GFF3 format
 
 #-----Protein Homology Evidence (for best results provide a file for at least one)
-protein=  #protein sequence file in fasta format (i.e. from mutiple organisms)
-protein_gff=../exonerate/protein_alignments_maker_input.gff  #aligned protein homology evidence from an external GFF3 file
+protein= #protein sequence file in fasta format (i.e. from mutiple organisms)
+protein_gff=protein_alignments_maker_input.gff #aligned protein homology evidence from an external GFF3 file
 
 #-----Repeat Masking (leave values blank to skip repeat masking)
 model_org= #select a model organism for RepBase masking in RepeatMasker
@@ -39,7 +39,7 @@ pred_gff= #ab-initio predictions from an external GFF3 file
 model_gff= #annotated gene models from an external GFF3 file (annotation pass-through)
 run_evm=0 #run EvidenceModeler, 1 = yes, 0 = no
 est2genome=1 #infer gene predictions directly from ESTs, 1 = yes, 0 = no
-protein2genome=1 #infer predictions from protein homology, 1 = yes, 0 = no
+protein2genome=0 #infer predictions from protein homology, 1 = yes, 0 = no
 trna=0 #find tRNAs with tRNAscan, 1 = yes, 0 = no
 snoscan_rrna= #rRNA file to have Snoscan find snoRNAs
 snoscan_meth= #-O-methylation site fileto have Snoscan find snoRNAs
@@ -75,4 +75,4 @@ correct_est_fusion=0 #limits use of ESTs in annotation to avoid fusion genes
 tries=2 #number of times to try a contig if there is a failure for some reason
 clean_try=0 #remove all data from previous run before retrying, 1 = yes, 0 = no
 clean_up=0 #removes theVoid directory with individual analysis files, 1 = yes, 0 = no
-TMP= #specify a directory other than the system default temporary directory for temporary files
+TMP=./ #specify a directory other than the system default temporary directory for temporary files
