@@ -132,7 +132,7 @@ then
 		-a ${min_anchor_len} \
 		-j ${min_junc_cov} \
 		-M ${frac_multi_hit} \
-		-l stringtie
+		-l ${output}
 fi
 #Run stringtie on each bam file separately
 if [ ${combine_bams} = FALSE ]
@@ -164,7 +164,7 @@ then
 			-a ${min_anchor_len} \
 			-j ${min_junc_cov} \
 			-M ${frac_multi_hit} \
-			-l stringtie \
+			-l ${output} \
 			-o ${output}.gtf
 		done
 	fi
@@ -187,7 +187,7 @@ then
 			-a ${min_anchor_len} \
 			-j ${min_junc_cov} \
 			-M ${frac_multi_hit} \
-			-l stringtie \
+			-l ${output} \
 			-o ${output}.gtf
 		done
 	fi
