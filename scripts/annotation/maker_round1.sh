@@ -99,7 +99,7 @@ then
 		cat ../exonerate/${i}/${i} >> protein_alignments
 	done
 	#Convert to gff
-	perl ${path1}/annotation/reformat_exonerate_protein_gff.pl \
+	perl ${path2}/annotation/reformat_exonerate_protein_gff.pl \
 		--input_gff protein_alignments \
 		--output_gff tmp.gff
 	#Sort gff file
