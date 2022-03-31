@@ -138,7 +138,7 @@ then
 			-v a=${species} \
 			-v b=${genotype} \
 			-v c=${sample} \
-			'{if ($1 == a && $2 == b && $3 == c) print $4}' \
+			'{if ($1 == a && $2 == b && $3 == c) print $6}' \
 			${path1}/annotation/annotation_sources.csv)"
 	fi
 	for i in ${SR_sources} ${LR_sources}
