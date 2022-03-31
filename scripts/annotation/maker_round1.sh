@@ -27,11 +27,6 @@ export AUGUSTUS_CONFIG_PATH="${conda}/envs/maker/config/"
 #export REPEATMASKER_LIB_DIR=
 #export REPEATMASKER_MATRICES_DIR=
 
-#Set temporary directories for large memory operations
-export TMPDIR=$(pwd)
-export TMP=$(pwd)
-export TEMP=$(pwd)
-
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
 path2=$(pwd | sed s/data.*/scripts/)
@@ -161,7 +156,6 @@ else
 fi
 
 #Run maker
-name=$(echo ${fasta} | sed s/\\.f.*//)
 echo "Running Maker Round 1 on ${fasta/.fa*/}"
 maker \
 	-q \
@@ -170,11 +164,12 @@ maker \
 	${path1}/annotation/maker_round1/*
 
 #Get gff & fasta files
-gff3_merge -d ${name}.output/${name}_master_datastore_index.log
+gff3_merge -d ${fasta/.fa*/}.output/${fasta/.fa*/}_master_datastore_index.log
 mv ${fasta/.f*/}.all.gff maker_round1.gff
-fasta_merge -d ${name}.output/${name}_master_datastore_index.log
+fasta_merge -d ${fasta/.fa*/}.output/${fasta/.fa*/}_master_datastore_index.log
 mv ${fasta/.f*/}.all.maker.proteins.fasta maker_round1_proteins.fa
 mv ${fasta/.f*/}.all.maker.transcripts.fasta maker_round1_transcripts.fa
+
 
 echo "Done"
 
