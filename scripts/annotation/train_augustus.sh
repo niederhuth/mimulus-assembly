@@ -86,7 +86,7 @@ then
 fi
 if [ -z ${transcripts} ]
 then
-	transcripts="${maker_dir}/maker_round1_transcripts.gff"
+	transcripts="${maker_dir}/maker_round1_transcripts.fa"
 fi
 
 
