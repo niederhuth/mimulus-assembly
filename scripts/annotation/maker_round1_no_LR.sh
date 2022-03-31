@@ -41,20 +41,26 @@ sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
 path3="maker_round1_no_LR"
 
 #Look for fasta file, there can only be one!
-if ls *.fa >/dev/null 2>&1
+if [ -z ${fasta} ]
 then
-	fasta=$(ls *fa | sed s/.*\ //)
-	echo "Fasta file ${fasta} found"
-elif ls *.fasta >/dev/null 2>&1
-then
-	fasta=$(ls *fasta | sed s/.*\ //)
-	echo "Fasta file ${fasta} found"
-elif ls *.fna >/dev/null 2>&1
-then
-	fasta=$(ls *fna | sed s/.*\ //)
-	echo "Fasta file ${fasta} found"
+	echo "No input fasta provided, looking for fasta"
+	if ls *.fa >/dev/null 2>&1
+	then
+		fasta=$(ls *fa | sed s/.*\ //)
+		echo "Fasta file ${fasta} found"
+	elif ls *.fasta >/dev/null 2>&1
+	then
+		fasta=$(ls *fasta | sed s/.*\ //)
+		echo "Fasta file ${fasta} found"
+	elif ls *.fna >/dev/null 2>&1
+	then
+		fasta=$(ls *fna | sed s/.*\ //)
+		echo "Fasta file ${fasta} found"
+	else
+		echo "No fasta file found, please check and restart"
+	fi
 else
-	echo "No fasta file found, please check and restart"
+	echo "Input fasta: ${fasta}"
 fi
 
 #Make & cd to directory
