@@ -170,7 +170,8 @@ randomSplit.pl augustus.gb ${NUMSPLIT}
 #We will use autoAug.pl for training because we have transcript alignments that will be used as hints.
 #The etraining and optimize_augustus.pl scripts from AUGUSTUS will not be used as they do not allow 
 #for the use of hints.
-echo ""
+#rm -R /mnt/home/niederhu/miniconda3/envs/maker/config//species/Mguttatus-S1-S1
+echo "Running first round of autoAug.pl"
 autoAug.pl \
 	--species=${AUGUSTUS_SPECIES_NAME} \
 	--genome=genbank_gene_seqs.fasta \
@@ -192,7 +193,7 @@ done
 #Run the next command as indicated by autoAug.pl in step 5.
 #When above jobs are finished, continue by running the command autoAug.pl
 cd ../../../
-echo ""
+echo "Running second round of autoAug.pl"
 autoAug.pl \
 	--species=${AUGUSTUS_SPECIES_NAME} \
 	--genome=genbank_gene_seqs.fasta \
