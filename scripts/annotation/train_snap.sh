@@ -69,7 +69,7 @@ fi
 #Set some more inputs
 if [ -z ${input_gff} ]
 then
-	input_gff="${maker_dir}/${fasta/.f*/}.all.gff"
+	input_gff="${maker_dir}/maker_round1.gff"
 fi
 
 #Run maker2zff

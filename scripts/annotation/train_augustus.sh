@@ -82,11 +82,11 @@ then
 fi
 if [ -z ${input_gff} ]
 then
-	input_gff="${maker_dir}/${fasta/.f*/}.all.gff"
+	input_gff="${maker_dir}/maker_round1.gff"
 fi
 if [ -z ${transcripts} ]
 then
-	transcripts="${maker_dir}/${fasta/.f*/}.all.maker.transcripts.fasta"
+	transcripts="${maker_dir}/maker_round1_transcripts.gff"
 fi
 
 

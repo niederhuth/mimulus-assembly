@@ -171,7 +171,10 @@ maker \
 
 #Get gff & fasta files
 gff3_merge -d ${name}.output/${name}_master_datastore_index.log
+mv ${fasta/.f*/}.all.gff maker_round1.gff
 fasta_merge -d ${name}.output/${name}_master_datastore_index.log
+mv ${fasta/.f*/}.all.maker.proteins.fasta maker_round1_proteins.fa
+mv ${fasta/.f*/}.all.maker.transcripts.fasta maker_round1_transcripts.fa
 
 echo "Done"
 
