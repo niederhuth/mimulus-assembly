@@ -1,9 +1,9 @@
 #!/bin/bash --login
-#SBATCH --time=168:00:00
+#SBATCH --time=3:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=200GB
+#SBATCH --mem=50GB
 #SBATCH --job-name train_snap
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
@@ -11,15 +11,15 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-input_gff="../maker_round1/maker_round1.gff" #input gff file
+maker_dir="../maker_round1" #maker dir with gff & transcripts, not needed if input_gff & transcripts specified
+input_gff= #input gff file, if left blank will look in maker_dir
+fasta= #input fasta, if left blank, will look for it in current directory
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
 export PATH="${conda}/envs/maker/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/maker/lib:${LD_LIBRARY_PATH}"
-#Export path to agusutus config files
-export AUGUSTUS_CONFIG_PATH="${conda}/envs/maker/config/"
 
 #Set temporary directories for large memory operations
 export TMPDIR=$(pwd)
@@ -34,6 +34,29 @@ genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
 path3="snap_training"
 
+#Look for fasta file, there can only be one!
+if [ -z ${fasta} ]
+then
+	echo "No input fasta provided, looking for fasta"
+	if ls *.fa >/dev/null 2>&1
+	then
+		fasta=$(ls *fa | sed s/.*\ //)
+		echo "Fasta file ${fasta} found"
+	elif ls *.fasta >/dev/null 2>&1
+	then
+		fasta=$(ls *fasta | sed s/.*\ //)
+		echo "Fasta file ${fasta} found"
+	elif ls *.fna >/dev/null 2>&1
+	then
+		fasta=$(ls *fna | sed s/.*\ //)
+		echo "Fasta file ${fasta} found"
+	else
+		echo "No fasta file found, please check and restart"
+	fi
+else
+	echo "Input fasta: ${fasta}"
+fi
+
 #Make & cd to directory
 if [ -d ${path3} ]
 then
@@ -43,10 +66,11 @@ else
 	cd ${path3}
 fi
 
-#Set temporary directories for large memory operations
-export TMPDIR=$(pwd)
-export TMP=$(pwd)
-export TEMP=$(pwd)
+#Set some more inputs
+if [ -z ${input_gff} ]
+then
+	input_gff="${maker_dir}/${fasta/.f*/}.all.gff"
+fi
 
 #Run maker2zff
 echo "Running maker2zff"
@@ -59,13 +83,25 @@ fathom \
 	genome.dna \
 	-categorize 1000
 
-fathom -export 1000 -plus uni.ann uni.dna
+#Run fathom again
+fathom \
+	-export 1000 \
+	-plus \
+	uni.ann \
+	uni.dna
 
-#
-forge export.ann export.dna
+#Run forge
+echo "Running forge"
+mkdir forge
+cd forge
+forge ../export.ann ../export.dna
+cd ..
 
-#
-hmm-assembler.pl stevia_snap /data/run/miughetta/Stevia_rebaudiana/trainingSNAP > SNAP.hmm
+#Run hmm-assembler
+echo "Running hmm-assembler.pl"
+hmm-assembler.pl \
+	${fasta/.f*/}_snap \
+	forge/ > SNAP.hmm
 
 echo "Done"
 
