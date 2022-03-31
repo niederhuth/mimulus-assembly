@@ -156,7 +156,7 @@ fi
 
 #Run maker
 name=$(echo ${fasta} | sed s/\\.f*//)
-echo "Running Maker Round 1 on "
+echo "Running Maker Round 1 on ${fasta/.fa*/}"
 maker \
 	-q \
 	-genome ../${fasta} \
