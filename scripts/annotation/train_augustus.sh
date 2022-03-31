@@ -2,17 +2,18 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
+#SBATCH --cpus-per-task=10
 #SBATCH --mem=200GB
 #SBATCH --job-name train_augustus
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
+input_gff="../maker_round1/maker_round1.gff" #input gff file
+AUGUSTUS_SPECIES_NAME=
 fasta= #input fasta, if left blank, will look for it in current directory
-input_gff="../maker_round1/maker_round1.gff"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -20,10 +21,7 @@ cd ${PBS_O_WORKDIR}
 export PATH="${conda}/envs/maker/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/maker/lib:${LD_LIBRARY_PATH}"
 #Export path to agusutus config files
-#export ZOE="${conda}/envs/maker" #Need to check
 export AUGUSTUS_CONFIG_PATH="${conda}/envs/maker/config/"
-#export REPEATMASKER_LIB_DIR=
-#export REPEATMASKER_MATRICES_DIR=
 
 #Set temporary directories for large memory operations
 export TMPDIR=$(pwd)
@@ -37,7 +35,6 @@ species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
 path3="augustus_training"
-path4="../maker_round1"
 
 #Look for fasta file, there can only be one!
 if ls *.fa >/dev/null 2>&1
@@ -70,7 +67,14 @@ export TMPDIR=$(pwd)
 export TMP=$(pwd)
 export TEMP=$(pwd)
 
-#maker2zff
+#Make transcripts fasta
+echo "Getting transcripts fasta"
+gffread \
+	-w transcripts.fa \
+	-g ${fasta} \
+	${input_gff}
+
+#Run maker2zff
 #For determining which genes are High Confidence for Retraining, there are 7 criteria.
 #-c fraction  The fraction of splice sites confirmed by an EST alignment, default 0.5
 #-e fraction  The fraction of exons that overlap an EST alignment, default 0.5
@@ -80,8 +84,7 @@ export TEMP=$(pwd)
 #-l number    The min length of the protein sequence produced by the mRNA
 #-x number    Max AED to allow 0.5 is default
 #-n           No filtering.  Accept all.
-echo ""
-echo "maker2zff -x 0.2 -l 200 $MAKER_GFF_FILE_W_FASTA"
+echo "Running maker2zff"
 maker2zff \
 	-c 0.5 \
 	-e 0.5 \
@@ -92,7 +95,7 @@ maker2zff \
 	-x 0.2 \
 	${input_gff}
 
-#fathom
+#Run fathom
 #-validate [-quiet]
 #-gene-stats [-errors-ok -nucleotide -dinucleotide]
 #-categorize <int>
@@ -104,14 +107,13 @@ maker2zff \
 #-compare-genes <predictions> [-details]
 #-score-genes <hmm> [-errors-ok]
 #-filter-genes <hmm> -min-score <float> -min-length <int>
-echo ""
-echo "fathom genome.ann genome.dna -categorize 1000"
+echo "Running fathom"
 fathom \
 	genome.ann \
 	genome.dna \
 	-categorize 1000
 
-NUMFOUND="`grep -c x'>' uni.ann`"
+NUMFOUND="`grep -c '>' uni.ann`"
 
 if [ ${NUMFOUND} -gt 499 ]
 then
@@ -121,54 +123,44 @@ fi
 TEMPSPLIT=$((NUMFOUND/2))
 NUMSPLIT=${TEMPSPLIT/.*}
 
-echo "number found after fathom: $NUMFOUND"
-echo "number after split: $NUMSPLIT"
+echo "number found after fathom: ${NUMFOUND}"
+echo "number after split: ${NUMSPLIT}"
 
 #Convert the uni.ann and uni.dna output from fathom into a genbank formatted file.
-#fathom_to_genbank.pl is available on github: https://github.com/Childs-Lab/GC_specific_MAKER.
-#Modify the path here, or ensure that fathom_to_genbank.pl is in your $PATH.
-echo "fathom_to_genbank.pl --annotation_file uni.ann --dna_file uni.dna --genbank_file augustus.gb --number ${NUMFOUND}"
-fathom_to_genbank.pl \
+#fathom_to_genbank.pl is from https://github.com/Childs-Lab/GC_specific_MAKER.
+echo "Conveting fathom to genbank format"
+perl ${path2}/annotation/fathom_to_genbank.pl \
 	--annotation_file uni.ann \
 	--dna_file uni.dna \
 	--genbank_file augustus.gb \
 	--number ${NUMFOUND}
 
-#To get the subset of fastas that correspond to the genes in the genbank file, follow these steps.
-#get_subset_of_fastas.pl is available on github: https://github.com/Childs-Lab/GC_specific_MAKER.
-#Modify the path here, or ensure that get_subset_of_fastas.pl is in your $PATH.
-perl -e  'while (my $line = <>){ if ($line =~ /^LOCUS\s+(\S+)/) { print "$1\n"; } }' ${WORKING_DIR}/augustus.gb > ${WORKING_DIR}/genbank_gene_list.txt
+#Get the subset of fastas that correspond to the genes in the genbank file.
+#get_subset_of_fastas.pl is from github: https://github.com/Childs-Lab/GC_specific_MAKER.
+perl -e  'while (my $line = <>){ if ($line =~ /^LOCUS\s+(\S+)/) { print "$1\n"; } }' augustus.gb > genbank_gene_list.txt
 
-echo "get_subset_of_fastas.pl -l ${WORKING_DIR}/genbank_gene_list.txt -f ${WORKING_DIR}/uni.dna -o ${WORKING_DIR}/genbank_gene_seqs.fasta"
+echo ""
 perl ${path2}/annotation/get_subset_of_fastas.pl \
-	-l  ${WORKING_DIR}/genbank_gene_list.txt \
-	-f ${WORKING_DIR}/uni.dna \
-	-o ${WORKING_DIR}/genbank_gene_seqs.fasta
+	-l genbank_gene_list.txt \
+	-f uni.dna \
+	-o genbank_gene_seqs.fasta
 
-#Split the known genes into test and training files.
-#randomSplit.pl is a script provided by AUGUSTUS.
-#Modify the path here, or ensure that randomSplit.pl is in your $PATH.
-echo "randomSplit.pl ${WORKING_DIR}/augustus.gb ${NUMSPLIT}"
-randomSplit.pl ${WORKING_DIR}/augustus.gb ${NUMSPLIT}
+#Split genes into test and training files.
+echo "Randomly splitting genes into test and training files"
+randomSplit.pl augustus.gb ${NUMSPLIT}
 
 #We will use autoAug.pl for training because we have transcript alignments that will be used as hints.
 #The etraining and optimize_augustus.pl scripts from AUGUSTUS will not be used as they do not allow for the use of hints.
-#Run autoAug.pl.
-#This script is provided in the AUGUSTUS installation.
-#Modify the path here, or ensure that autoAug.pl is in your $PATH.
-echo "autoAug.pl --species=$AUGUSTUS_SPECIES_NAME --genome=${WORKING_DIR}/genbank_gene_seqs.fasta --trainingset=${WORKING_DIR}/augustus.gb.train --cdna=$CDNA_FASTA --noutr"
+echo ""
 autoAug.pl \
 	--species=${AUGUSTUS_SPECIES_NAME} \
-	--genome=${WORKING_DIR}/genbank_gene_seqs.fasta \
-	--trainingset=${WORKING_DIR}/augustus.gb.train \
-	--cdna=$CDNA_FASTA \
+	--genome=genbank_gene_seqs.fasta \
+	--trainingset=augustus.gb.train \
+	--cdna=transcripts.fa \
 	--noutr
 
-#Run the batch scripts generated by the previous command
-cd "${WORKING_DIR}/autoAug/autoAugPred_abinitio/shells"
-cd ${WORKING_DIR}/autoAug/autoAugPred_abinitio/shells
-
-# The number of ./aug# scripts is variable.  Run until the new file does not exist.
+#Run the batch scripts generated by autoAug.pl
+cd autoAug/autoAugPred_abinitio/shells
 x=1
 while [ -e ./aug${x} ]
 do
@@ -179,21 +171,17 @@ done
 
 #Run the next command as indicated by autoAug.pl in step 5.
 #When above jobs are finished, continue by running the command autoAug.pl
-echo "cd $WORKING_DIR"
-cd $WORKING_DIR
-echo "autoAug.pl --species=$AUGUSTUS_SPECIES_NAME --genome=${WORKING_DIR}/genbank_gene_seqs.fasta --useexisting --hints=${WORKING_DIR}/autoAug/hints/hints.E.gff  -v -v -v  --index=1"
+cd ../../../
+echo ""
 autoAug.pl \
 	--species=${AUGUSTUS_SPECIES_NAME} \
-	--genome=${WORKING_DIR}/genbank_gene_seqs.fasta \
+	--genome=genbank_gene_seqs.fasta \
 	--useexisting \
-	--hints=${WORKING_DIR}/autoAug/hints/hints.E.gff  \
+	--hints=autoAug/hints/hints.E.gff  \
 	-v -v -v --index=1
 
-#Run the batch scripts as indicated by autoAug.pl in step 7.
-echo "cd ${WORKING_DIR}/autoAug/autoAugPred_hints/shells/"
-cd ${WORKING_DIR}/autoAug/autoAugPred_hints/shells/
-
-#The number of ./aug# scripts is variable.  Run until the new file does not exist.
+#Run the batch scripts generated by autoAug.pl
+cd autoAug/autoAugPred_hints/shells/
 let x=1
 while [ -e ./aug${x} ]
 do
@@ -203,9 +191,11 @@ do
 done
 
 #Checked sensitivity and specificity of the newly trained AUGUSTUS HMM by using the test data.
-cd ${WORKING_DIR}
-echo "augustus --species=$AUGUSTUS_SPECIES_NAME augustus.gb.test"
-augustus --species=$AUGUSTUS_SPECIES_NAME augustus.gb.test
+cd ../../../
+echo ""
+augustus \
+	--species=${AUGUSTUS_SPECIES_NAME} \
+	augustus.gb.test
 
 echo "Done"
 
