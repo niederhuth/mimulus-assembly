@@ -32,11 +32,12 @@ export TEMP=$(pwd)
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
+path2=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
-path2="augustus_training"
-path3="../maker_round1"
+path3="augustus_training"
+path4="../maker_round1"
 
 #Look for fasta file, there can only be one!
 if ls *.fa >/dev/null 2>&1
@@ -56,12 +57,12 @@ else
 fi
 
 #Make & cd to directory
-if [ -d ${path2} ]
+if [ -d ${path3} ]
 then
-	cd ${path2}
+	cd ${path3}
 else
-	mkdir ${path2}
-	cd ${path2}
+	mkdir ${path3}
+	cd ${path3}
 fi
 
 #Set temporary directories for large memory operations
@@ -139,7 +140,7 @@ fathom_to_genbank.pl \
 perl -e  'while (my $line = <>){ if ($line =~ /^LOCUS\s+(\S+)/) { print "$1\n"; } }' ${WORKING_DIR}/augustus.gb > ${WORKING_DIR}/genbank_gene_list.txt
 
 echo "get_subset_of_fastas.pl -l ${WORKING_DIR}/genbank_gene_list.txt -f ${WORKING_DIR}/uni.dna -o ${WORKING_DIR}/genbank_gene_seqs.fasta"
-get_subset_of_fastas.pl \
+perl ${path2}/annotation/get_subset_of_fastas.pl \
 	-l  ${WORKING_DIR}/genbank_gene_list.txt \
 	-f ${WORKING_DIR}/uni.dna \
 	-o ${WORKING_DIR}/genbank_gene_seqs.fasta
@@ -152,7 +153,7 @@ randomSplit.pl ${WORKING_DIR}/augustus.gb ${NUMSPLIT}
 
 #We will use autoAug.pl for training because we have transcript alignments that will be used as hints.
 #The etraining and optimize_augustus.pl scripts from AUGUSTUS will not be used as they do not allow for the use of hints.
-#Run autoAug.pl.  
+#Run autoAug.pl.
 #This script is provided in the AUGUSTUS installation.
 #Modify the path here, or ensure that autoAug.pl is in your $PATH.
 echo "autoAug.pl --species=$AUGUSTUS_SPECIES_NAME --genome=${WORKING_DIR}/genbank_gene_seqs.fasta --trainingset=${WORKING_DIR}/augustus.gb.train --cdna=$CDNA_FASTA --noutr"
