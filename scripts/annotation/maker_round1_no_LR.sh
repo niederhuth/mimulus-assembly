@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 SR=TRUE #Use short read transcript asemblies?
-LR=TRUE #Use long read transcript assemblies?
+LR=FALSE #Use long read transcript assemblies?
 fasta= #input fasta, if left blank, will look for it in current directory
 blast_threads=10 #Leave 1 for MPI
 
@@ -38,7 +38,7 @@ path2=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
-path3="maker_round1"
+path3="maker_round1_no_LR"
 
 #Look for fasta file, there can only be one!
 if ls *.fa >/dev/null 2>&1
