@@ -21,11 +21,6 @@ cd ${PBS_O_WORKDIR}
 export PATH="${conda}/envs/maker/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/maker/lib:${LD_LIBRARY_PATH}"
 
-#Set temporary directories for large memory operations
-export TMPDIR=$(pwd)
-export TMP=$(pwd)
-export TEMP=$(pwd)
-
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
 path2=$(pwd | sed s/data.*/scripts/)

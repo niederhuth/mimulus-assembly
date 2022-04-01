@@ -25,6 +25,11 @@ export LD_LIBRARY_PATH="${conda}/envs/maker/lib:${LD_LIBRARY_PATH}"
 #Export path to agusutus config files
 export AUGUSTUS_CONFIG_PATH="${conda}/envs/maker/config/"
 
+#Set temporary directories for large memory operations
+export TMPDIR=$(pwd)
+export TMP=$(pwd)
+export TEMP=$(pwd)
+
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
 path2=$(pwd | sed s/data.*/scripts/)
