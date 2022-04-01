@@ -73,7 +73,7 @@ export TMP=$(pwd)
 export TEMP=$(pwd)
 
 #Run maker
-echo "Running Maker Round 2 on ${fasta/.fa*/}"
+echo "Running Maker Round 2 on ${fasta/.f.*/}"
 maker \
 	-q \
 	-genome ../${fasta} \
@@ -81,8 +81,8 @@ maker \
 	${path1}/annotation/maker_round2/*
 
 #Get gff & fasta files
-gff3_merge -d ${fasta/.fa*/}.output/${fasta/.fa*/}_master_datastore_index.log
-fasta_merge -d ${fasta/.fa*/}.output/${fasta/.fa*/}_master_datastore_index.log
+gff3_merge -d ${fasta/.f.*/}.output/${fasta/.f.*/}_master_datastore_index.log
+fasta_merge -d ${fasta/.f.*/}.output/${fasta/.f.*/}_master_datastore_index.log
 
 echo "Done"
 
