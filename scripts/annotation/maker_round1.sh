@@ -164,12 +164,11 @@ maker \
 	${path1}/annotation/maker_round1/*
 
 #Get gff & fasta files
-gff3_merge -d ${fasta/.fa*/}.output/${fasta/.fa*/}_master_datastore_index.log
-mv ${fasta/.f*/}.all.gff maker_round1.gff
-fasta_merge -d ${fasta/.fa*/}.output/${fasta/.fa*/}_master_datastore_index.log
-mv ${fasta/.f*/}.all.maker.proteins.fasta maker_round1_proteins.fa
-mv ${fasta/.f*/}.all.maker.transcripts.fasta maker_round1_transcripts.fa
-
+gff3_merge -d ${fasta/.f.*/}.output/${fasta/.f.*/}_master_datastore_index.log
+mv ${fasta/.f*/}.all.gff maker.gff
+fasta_merge -d ${fasta/.f.*/}.output/${fasta/.f.*/}_master_datastore_index.log
+mv ${fasta/.f.*/}.all.maker.proteins.fasta maker_proteins.fa
+mv ${fasta/.f.*/}.all.maker.transcripts.fasta maker_transcripts.fa
 
 echo "Done"
 
