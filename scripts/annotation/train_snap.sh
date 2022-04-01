@@ -64,7 +64,7 @@ fi
 #Set some more inputs
 if [ -z ${input_gff} ]
 then
-	input_gff="${maker_dir}/maker_round1.gff"
+	input_gff="${maker_dir}/maker.gff"
 fi
 
 #Run maker2zff
