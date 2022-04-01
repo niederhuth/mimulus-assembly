@@ -131,9 +131,9 @@ fathom \
 
 NUMFOUND="`grep -c '>' uni.ann`"
 
-if [ ${NUMFOUND} -gt 499 ]
+if [ ${NUMFOUND} -gt 599 ]
 then
-	NUMFOUND=500
+	NUMFOUND=600
 fi
 
 TEMPSPLIT=$((NUMFOUND/2))
