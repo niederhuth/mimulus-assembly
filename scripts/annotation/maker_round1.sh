@@ -14,7 +14,7 @@ conda="${HOME}/miniconda3"
 SR=TRUE #Use short read transcript asemblies?
 LR=TRUE #Use long read transcript assemblies?
 fasta= #input fasta, if left blank, will look for it in current directory
-blast_threads=10 #Leave 1 for MPI
+blast_threads=1 #Leave 1 for MPI
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
