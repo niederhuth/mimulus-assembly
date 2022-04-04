@@ -101,6 +101,7 @@ perl get_subset_of_fastas.pl \
 	-l ${gene_ids} \
 	-f ${transcripts} \
 	-o maker_standard_transcripts.fa
+	
 echo ""
 perl get_subset_of_fastas.pl \
 	-l ${gene_ids} \
@@ -164,6 +165,7 @@ perl get_subset_of_fastas.pl \
 	-l $gene_ids \
 	-f $transcripts \
 	-o Sreb_v1.0_maker_std_transcripts_noTE.fasta
+
 perl get_subset_of_fastas.pl \
 	-l $gene_ids \
 	-f $proteins \
