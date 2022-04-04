@@ -4,9 +4,9 @@ organism_type=eukaryotic #eukaryotic or prokaryotic. Default is eukaryotic
 
 #-----Re-annotation Using MAKER Derived GFF3
 maker_gff=../maker_round1/maker.gff #MAKER derived GFF3 file
-est_pass=0 #use ESTs in maker_gff: 1 = yes, 0 = no
+est_pass=1 #use ESTs in maker_gff: 1 = yes, 0 = no
 altest_pass=0 #use alternate organism ESTs in maker_gff: 1 = yes, 0 = no
-protein_pass=0 #use protein alignments in maker_gff: 1 = yes, 0 = no
+protein_pass=1 #use protein alignments in maker_gff: 1 = yes, 0 = no
 rm_pass=1 #use repeats in maker_gff: 1 = yes, 0 = no
 model_pass=0 #use gene models in maker_gff: 1 = yes, 0 = no
 pred_pass=0 #use ab-initio predictions in maker_gff: 1 = yes, 0 = no
