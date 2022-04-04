@@ -3,7 +3,7 @@ genome= #genome sequence (fasta file or fasta embeded in GFF3 file)
 organism_type=eukaryotic #eukaryotic or prokaryotic. Default is eukaryotic
 
 #-----Re-annotation Using MAKER Derived GFF3
-maker_gff=../maker_round1/maker_round1.gff #MAKER derived GFF3 file
+maker_gff=../maker_round1/maker.gff #MAKER derived GFF3 file
 est_pass=0 #use ESTs in maker_gff: 1 = yes, 0 = no
 altest_pass=0 #use alternate organism ESTs in maker_gff: 1 = yes, 0 = no
 protein_pass=0 #use protein alignments in maker_gff: 1 = yes, 0 = no
