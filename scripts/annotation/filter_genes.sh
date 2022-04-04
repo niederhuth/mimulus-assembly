@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=200GB
-#SBATCH --job-name filter_TEs
+#SBATCH --job-name filter_genes
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -30,7 +30,7 @@ path2=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
-path3="TE_filtering"
+path3="gene_filtering"
 
 #Look for fasta file, there can only be one!
 if [ -z ${fasta} ]
@@ -76,18 +76,9 @@ gff=${maker_dir}/maker.gff
 gene_ids=maker_standard_gene_list.txt
 
 #Check for Pfam A
-if [[ -z Pfam-A.hmm || -z Pfam-A.hmm.gz ]]
-then
-	echo Pfam-A.hmm found
-	if [ -z Pfam-A.hmm.gz ]
-	then
-		gunzip Pfam-A.hmm.gz
-	fi
-else
-	echo "Downloading Pfam-A"
-	wget http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
-	gunzip Pfam-A.hmm.gz
-fi
+echo "Downloading Pfam-A"
+wget http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
+gunzip Pfam-A.hmm.gz
 
 #Prepare Pfam A hmm-database
 echo "Preparing Pfam A hmm database"
@@ -130,37 +121,32 @@ perl ${path2}/annotation/create_maker_standard_gff.pl \
 	--output_gff maker_standard.gff \
 	--maker_standard_gene_list ${gene_ids}
 
-#Make Transposase BLAST DB
-echo "Making Transposase BLAST DB"
-makeblastdb \
-	-in Tpases020812 \
-	-title "Tpases020812DB" \
-	-parse_seqids \
-	-out Tpases020812DB \
-	-dbtype prot
+#Download and make Transposase blast DB
+echo "Downloading Tpases020812"
+wget http://www.hrt.msu.edu/uploads/535/78637/Tpases020812.gz
+gunzip Tpases020812.gz
 
+echo "Making Transposase diamond blast DB"
+diamond makedb \
+	--in  Tpases020812 \
+	--db Tpases020812.dmnd
 
-#Run BLAST against Transposases 
-echo "Running BLAST on Transposases"
-blastp \
-	-db Tpases020812DB \
-	-query ${proteins} \
-	-out TE_blast.out \
-	-evalue 1e-10 \
-	-outfmt 6 \
-	-num_threads ${threads}
+#Run diamond blastp against Transposases 
+echo "Running diamond blastp on Transposases"
+diamond blastp \
+	--threads ${threads} \
+	--db Tpases020812.dmnd \
+	--query ${proteins} \
+	--out TE_blast.out\
+	--evalue ${evalue} \
+	--outfmt 6
 
 #Download Gypsy DB hmm files and format the hmm database
-if [ -z all_gypsy.hmm ]
-then
-	echo "all_gypsy.hmm found"
-else
-	echo "Downloading GyDB_collection"
-	wget https://gydb.org/extensions/Collection/collection/db/GyDB_collection.zip
-	unzip GyDB_collection.zip
-	echo "Combining GyDB hmm profiles"
-	cat GyDB_collection/profiles/*hmm > all_gypsy.hmm
-fi
+echo "Downloading GyDB_collection"
+wget https://gydb.org/extensions/Collection/collection/db/GyDB_collection.zip
+unzip GyDB_collection.zip
+echo "Combining GyDB hmm profiles"
+cat GyDB_collection/profiles/*hmm > all_gypsy.hmm
 echo "Formatting all_gypsy.hmm database"
 hmmpress all_gypsy.hmm
 
