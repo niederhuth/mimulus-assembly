@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=200GB
-#SBATCH --job-name filter_genes
+#SBATCH --job-name filter_TEs
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -30,7 +30,7 @@ path2=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
-path3=""
+path3="TE_filtering"
 
 #Look for fasta file, there can only be one!
 if [ -z ${fasta} ]
@@ -127,7 +127,7 @@ perl ${path2}/annotation/get_subset_of_fastas.pl \
 echo "Making Maker Standard GFF file"
 perl ${path2}/annotation/create_maker_standard_gff.pl \
 	--input_gff ${gff} \
-	--output_gff maker_standard.gff3 \
+	--output_gff maker_standard.gff \
 	--maker_standard_gene_list ${gene_ids}
 
 #Make Transposase BLAST DB
@@ -145,7 +145,7 @@ echo "Running BLAST on Transposases"
 blastp \
 	-db Tpases020812DB \
 	-query ${proteins} \
-	-out blast.out \
+	-out TE_blast.out \
 	-evalue 1e-10 \
 	-outfmt 6 \
 	-num_threads ${threads}
@@ -174,35 +174,34 @@ hmmscan \
 	all_gypsy.hmm \
 	${proteins}
 
-#
+#Create a genelist with no TEs
+echo "Creating gene list with TEs removed"
 python ${path2}/annotation/create_no_TE_genelist.py \
-	--input_file_TEpfam TE_Pfam_domains.txt \
-	--input_file_maxPfam Sreb_prot_domains.out \
-	--input_file_geneList_toKeep Sreb_maker2_standard_gene_list.txt \
+	--input_file_TEpfam ${path1}/annotation/TE_Pfam_domains.txt \
+	--input_file_maxPfam prot_domains.out \
+	--input_file_geneList_toKeep maker_standard_gene_list.txt \
 	--input_file_TEhmm gypsyHMM_analysis.out \
-	--input_file_TEblast Sreb_blast.out \
-	--output_file noTE_Sreb_v1.0_maker2standard_gene_list.txt
+	--input_file_TEblast TE_blast.out \
+	--output_file noTE_maker_standard_gene_list.txt
 
-#
-gene_ids=noTE_Sreb_v1.0_maker2standard_gene_list.txt
-transcripts=Sreb_maker_standard_transcripts.fasta
-proteins=Sreb_maker_standard_proteins.fasta
-input_gff=Sred_maker2_standard.gff3
-
+#Generate noTE files
+echo "Making no TE Maker Standard Transcripts fasta"
 perl ${path2}/annotation/get_subset_of_fastas.pl \
-	-l $gene_ids \
-	-f $transcripts \
-	-o Sreb_v1.0_maker_std_transcripts_noTE.fasta
+	-l noTE_maker_standard_gene_list.txt \
+	-f maker_standard_transcripts.fa \
+	-o ${fasta/.fa/}_maker_standard_transcripts_noTE.fa
 
+echo "Making no TE Maker Standard proteins fasta"
 perl ${path2}/annotation/get_subset_of_fastas.pl \
-	-l $gene_ids \
-	-f $proteins \
-	-o Sreb_v1.0_maker_std_proteins_noTE.fasta
+	-l noTE_maker_standard_gene_list.txt \
+	-f maker_standard_proteins.fa \
+	-o ${fasta/.fa/}_maker_standard_proteins_noTE.fa
 
+echo "Making no TE Maker Standard gff"
 perl ${path2}/annotation/create_maker_standard_gff.pl \
-	--input_gff $input_gff \
-	--output_gff Sreb_v1.0_maker_std_noTE.gff3 \
-	--maker_standard_gene_list noTE_Sreb_v1.0_maker2standard_gene_list.txt
+	--input_gff maker_standard.gff \
+	--output_gff ${fasta/.fa/}_maker_standard_transcripts_noTE.gff \
+	--maker_standard_gene_list noTE_maker_standard_gene_list.txt
 
 echo "Done"
 
