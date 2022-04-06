@@ -1,5 +1,5 @@
 #!/bin/bash --login
-#SBATCH --time=168:00:00
+#SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=50
@@ -11,12 +11,8 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-<<<<<<< HEAD
-threads=20
-maker_dir="../maker_round2"
-=======
 threads=50
->>>>>>> ca700cc95640f39a0690c32852fd3046de406c98
+maker_dir="../maker_round2"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
