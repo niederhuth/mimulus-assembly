@@ -21,32 +21,32 @@ args = parser.parse_args()
 
 input_file_TEpfam = args.input_file_TEpfam
 if os.path.isfile(input_file_TEpfam) == False:
-    print '\n\nThe file ' + input_file_TEpfam + ' does not exist.\n'
+    print('\n\nThe file ' + input_file_TEpfam + ' does not exist.\n')
     sys.exit()
 input_file_TEhmm = args.input_file_TEhmm
 if os.path.isfile(input_file_TEhmm) == False:
-    print '\n\nThe file ' + input_file_TEhmm + ' does not exist.\n'
+    print('\n\nThe file ' + input_file_TEhmm + ' does not exist.\n')
     sys.exit()
 input_file_maxPfam = args.input_file_maxPfam
 if os.path.isfile(input_file_maxPfam) == False:
-    print '\n\nThe file ' + input_file_maxPfam + ' does not exist.\n'
+    print('\n\nThe file ' + input_file_maxPfam + ' does not exist.\n')
     sys.exit()
 input_file_geneList_toKeep = args.input_file_geneList_toKeep
 if os.path.isfile(input_file_geneList_toKeep) == False:
-    print '\n\nThe file ' + input_file_geneList_toKeep + ' does not exist.\n'
+    print('\n\nThe file ' + input_file_geneList_toKeep + ' does not exist.\n')
     sys.exit()
 input_file_TEblast = args.input_file_TEblast
 if os.path.isfile(input_file_TEblast) == False:
-    print '\n\nThe file ' + input_file_TEblast + ' does not exist.\n'
+    print('\n\nThe file ' + input_file_TEblast + ' does not exist.\n')
     sys.exit()
 input_file_TErefmap = args.input_file_TErefmap
 if os.path.isfile(input_file_TErefmap) == False:
-    print '\n\nThe file ' + input_file_TErefmap + ' does not exist.\n'
+    print('\n\nThe file ' + input_file_TErefmap + ' does not exist.\n')
     sys.exit()
 
 output_file = args.output_file
 if os.path.isfile(output_file):
-    print '\n\nThe file ' + output_file + ' already exists.\n'
+    print('\n\nThe file ' + output_file + ' already exists.\n')
     sys.exit()
 output_fh = open(output_file, 'w')
 
@@ -61,7 +61,7 @@ with open(input_file_TEpfam) as input_fh_TEpfam:
             line_string = each_line.strip()
             (Pfam,Domain,Description) = line_string.split('\t')
             TEpfamSet.add(Pfam)
-print "Total number of TE-related pfam domains: ", len(TEpfamSet)
+print("Total number of TE-related pfam domains: ", len(TEpfamSet))
 
 #This loop compares PfamIDs between the TE pfam list and the maxPfam file,
 #resulting in a list of TE-related PfamIDs that were present in the maxPfam file
@@ -104,7 +104,7 @@ with open(input_file_TEblast) as input_fh_TEblast:
             line_tuple = line_string.split()
             gene = line_tuple[0]
             TEgeneSet.add(gene)
-print "Number of TE-related genes after adding blast info: ", len(TEgeneSet)
+print("Number of TE-related genes after adding blast info: ", len(TEgeneSet))
 
 #Add matching loci from gffcompare refmap
 count = 0
@@ -119,13 +119,13 @@ with open(input_file_TErefmap) as input_fh_TErefmap:
         if match == "=":
             count = count + 1
             TEgeneSet.add(mRNA)
-print "Total number of full matches: ", count
-print "Number of TE-related genes after adding refmap info: ", len(TEgeneSet)
+print("Total number of full matches: ", count)
+print("Number of TE-related genes after adding refmap info: ", len(TEgeneSet))
 
 #Below: what is present in oldGeneListSet, absent in TEgeneSet
 newGeneSet = oldGeneSet.difference(TEgeneSet)
-print "Length of old gene set: ", len(oldGeneSet)
-print "Length of new gene set: ", len(newGeneSet)
+print("Length of old gene set: ", len(oldGeneSet))
+print("Length of new gene set: ", len(newGeneSet))
 for each_element in newGeneSet:
     output_fh.write("%s\n"%(each_element))
 
