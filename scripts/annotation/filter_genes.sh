@@ -12,6 +12,9 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
+gff= #input gff, if left blank will search in maker_dir
+transcripts= #input transcripts fa, if left blank will search in maker_dir
+proteins= #input transcripts fa, if left blank will search in maker_dir
 maker_dir="../maker_round2"
 
 #Change to current directory
@@ -71,10 +74,18 @@ export TMP=$(pwd)
 export TEMP=$(pwd)
 
 #Set various datasets
-transcripts=${maker_dir}/maker_transcripts.fa
-proteins=${maker_dir}/maker_proteins.fa
-gff=${maker_dir}/maker.gff
-gene_ids=maker_standard_gene_list.txt
+if [ -z ${transcripts} ]
+then
+	transcripts=${maker_dir}/${fasta/.fa/}.all.maker.transcripts.fasta
+fi
+if [ -z ${proteins} ]
+then
+	proteins=${maker_dir}/${fasta/.fa/}.all.maker.proteins.fasta
+fi
+if [ -z ${gff} ]
+then
+	gff=${maker_dir}/${fasta/.fa/}.all.gff
+fi
 
 #Check for Pfam A
 echo "Downloading Pfam-A"
@@ -97,31 +108,31 @@ hmmscan \
 	${proteins}
 
 #Generate maker standard gene list
-echo "Generating Maker Standard Gene List"
+echo "Generating Pfam filtered Gene List"
 perl ${path2}/annotation/generate_maker_standard_gene_list.pl \
 	--input_gff ${gff} \
 	--pfam_results prot_domains.out \
 	--pfam_cutoff 1e-10 \
-	--output_file maker_standard_gene_list.txt
+	--output_file pfam_filtered_gene_list.txt
 
 #Make Maker Standard Files
-echo "Making Maker Standard Transcripts fasta"
+echo "Making Initial Transcripts fasta"
 perl ${path2}/annotation/get_subset_of_fastas.pl \
-	-l ${gene_ids} \
+	-l pfam_filtered_gene_list.txt \
 	-f ${transcripts} \
-	-o maker_standard_transcripts.fa
+	-o pfam_filtered_transcripts.fa
 	
-echo "Making Maker Standard Protein fasta"
+echo "Making Initial Protein fasta"
 perl ${path2}/annotation/get_subset_of_fastas.pl \
-	-l ${gene_ids} \
+	-l pfam_filtered_gene_list.txt} \
 	-f ${proteins} \
-	-o maker_standard_proteins.fa
+	-o pfam_filtered_proteins.fa
 
-echo "Making Maker Standard GFF file"
+echo "Making Initial GFF file"
 perl ${path2}/annotation/create_maker_standard_gff.pl \
 	--input_gff ${gff} \
-	--output_gff maker_standard.gff \
-	--maker_standard_gene_list ${gene_ids}
+	--output_gff pfam_filtered.gff \
+	--maker_standard_gene_list pfam_filtered_gene_list.txt
 
 #Download and make Transposase blast DB
 echo "Downloading Tpases020812"
@@ -171,29 +182,29 @@ echo "Creating gene list with TEs removed"
 python ${path2}/annotation/create_no_TE_genelist.py \
 	--input_file_TEpfam ${path1}/annotation/TE_Pfam_domains.txt \
 	--input_file_maxPfam prot_domains.out \
-	--input_file_geneList_toKeep maker_standard_gene_list.txt \
+	--input_file_geneList_toKeep pfam_filtered_gene_list.txt \
 	--input_file_TEhmm gypsyHMM_analysis.out \
 	--input_file_TEblast TE_blast.out \
-	--output_file noTE_maker_standard_gene_list.txt
+	--output_file noTE_gene_list.txt
 
 #Generate noTE files
-echo "Making no TE Maker Standard Transcripts fasta"
+echo "Making no TE Transcripts fasta"
 perl ${path2}/annotation/get_subset_of_fastas.pl \
-	-l noTE_maker_standard_gene_list.txt \
-	-f maker_standard_transcripts.fa \
-	-o ${fasta/.fa/}_maker_standard_transcripts_noTE.fa
+	-l noTE_gene_list.txt \
+	-f pfam_filtered_transcripts.fa \
+	-o ${fasta/.fa/}_transcripts_noTE.fa
 
-echo "Making no TE Maker Standard proteins fasta"
+echo "Making no TE proteins fasta"
 perl ${path2}/annotation/get_subset_of_fastas.pl \
-	-l noTE_maker_standard_gene_list.txt \
-	-f maker_standard_proteins.fa \
-	-o ${fasta/.fa/}_maker_standard_proteins_noTE.fa
+	-l noTE_gene_list.txt \
+	-f pfam_filtered_proteins.fa \
+	-o ${fasta/.fa/}_proteins_noTE.fa
 
-echo "Making no TE Maker Standard gff"
+echo "Making no TE gff"
 perl ${path2}/annotation/create_maker_standard_gff.pl \
-	--input_gff maker_standard.gff \
-	--output_gff ${fasta/.fa/}_maker_standard_transcripts_noTE.gff \
-	--maker_standard_gene_list noTE_maker_standard_gene_list.txt
+	--input_gff pfam_filtered.gff \
+	--maker_standard_gene_list noTE_gene_list.txt \
+	--output_gff ${fasta/.fa/}_transcripts_noTE.gff
 
 echo "Done"
 
