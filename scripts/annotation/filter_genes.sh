@@ -2,8 +2,8 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=200GB
+#SBATCH --cpus-per-task=50
+#SBATCH --mem=50GB
 #SBATCH --job-name filter_genes
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
@@ -11,8 +11,12 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
+<<<<<<< HEAD
 threads=20
 maker_dir="../maker_round2"
+=======
+threads=50
+>>>>>>> ca700cc95640f39a0690c32852fd3046de406c98
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -91,6 +95,7 @@ hmmscan \
 	--domE 1e-5 \
 	-E 1e-5 \
 	--cpu ${threads} \
+	-o pfam_alignments.out \
 	--tblout prot_domains.out \
 	Pfam-A.hmm \
 	${proteins}
@@ -126,10 +131,13 @@ perl ${path2}/annotation/create_maker_standard_gff.pl \
 echo "Downloading Tpases020812"
 wget http://www.hrt.msu.edu/uploads/535/78637/Tpases020812.gz
 gunzip Tpases020812.gz
+#remove trailing white space in the Tpases020812 file
+sed -i 's/[ \t]*$//' Tpases020812
 
 echo "Making Transposase diamond blast DB"
 diamond makedb \
-	--in  Tpases020812 \
+	--threads ${threads} \
+	--in Tpases020812 \
 	--db Tpases020812.dmnd
 
 #Run diamond blastp against Transposases 
@@ -139,7 +147,7 @@ diamond blastp \
 	--db Tpases020812.dmnd \
 	--query ${proteins} \
 	--out TE_blast.out\
-	--evalue ${evalue} \
+	--evalue 1e-10 \
 	--outfmt 6
 
 #Download Gypsy DB hmm files and format the hmm database
@@ -157,6 +165,7 @@ hmmscan \
 	--domE 1e-5 \
 	-E 1e-5 \
 	--cpu ${threads} \
+	-o gypsy_alignments.out \
 	--tblout gypsyHMM_analysis.out \
 	all_gypsy.hmm \
 	${proteins}
