@@ -12,6 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=20
+maker_dir="../maker_round2"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
