@@ -15,7 +15,6 @@ parser.add_argument("--input_file_maxPfam", help="Path to input file: hmmscan ou
 parser.add_argument("--input_file_geneList_toKeep", help="Path to input file: genes to keep (e.g. maker standard gene list).", required = True)
 parser.add_argument("--input_file_TEhmm", help="Path to input file: hmmscan output of TE-related genes (e.g. gypsy hmm)")
 parser.add_argument("--input_file_TEblast", help="Path to input file: TE-related blast results (e.g. blastp with transposases).")
-parser.add_argument("--input_file_TErefmap", help="Path to input file: gffcompare refmap file.")
 parser.add_argument("--output_file", help="Path to the output file.", required=True)
 args = parser.parse_args()
 
@@ -38,10 +37,6 @@ if os.path.isfile(input_file_geneList_toKeep) == False:
 input_file_TEblast = args.input_file_TEblast
 if os.path.isfile(input_file_TEblast) == False:
     print('\n\nThe file ' + input_file_TEblast + ' does not exist.\n')
-    sys.exit()
-input_file_TErefmap = args.input_file_TErefmap
-if os.path.isfile(input_file_TErefmap) == False:
-    print('\n\nThe file ' + input_file_TErefmap + ' does not exist.\n')
     sys.exit()
 
 output_file = args.output_file
@@ -105,22 +100,6 @@ with open(input_file_TEblast) as input_fh_TEblast:
             gene = line_tuple[0]
             TEgeneSet.add(gene)
 print("Number of TE-related genes after adding blast info: ", len(TEgeneSet))
-
-#Add matching loci from gffcompare refmap
-count = 0
-with open(input_file_TErefmap) as input_fh_TErefmap:
-    for each_line in input_fh_TErefmap:
-        line_string = each_line.strip()
-        line_tuple = line_string.split()
-        query = line_tuple[-1]
-        query_split = query.split("|")
-        mRNA = query_split[-1]
-        match = line_tuple[2]
-        if match == "=":
-            count = count + 1
-            TEgeneSet.add(mRNA)
-print("Total number of full matches: ", count)
-print("Number of TE-related genes after adding refmap info: ", len(TEgeneSet))
 
 #Below: what is present in oldGeneListSet, absent in TEgeneSet
 newGeneSet = oldGeneSet.difference(TEgeneSet)
