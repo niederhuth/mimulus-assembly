@@ -138,7 +138,7 @@ diamond blastp \
 	--db Tpases020812.dmnd \
 	--query ${proteins} \
 	--out TE_blast.out\
-	--evalue ${evalue} \
+	--evalue 1e-10 \
 	--outfmt 6
 
 #Download Gypsy DB hmm files and format the hmm database
