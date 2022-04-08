@@ -12,6 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
+fasta= #genome fasta, if left blank will search for in submission directory
 gff= #input gff, if left blank will search in maker_dir
 transcripts= #input transcripts fa, if left blank will search in maker_dir
 proteins= #input transcripts fa, if left blank will search in maker_dir
