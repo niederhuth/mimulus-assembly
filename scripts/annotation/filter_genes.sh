@@ -124,7 +124,7 @@ perl ${path2}/annotation/get_subset_of_fastas.pl \
 	
 echo "Making Initial Protein fasta"
 perl ${path2}/annotation/get_subset_of_fastas.pl \
-	-l pfam_filtered_gene_list.txt} \
+	-l pfam_filtered_gene_list.txt \
 	-f ${proteins} \
 	-o pfam_filtered_proteins.fa
 
@@ -202,9 +202,9 @@ perl ${path2}/annotation/get_subset_of_fastas.pl \
 
 echo "Making no TE gff"
 perl ${path2}/annotation/create_maker_standard_gff.pl \
-	--input_gff pfam_filtered.gff \
 	--maker_standard_gene_list noTE_gene_list.txt \
-	--output_gff ${fasta/.fa/}_transcripts_noTE.gff
+	--input_gff pfam_filtered.gff \
+	--output_gff ${fasta/.fa/}_noTE.gff
 
 echo "Done"
 
