@@ -17,7 +17,7 @@ threads=10 #Actual cores used by RM are thread number multiplied by the cores fo
 			#So 10 threads with RMBlast actually needs 40 cores!
 #Set what repeat library to use. This is currently set to a set of denovo TEs identified by EDTA
 LTR_lib="../edta/*.fa.mod.EDTA.raw/LTR/*.fa.mod.LTRlib.fa" #non-redundant LTRlib from LTR_retriever
-LTR_list="../edta/*.fa.mod.EDTA.raw/*.fa.mod.pass.list"
+LTR_list="../edta/*.fa.mod.EDTA.raw/LTR/*.fa.mod.pass.list"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
