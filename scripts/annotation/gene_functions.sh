@@ -115,7 +115,7 @@ create_functional_annotation_file_2020.pl \
 	--protein_fasta ${proteins} \
 	--model_annot TAIR10_short_functional_descriptions.txt \
 	--model_blast TAIR10_blast.out \
-	--pfam_results_file ${proteins}.iprscan \ 
+	--pfam_results_file ${proteins}.iprscan \
 	--max_hits 5 \
 	--output prot_func_desc_list.txt
 
