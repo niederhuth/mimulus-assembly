@@ -59,11 +59,11 @@ else
 	cd ${path2}
 	cp ${LTR_lib} ./LTRlib.fa
 	cp ${LTR_list} ./LTR_list.pass.list
-	echo "Running RepeatMasker with ${LTR_lib}"
+	echo "Running RepeatMasker"
 	RepeatMasker \
 		-e ${engine} \
 		-pa ${threads} \
-		-1 \
+		-q \
 		-norna \
 		-no_is \
 		-div 40 \
