@@ -19,7 +19,7 @@ primer_sets="Lowry_et_al" #List of primers & associated genetic map
 primer_max_dist=5000 #max distance for primers to be separated
 synteny=TRUE #Use synteny, right now this assumes same species
 gff= #gff file of annotations for synteny, if left blank will look in current directory
-synteny_ref="TOL NONTOL" #List of genomes to use for synteny, these are assumed to be the same species
+synt_ref="TOL NONTOL" #List of genomes to use for synteny, these are assumed to be the same species
 markers=FALSE #Have not implemented this option
 optical=FALSE #Have not implemented this option
 
