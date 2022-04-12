@@ -13,15 +13,23 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=10
 distance=rank #cM or rank
-primers=TRUE #Paired primer sequences for genetic markers
+mask_regions= #bed file of regions to exclude which may introduce errors, e.g. known inversions
+primers=FALSE #Paired primer sequences for genetic markers
 primer_sets="Lowry_et_al" #List of primers & associated genetic map
 primer_max_dist=5000 #max distance for primers to be separated
-quick_synt=TRUE #Use synteny, by mapping transcript seqs, requires quick_synt_refs
-quick_synt_ref="TOL NONTOL" #List of genomes to use for quick_synt, these are assumed to be of same species
-chr_list="Chr_01 Chr_02 Chr_03 Chr_04 Chr_05 Chr_06 Chr_07 Chr_08 Chr_09 Chr_10 Chr_11 Chr_12 Chr_13 Chr_14"
+synteny=TRUE #Use synteny, right now this assumes same species
+gff= #gff file of annotations for synteny, if left blank will look in current directory
+synt_ref="TOL NONTOL" #List of genomes to use for synteny, these are assumed to be the same species
 markers=FALSE #Have not implemented this option
-synteny=FALSE #Have not implemented this option
 optical=FALSE #Have not implemented this option
+
+#quick_synt
+#If you do not yet have annotations for your genome, you can use this to map transcript sequences
+#From another genome and use this as a set of markers
+#I don't really recommend this
+quick_synt=FALSE #Use quick_synt TRUE or FALSE
+quick_synt_ref= #List of genomes to use for quick_synt, these are assumed to be of same species
+chr_list= #Names of sequences (i.e. chromosome names) to use with quick_synt
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -61,6 +69,24 @@ then
 	fi
 else
 	echo "Input fasta: ${input}"
+fi
+
+#Look for gff file if synteny set to TRUE
+if [ ${synteny} = "TRUE" ]
+then
+	if [ -z ${gff} ]
+	then
+		echo "No input gffprovided, looking for gff"
+		if ls *.gff >/dev/null 2>&1
+		then
+			gff=$(ls *gff | sed s/.*\ //)
+			echo "GFF file ${gff} found"
+		else
+			echo "No gff file found, please check and restart"
+		fi
+	else
+		echo "Input fasta: ${input}"
+	fi
 fi
 
 #Make and cd to output directory
@@ -162,6 +188,65 @@ then
 	done
 fi
 
+#Synteny 
+if [ ${synteny} = "TRUE" ]
+then
+	#Iterate of references and prep files
+	for ref in ${synt_ref}
+	do
+		if [ -s synt_${ref}/${ref}_synteny.bed ]
+		then
+			echo "synt_${ref}/${ref}_synteny.bed already exists, skipping"
+			echo "To repeat this step, delete synt_${ref}/${ref}_synteny.bed and resubmit"
+		else
+			echo "Performing synteny analysis for ${ref}"
+			mkdir synt_${ref}
+			cd synt_${ref}
+			echo "Formatting files"
+			#Format query gff file
+			python -m jcvi.formats.gff bed \
+				--primary_only \
+				--type=mRNA \
+				--key=Name \
+				../../${gff} \
+				-o input.bed
+			#Make cds file
+			gffread \
+				-x tmp_cds.fa \
+				-g ../../${input} \
+				../../${gff}
+			#Format query cds fasta file
+			python -m jcvi.formats.fasta format \
+				tmp_cds.fa \
+				input.cds
+			rm tmp_cds.fa
+			#Format target gff file
+			python -m jcvi.formats.gff bed \
+				--primary_only \
+				--type=mRNA \
+				--key=Name \
+				${path4}/${ref}/ref/annotations/${ref}-v*.gff \
+				-o ref.bed
+			#Format target cds fasta file
+			python -m jcvi.formats.fasta format \
+				${path4}/${ref}/ref/annotations/${ref}-v*-cds-primary.fa \
+				ref.cds
+			#Run synteny analysis
+			echo "Running synteny analysis"
+			python -m jcvi.compara.catalog ortholog input ref
+			#Build synteny.bed
+			echo "Building synteny bed for allmaps"
+			python -m jcvi.assembly.syntenypath bed \
+				--switch \
+				ref.input.lifted.anchors \
+				-o ${ref}_synteny.bed
+			cd ../
+		fi
+		#Add to list of data for allmaps
+		position_data="${position_data} synt_${ref}/${ref}_synteny.bed "
+	done
+fi
+
 #Quick Synteny data
 if [ ${quick_synt} = "TRUE" ]
 then
@@ -185,7 +270,8 @@ then
 					quick_synt_${ref}/ref-cds-primary.fa > quick_synt_${ref}/${i}.paf 
 
 				#Convert to bed file
-				awk -v OFS="\t" '{print $6,$8,$9,$1,100,$5}' quick_synt_${ref}/${i}.paf > quick_synt_${ref}/${i}_aln.bed
+				awk -v OFS="\t" '{print $6,$8,$9,$1,100,$5}' \
+				quick_synt_${ref}/${i}.paf > quick_synt_${ref}/${i}_aln.bed
 
 				#Retain only unique alignments
 				cut -f4 quick_synt_${ref}/${i}_aln.bed | sort | uniq -c | sed 's/^ *//' | \
