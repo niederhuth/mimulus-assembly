@@ -13,6 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=10
 distance=rank #cM or rank
+mask_regions= #bed file of regions to exclude which may introduce errors, e.g. known inversions
 primers=TRUE #Paired primer sequences for genetic markers
 primer_sets="Lowry_et_al" #List of primers & associated genetic map
 primer_max_dist=5000 #max distance for primers to be separated

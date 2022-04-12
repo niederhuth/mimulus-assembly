@@ -68,6 +68,7 @@ else
 		-no_is \
 		-div 40 \
 		-cutoff 225 \
+		-dir .
 		-lib LTRlib.fa \
 		../${input}
 	echo "Running LAI"

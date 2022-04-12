@@ -1,9 +1,11 @@
 species,genotype,sample,condition,datatype,sra,genomes,adapters,genomeSize,misc(unmethylated_chr/lineage/etc)
-Mguttatus,L1,L1,assembly,ont,no,IM62 NONTOL TOL,,0.32g,eudicots_odb10,
-Mguttatus,S1,S1,assembly,ont,no,IM62 NONTOL TOL,,0.32g,eudicots_odb10,
-Mguttatus,L1,L1,assembly,wgs,no,IM62 NONTOL TOL,IDT,,,
-Mguttatus,S1,S1,assembly,wgs,no,IM62 NONTOL TOL,IDT,,,
-Mguttatus,L1,L1,variants,ont,no,S1,,,,
-Mguttatus,S1,S1,variants,ont,no,L1,,,,
-Mguttatus,S1,S1,annotation,rna,yes,,TruSeq3-SE,,,
-Mguttatus,L1,L1,annotation,rna,yes,,TruSeq3-SE,,,
+Mguttatus,L1,L1,assembly,ont,no,Mguttatus_IM62 Mguttatus_NONTOL Mguttatus_TOL,,0.32g,eudicots_odb10
+Mguttatus,S1,S1,assembly,ont,no,Mguttatus_IM62 Mguttatus_NONTOL Mguttatus_TOL,,0.32g,eudicots_odb10
+Mguttatus,L1,L1,assembly,wgs,no,Mguttatus_IM62 Mguttatus_NONTOL Mguttatus_TOL,IDT,,
+Mguttatus,S1,S1,assembly,wgs,no,Mguttatus_IM62 Mguttatus_NONTOL Mguttatus_TOL,IDT,,
+Mguttatus,L1,L1,variants,ont,no,S1,,,
+Mguttatus,S1,S1,variants,ont,no,L1,,,
+Mguttatus,S1,S1,annotation,rna,yes,,TruSeq3-SE,,
+Mguttatus,L1,L1,annotation,rna,yes,,TruSeq3-SE,,
+Mguttatus,S1,comparative,blastp,protein-primary,,Mguttatus_L1 Mguttatus_IM62 Mguttatus_NONTOL Mguttatus_TOL,,,
+Mguttatus,L1,comparative,blastp,protein-primary,,Mguttatus_S1 Mguttatus_IM62 Mguttatus_NONTOL Mguttatus_TOL,,,
