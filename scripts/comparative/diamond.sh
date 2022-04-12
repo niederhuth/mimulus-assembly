@@ -96,7 +96,7 @@ do
 		diamond blastp \
 			${options} \
 			--db ${dmnd_db} \
-			--query ${query}-${datatype}.fa \
+			--query ${query_seqs} \
 			--out ${query}-${i}.m8 \
 			--un ${query}-${i}-un.fa \
 			--evalue ${evalue} \
