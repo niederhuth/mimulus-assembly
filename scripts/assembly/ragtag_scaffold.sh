@@ -84,10 +84,15 @@ genomes=$(awk -v FS="," \
 #Run ragtag correct
 for i in ${genomes}
 do
-	echo "Running ragtag scaffold with ${i} as reference genome"
-	path3=$(pwd | sed s/${species}\\/.*/${species}\\/${i}/)
-	version=$(ls ${path3}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
-	ref="${path3}/ref/${i}-v${version}.fa"
+	#Find reference genome
+	species2=$(echo ${i} | sed s/_.*//)
+	genotype2=$(echo ${i} | sed s/${species2}_// | sed s/_.*//)
+	path3=$(pwd | sed s/data\\/.*/data/)
+	path4="${path3}/${species2}/${genotype2}"
+	version=$(ls ${path4}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
+	ref="${path4}/ref/${i}-v${version}.fa"
+	echo "Running ragtag scaffold with ${i}-v${version}.fa as reference genome"
+	
 	#Run ragtag scaffold
 	echo "Running ragtag scaffold"
 	ragtag.py scaffold \
