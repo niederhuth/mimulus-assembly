@@ -57,6 +57,7 @@ fi
 
 #Get query sequences
 query="${species}_${genotype}"
+version=$(ls ${path2}/${species}/${genotype}/ref/${species}-v*.fa | sed s/.*\-v// | sed s/.fa//)
 query_seqs="${path2}/${species}/${genotype}/ref/annotations/${genotype}-v${version}-${datatype}.fa"
 
 #Run diamond
@@ -66,14 +67,14 @@ do
 	species2=$(echo ${i} | sed s/_.*//)
 	genotype2=$(echo ${i} | sed s/${species2}_// | sed s/_.*//)
 	path4="${path2}/${species2}/${genotype2}"
-	version=$(ls ${path4}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
-	target_seqs="${path4}/ref/annotations/${i}-v${version}-${datatype}.fa"
-	dmnd_db="${path4}/ref/annotations/${i}-v${version}-${datatype}.dmnd"
-	echo "Running diamond blastp against ${i}-v${version}"
+	version2=$(ls ${path4}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
+	target_seqs="${path4}/ref/annotations/${i}-v${version2}-${datatype}.fa"
+	dmnd_db="${path4}/ref/annotations/${i}-v${version2}-${datatype}.dmnd"
+	echo "Target is ${i}-v${version2}"
 
 	#Check for diamond database
 	echo "Checking for ${i} diamond database"
-	if [ -f ${path4}/ref/annotations/${i}-v${version}-proteins.dmnd ]
+	if [ -f ${path4}/ref/annotations/${i}-v${version2}-proteins.dmnd ]
 	then
 		echo "Found diamond database"
 	else
@@ -91,7 +92,7 @@ do
 		echo "To rerun diamond blastp on ${query}-${i}.m8, then delete ${query}-${i}.m8 and resubmit"
 	else
 		options="--threads ${threads} ${options}"
-		echo "Running ${query}-${i} diamond blastp"
+		echo "Running diamond blastp against ${i}-v${version2}"
 		diamond blastp \
 			${options} \
 			--db ${dmnd_db} \
