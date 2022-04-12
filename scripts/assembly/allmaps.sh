@@ -208,7 +208,7 @@ then
 				--primary_only \
 				--type=mRNA \
 				--key=Name \
-				../../${gff}
+				../../${gff} \
 				-o input.bed
 			#Make cds file
 			gffread \
@@ -225,7 +225,7 @@ then
 				--primary_only \
 				--type=mRNA \
 				--key=Name \
-				${path4}/${ref}/ref/annotations/${ref}-v*.gff 
+				${path4}/${ref}/ref/annotations/${ref}-v*.gff \
 				-o ref.bed
 			#Format target cds fasta file
 			python -m jcvi.formats.fasta format \
