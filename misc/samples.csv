@@ -1,9 +1,11 @@
 species,genotype,sample,condition,datatype,sra,genomes,adapters,genomeSize,misc(unmethylated_chr/lineage/etc)
-Mguttatus,L1,L1,assembly,ont,no,IM62 NONTOL TOL,,0.32g,eudicots_odb10,
-Mguttatus,S1,S1,assembly,ont,no,IM62 NONTOL TOL,,0.32g,eudicots_odb10,
-Mguttatus,L1,L1,assembly,wgs,no,IM62 NONTOL TOL,IDT,,,
-Mguttatus,S1,S1,assembly,wgs,no,IM62 NONTOL TOL,IDT,,,
-Mguttatus,L1,L1,variants,ont,no,S1,,,,
-Mguttatus,S1,S1,variants,ont,no,L1,,,,
-Mguttatus,S1,S1,annotation,rna,yes,,TruSeq3-SE,,,
-Mguttatus,L1,L1,annotation,rna,yes,,TruSeq3-SE,,,
+Mguttatus,L1,L1,assembly,ont,no,IM62 NONTOL TOL,,0.32g,eudicots_odb10
+Mguttatus,S1,S1,assembly,ont,no,IM62 NONTOL TOL,,0.32g,eudicots_odb10
+Mguttatus,L1,L1,assembly,wgs,no,IM62 NONTOL TOL,IDT,,
+Mguttatus,S1,S1,assembly,wgs,no,IM62 NONTOL TOL,IDT,,
+Mguttatus,L1,L1,variants,ont,no,S1,,,
+Mguttatus,S1,S1,variants,ont,no,L1,,,
+Mguttatus,S1,S1,annotation,rna,yes,,TruSeq3-SE,,
+Mguttatus,L1,L1,annotation,rna,yes,,TruSeq3-SE,,
+Mguttatus,S1,S1,comparative,,,,,,
+Mguttatus,L1,L1,comparative,,,,,,
