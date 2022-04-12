@@ -57,7 +57,7 @@ fi
 
 #Get query sequences
 query="${species}_${genotype}"
-version=$(ls ${path2}/${species}/${genotype}/ref/${species}-v*.fa | sed s/.*\-v// | sed s/.fa//)
+version=$(ls ${path2}/${species}/${genotype}/ref/${genotype}-v*.fa | sed s/.*\-v// | sed s/.fa//)
 query_seqs="${path2}/${species}/${genotype}/ref/annotations/${genotype}-v${version}-${datatype}.fa"
 
 #Run diamond
@@ -67,14 +67,14 @@ do
 	species2=$(echo ${i} | sed s/_.*//)
 	genotype2=$(echo ${i} | sed s/${species2}_// | sed s/_.*//)
 	path4="${path2}/${species2}/${genotype2}"
-	version2=$(ls ${path4}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
-	target_seqs="${path4}/ref/annotations/${i}-v${version2}-${datatype}.fa"
-	dmnd_db="${path4}/ref/annotations/${i}-v${version2}-${datatype}.dmnd"
+	version2=$(ls ${path4}/ref/${genotype2}-v*.fa | sed s/.*\-v// | sed s/.fa//)
+	target_seqs="${path4}/ref/annotations/${genotype2}-v${version2}-${datatype}.fa"
+	dmnd_db="${path4}/ref/annotations/${genotype2}-v${version2}-${datatype}.dmnd"
 	echo "Target is ${i}-v${version2}"
 
 	#Check for diamond database
 	echo "Checking for ${i} diamond database"
-	if [ -f ${path4}/ref/annotations/${i}-v${version2}-proteins.dmnd ]
+	if [ -f ${path4}/ref/annotations/${genotype2}-v${version2}-${datatype}.dmnd ]
 	then
 		echo "Found diamond database"
 	else
