@@ -1,3 +1,4 @@
-primers 1
-NONTOL_synteny 0.8
-TOL_synteny 0.8
+NONTOL_synteny 2
+primers 2
+TOL_synteny 1
+IM62_synteny 1

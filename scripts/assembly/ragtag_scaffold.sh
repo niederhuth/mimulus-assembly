@@ -2,16 +2,16 @@
 #SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=20
 #SBATCH --mem=100GB
 #SBATCH --job-name ragtag_scaffold
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=10
+threads=20
 aligner="nucmer"
 min_len=1000
 merge_dist=100000
@@ -89,14 +89,14 @@ do
 	genotype2=$(echo ${i} | sed s/${species2}_// | sed s/_.*//)
 	path3=$(pwd | sed s/data\\/.*/data/)
 	path4="${path3}/${species2}/${genotype2}"
-	version=$(ls ${path4}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
-	ref="${path4}/ref/${i}-v${version}.fa"
+	version=$(ls ${path4}/ref/${genotype2}-v*.fa | sed s/.*\-v// | sed s/.fa//)
+	ref="${path4}/ref/${genotype2}-v${version}.fa"
 	echo "Running ragtag scaffold with ${i}-v${version}.fa as reference genome"
 	
 	#Run ragtag scaffold
 	echo "Running ragtag scaffold"
 	ragtag.py scaffold \
-		-o ${i}_ragtag_scaffold \
+		-o ragtag_scaffold_${i} \
 		--aligner ${aligner} \
 		-f ${min_len} \
 		-d ${merge_dist} \
@@ -105,6 +105,7 @@ do
 		-s ${min_orient_score} ${gaps}\
 		-u \
 		${ref} ${input}
+	cd ../
 done
 
 echo "Done"

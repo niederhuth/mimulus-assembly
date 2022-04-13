@@ -2,7 +2,7 @@
 #SBATCH --time=3:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=50
 #SBATCH --mem=50GB
 #SBATCH --job-name allmaps
 #SBATCH --output=../job_reports/%x-%j.SLURMout
@@ -11,16 +11,16 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=10
+threads=50
 distance=rank #cM or rank
 mask_regions= #bed file of regions to exclude which may introduce errors, e.g. known inversions
-weights="$(pwd | sed s/data.*/misc/)/genetic_map/weights.txt"
+weights= #"$(pwd | sed s/data.*/misc/)/genetic_map/weights.txt"
 primers=TRUE #Paired primer sequences for genetic markers
 primer_sets="Lowry_et_al" #List of primers & associated genetic map
 primer_max_dist=5000 #max distance for primers to be separated
-synteny=TRUE #Use synteny, right now this assumes same species
+synteny=FALSE #Use synteny, right now this assumes same species
 gff= #gff file of annotations for synteny, if left blank will look in current directory
-synt_ref="TOL NONTOL" #List of genomes to use for synteny, these are assumed to be the same species
+synt_ref="IM62 NONTOL TOL" #List of genomes to use for synteny, these are assumed to be the same species
 markers=FALSE #Have not implemented this option
 optical=FALSE #Have not implemented this option
 
@@ -28,8 +28,8 @@ optical=FALSE #Have not implemented this option
 #If you do not yet have annotations for your genome, you can use this to map transcript sequences
 #From another genome and use this as a set of markers
 #I don't really recommend this
-quick_synt=FALSE #Use quick_synt TRUE or FALSE
-quick_synt_ref= #List of genomes to use for quick_synt, these are assumed to be of same species
+quick_synt=TRUE #Use quick_synt TRUE or FALSE
+quick_synt_ref="TOL NONTOL" #List of genomes to use for quick_synt, these are assumed to be of same species
 chr_list= #Names of sequences (i.e. chromosome names) to use with quick_synt
 
 #Change to current directory
@@ -115,7 +115,10 @@ then
 	else
 		echo "Building bowtie2 index"
 		mkdir bowtie2_index
-		bowtie2-build input.fa bowtie2_index/input
+		bowtie2-build \
+			--threads ${threads} \
+			input.fa \
+			bowtie2_index/input
 	fi
 	for i in ${primer_sets}
 	do
@@ -128,6 +131,7 @@ then
 			#Align primers
 			echo "Aligning primer data with bowtie"
 			bowtie2 \
+				-p ${threads} \
 				--sam-nohead \
 				--no-unal \
 				--very-sensitive \
@@ -161,7 +165,7 @@ then
 							tr ',' '\t' >> ${i}_primers/primers.bed
 						elif [ ${Fpos} -lt ${Rpos} ]
 						then
-							echo "${Fchr},${Fpos},${Rpos},"LG"${LG}:${GP}" | \
+							echo "${Fchr},${Fpos},${Rpos},LG${LG}:${GP}" | \
 							tr ',' '\t' >> ${i}_primers/primers.bed
 						fi
 					else
@@ -319,10 +323,10 @@ python -m jcvi.assembly.allmaps mergebed \
 #if weights.txt is specified, copy it over
 if [ -z ${weights} ]
 then
-	echo "Using weight file: ${weights}"
-	cp ${weights} weights.txt
-else
 	echo "Using allmaps mergebed specified weights.txt"
+else
+	echo "Using weights file: ${weights}"
+	cp ${weights} ./weights.txt
 fi
 
 #Run allmaps path
