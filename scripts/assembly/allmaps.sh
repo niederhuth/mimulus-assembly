@@ -14,6 +14,7 @@ conda="${HOME}/miniconda3"
 threads=10
 distance=rank #cM or rank
 mask_regions= #bed file of regions to exclude which may introduce errors, e.g. known inversions
+weights="$(pwd | sed s/data.*/misc/)/genetic_map/weights.txt"
 primers=TRUE #Paired primer sequences for genetic markers
 primer_sets="Lowry_et_al" #List of primers & associated genetic map
 primer_max_dist=5000 #max distance for primers to be separated
@@ -314,6 +315,15 @@ fi
 echo "Merging position data files"
 python -m jcvi.assembly.allmaps mergebed \
 	${position_data} -o allmaps.bed
+
+#if weights.txt is specified, copy it over
+if [ -z ${weights} ]
+then
+	echo "Using weight file: ${weights}"
+	cp ${weights} weights.txt
+else
+	echo "Using allmaps mergebed specified weights.txt"
+fi
 
 #Run allmaps path
 echo "Running allmaps path"

@@ -1,0 +1,3 @@
+primers 1
+NONTOL_synteny 0.8
+TOL_synteny 0.8
