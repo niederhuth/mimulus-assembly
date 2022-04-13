@@ -14,7 +14,7 @@ conda="${HOME}/miniconda3"
 threads=10
 distance=rank #cM or rank
 mask_regions= #bed file of regions to exclude which may introduce errors, e.g. known inversions
-primers=FALSE #Paired primer sequences for genetic markers
+primers=TRUE #Paired primer sequences for genetic markers
 primer_sets="Lowry_et_al" #List of primers & associated genetic map
 primer_max_dist=5000 #max distance for primers to be separated
 synteny=TRUE #Use synteny, right now this assumes same species
@@ -184,7 +184,7 @@ then
 			done
 		fi
 		#Add to list of data for allmaps
-		position_data="${position_data} ${i}_primers/primers.bed"
+		position_data="${i}_primers/primers.bed ${position_data}"
 	done
 fi
 
@@ -233,7 +233,9 @@ then
 				ref.cds
 			#Run synteny analysis
 			echo "Running synteny analysis"
-			python -m jcvi.compara.catalog ortholog input ref
+			python -m jcvi.compara.catalog ortholog \
+				--no_strip_names \
+				ref input
 			#Build synteny.bed
 			echo "Building synteny bed for allmaps"
 			python -m jcvi.assembly.syntenypath bed \
@@ -243,7 +245,7 @@ then
 			cd ../
 		fi
 		#Add to list of data for allmaps
-		position_data="${position_data} synt_${ref}/${ref}_synteny.bed "
+		position_data="synt_${ref}/${ref}_synteny.bed ${position_data}"
 	done
 fi
 
@@ -304,7 +306,7 @@ then
 			rm quick_synt_${ref}/input.fa quick_synt_${ref}/ref-cds-primary.fa quick_synt_${ref}/ref.fa
 		fi
 		#Add to list of data for allmaps
-		position_data="${position_data} quick_synt_${ref}/${ref}_synteny.bed "
+		position_data="quick_synt_${ref}/${ref}_synteny.bed ${position_data}"
 	done
 fi
 
