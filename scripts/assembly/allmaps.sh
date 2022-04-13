@@ -13,8 +13,8 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=50
 distance=rank #cM or rank
-mask_regions= #bed file of regions to exclude which may introduce errors, e.g. known inversions
-weights= #"$(pwd | sed s/data.*/misc/)/genetic_map/weights.txt"
+mask_regions=(pwd | sed s/data.*/misc/)/genetic_map/$(pwd | sed s/.*$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)\\/// | sed s/\\/.*//)_mask_regions.bed #bed file of regions to exclude which may introduce errors, e.g. known inversions
+weights= #path to set of alternative weights.txt file
 primers=TRUE #Paired primer sequences for genetic markers
 primer_sets="Lowry_et_al" #List of primers & associated genetic map
 primer_max_dist=5000 #max distance for primers to be separated
@@ -188,6 +188,15 @@ then
 				R=""
 			done
 		fi
+		#Filter regions if mask_regions provided
+		if [ -z {mask_regions} ]
+		then
+			echo "Filtering bed file for masked regions"
+			bedtools intersect -v \
+				-a ${i}_primers/primers.bed \
+				-b ${mask_regions} > ${i}_primers/tmp
+			mv ${i}_primers/tmp ${i}_primers/primers.bed
+		fi
 		#Add to list of data for allmaps
 		position_data="${i}_primers/primers.bed ${position_data}"
 	done
@@ -248,6 +257,15 @@ then
 				ref.input.lifted.anchors \
 				-o ${ref}_synteny.bed
 			cd ../
+		fi
+		#Filter regions if mask_regions provided
+		if [ -z {mask_regions} ]
+		then
+			echo "Filtering bed file for masked regions"
+			bedtools intersect -v \
+				-a synt_${ref}/${ref}_synteny.bed \
+				-b ${mask_regions} > synt_${ref}/tmp
+			mv synt_${ref}/tmp synt_${ref}/${ref}_synteny.bed
 		fi
 		#Add to list of data for allmaps
 		position_data="synt_${ref}/${ref}_synteny.bed ${position_data}"
@@ -310,6 +328,17 @@ then
 			#Cleanup
 			rm quick_synt_${ref}/input.fa quick_synt_${ref}/ref-cds-primary.fa quick_synt_${ref}/ref.fa
 		fi
+		#Filter regions if mask_regions provided
+		if [ -z {mask_regions} ]
+		then
+			echo "Filtering bed file for masked regions"
+			bedtools intersect -v \
+				-a quick_synt_${ref}/${ref}_synteny.bed \
+				-b ${mask_regions} > quick_synt_${ref}/tmp
+			mv quick_synt_${ref}/tmp quick_synt_${ref}/${ref}_synteny.bed
+		fi
+		#Add to list of data for allmaps
+		position_data="${i}_primers/primers.bed ${position_data}"
 		#Add to list of data for allmaps
 		position_data="quick_synt_${ref}/${ref}_synteny.bed ${position_data}"
 	done
