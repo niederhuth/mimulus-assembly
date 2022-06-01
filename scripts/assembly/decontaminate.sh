@@ -59,7 +59,7 @@ fi
 #Download database
 mkdir ${path2}
 echo "Checking for contaminants with gather-by-contig.py"
-${path1}/gather-by-contig.py \
+${path1}/py/gather-by-contig.py \
 	${input} \
 	${microbes} \
 	--output-nomatch ${path2}/clean.fa \

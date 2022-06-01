@@ -110,7 +110,7 @@ hmmscan \
 
 #Generate maker standard gene list
 echo "Generating Pfam filtered Gene List"
-perl ${path2}/annotation/generate_maker_standard_gene_list.pl \
+perl ${path2}/annotation/pl/generate_maker_standard_gene_list.pl \
 	--input_gff ${gff} \
 	--pfam_results prot_domains.out \
 	--pfam_cutoff 1e-10 \
@@ -118,19 +118,19 @@ perl ${path2}/annotation/generate_maker_standard_gene_list.pl \
 
 #Make Maker Standard Files
 echo "Making Initial Transcripts fasta"
-perl ${path2}/annotation/get_subset_of_fastas.pl \
+perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
 	-l pfam_filtered_gene_list.txt \
 	-f ${transcripts} \
 	-o pfam_filtered_transcripts.fa
 	
 echo "Making Initial Protein fasta"
-perl ${path2}/annotation/get_subset_of_fastas.pl \
+perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
 	-l pfam_filtered_gene_list.txt \
 	-f ${proteins} \
 	-o pfam_filtered_proteins.fa
 
 echo "Making Initial GFF file"
-perl ${path2}/annotation/create_maker_standard_gff.pl \
+perl ${path2}/annotation/pl/create_maker_standard_gff.pl \
 	--input_gff ${gff} \
 	--output_gff pfam_filtered.gff \
 	--maker_standard_gene_list pfam_filtered_gene_list.txt
@@ -180,7 +180,7 @@ hmmscan \
 
 #Create a genelist with no TEs
 echo "Creating gene list with TEs removed"
-python ${path2}/annotation/create_no_TE_genelist.py \
+python ${path2}/annotation/py/create_no_TE_genelist.py \
 	--input_file_TEpfam ${path1}/annotation/TE_Pfam_domains.txt \
 	--input_file_maxPfam prot_domains.out \
 	--input_file_geneList_toKeep pfam_filtered_gene_list.txt \
@@ -190,7 +190,7 @@ python ${path2}/annotation/create_no_TE_genelist.py \
 
 #Generate noTE files
 echo "Making no TE Transcripts fasta"
-perl ${path2}/annotation/get_subset_of_fastas.pl \
+perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
 	-l noTE_gene_list.txt \
 	-f pfam_filtered_transcripts.fa \
 	-o ${fasta/.fa/}_transcripts_noTE.fa

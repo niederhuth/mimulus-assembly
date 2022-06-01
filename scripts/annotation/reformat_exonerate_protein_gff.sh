@@ -20,7 +20,7 @@ cd ..
 cat tmp/*tmp > ${a}
 
 #Reformat exonerate output
-perl ${path1}/annotation/reformat_exonerate_protein_gff.pl --input_gff ${a} --output_gff tmp.gff
+perl ${path1}/annotation/pl/reformat_exonerate_protein_gff.pl --input_gff ${a} --output_gff tmp.gff
 
 #Sort the gff file
 gff3_sort -g tmp.gff -og ${a}.gff

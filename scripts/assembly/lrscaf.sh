@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=40
 datatype="ont"
-reads="fail.fastq.gz"
+reads="clean.fastq.gz"
 input="" #Input assembly, if left blank, will search for fasta file
 
 #Change to current directory
@@ -33,7 +33,7 @@ path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
 path3="lrscaf"
 
 #Path to LRScaf
-LRScaf="${path1}/assembly/LRScaf-1.1.11.jar"
+LRScaf="${path1}/assembly/jar/LRScaf-1.1.11.jar"
 
 #Change preset based on datatype
 if [ ${datatype} = "ont" ]

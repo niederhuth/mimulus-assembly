@@ -140,7 +140,7 @@ echo "number after split: ${NUMSPLIT}"
 #Convert the uni.ann and uni.dna output from fathom into a genbank formatted file.
 #fathom_to_genbank.pl is from https://github.com/Childs-Lab/GC_specific_MAKER.
 echo "Conveting fathom to genbank format"
-perl ${path2}/annotation/fathom_to_genbank.pl \
+perl ${path2}/annotation/pl/fathom_to_genbank.pl \
 	--annotation_file uni.ann \
 	--dna_file uni.dna \
 	--genbank_file augustus.gb \
@@ -153,7 +153,7 @@ perl -e  'while (my $line = <>){ if ($line =~ /^LOCUS\s+(\S+)/) { print "$1\n"; 
 augustus.gb > genbank_gene_list.txt
 
 echo "Subsetting fastas"
-perl ${path2}/annotation/get_subset_of_fastas.pl \
+perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
 	-l genbank_gene_list.txt \
 	-f uni.dna \
 	-o genbank_gene_seqs.fasta
