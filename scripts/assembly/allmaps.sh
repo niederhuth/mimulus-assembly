@@ -13,12 +13,12 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=50
 distance=rank #cM or rank
-mask_regions=(pwd | sed s/data.*/misc/)/genetic_map/$(pwd | sed s/.*$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)\\/// | sed s/\\/.*//)_mask_regions.bed #bed file of regions to exclude which may introduce errors, e.g. known inversions
+mask_regions="$(pwd | sed s/data.*/misc/)/genetic_map/$(pwd | sed s/.*$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)\\/// | sed s/\\/.*//)_mask_regions.bed" #bed file of regions to exclude which may introduce errors, e.g. known inversions
 weights= #path to set of alternative weights.txt file
 primers=TRUE #Paired primer sequences for genetic markers
 primer_sets="Lowry_et_al" #List of primers & associated genetic map
 primer_max_dist=5000 #max distance for primers to be separated
-synteny=FALSE #Use synteny, right now this assumes same species
+synteny=TRUE #Use synteny, right now this assumes same species
 gff= #gff file of annotations for synteny, if left blank will look in current directory
 synt_ref="IM62 NONTOL TOL" #List of genomes to use for synteny, these are assumed to be the same species
 markers=FALSE #Have not implemented this option
@@ -28,8 +28,8 @@ optical=FALSE #Have not implemented this option
 #If you do not yet have annotations for your genome, you can use this to map transcript sequences
 #From another genome and use this as a set of markers
 #I don't really recommend this
-quick_synt=TRUE #Use quick_synt TRUE or FALSE
-quick_synt_ref="TOL NONTOL" #List of genomes to use for quick_synt, these are assumed to be of same species
+quick_synt=FALSE #Use quick_synt TRUE or FALSE
+quick_synt_ref="IM62 NONTOL TOL" #List of genomes to use for quick_synt, these are assumed to be of same species
 chr_list= #Names of sequences (i.e. chromosome names) to use with quick_synt
 
 #Change to current directory
@@ -116,6 +116,7 @@ then
 		echo "Building bowtie2 index"
 		mkdir bowtie2_index
 		bowtie2-build \
+			--quiet \
 			--threads ${threads} \
 			input.fa \
 			bowtie2_index/input
@@ -158,7 +159,7 @@ then
 				then
 					if [ ${Fchr} == ${Rchr} ]
 					then
-						echo "Primers ${M} properly paired"
+						#echo "Primers ${M} properly paired"
 						if [ ${Fpos} -gt ${Rpos} ]
 						then
 							echo "${Fchr},${Rpos},${Fpos},LG${LG}:${GP}" | \
@@ -173,12 +174,12 @@ then
 					fi
 				elif [[ -n ${F} ]]
 				then
-					echo "${M} forward primer only"
+					#echo "${M} forward primer only"
 					echo "${Fchr},${Fpos},$(expr ${Fpos} + 1),LG${LG}:${GP}" | \
 					tr ',' '\t' >> ${i}_primers/primers.bed
 				elif [[ -n ${R} ]]
 				then
-					echo "${M} reverse primer only"
+					#echo "${M} reverse primer only"
 					echo "${Rchr},${Fpos},$(expr ${Rpos} + 1),LG${LG}:${GP}" | \
 					tr ',' '\t' >> ${i}_primers/primers.bed
 				else
@@ -189,7 +190,7 @@ then
 			done
 		fi
 		#Filter regions if mask_regions provided
-		if [ -z {mask_regions} ]
+		if [ ! -z ${mask_regions} ]
 		then
 			echo "Filtering bed file for masked regions"
 			bedtools intersect -v \
@@ -254,12 +255,12 @@ then
 			echo "Building synteny bed for allmaps"
 			python -m jcvi.assembly.syntenypath bed \
 				--switch \
-				ref.input.lifted.anchors \
+				ref.input.anchors \
 				-o ${ref}_synteny.bed
 			cd ../
 		fi
 		#Filter regions if mask_regions provided
-		if [ -z {mask_regions} ]
+		if [ ! -z ${mask_regions} ]
 		then
 			echo "Filtering bed file for masked regions"
 			bedtools intersect -v \
@@ -323,24 +324,22 @@ then
 			python -m jcvi.assembly.syntenypath bed \
 				--switch \
 				quick_synt_${ref}/ref.input.1x1.anchors \
-				-o quick_synt_${ref}/${ref}_synteny.bed
+				-o quick_synt_${ref}/${ref}_quick_synteny.bed
 			
 			#Cleanup
 			rm quick_synt_${ref}/input.fa quick_synt_${ref}/ref-cds-primary.fa quick_synt_${ref}/ref.fa
 		fi
 		#Filter regions if mask_regions provided
-		if [ -z {mask_regions} ]
+		if [ ! -z ${mask_regions} ]
 		then
 			echo "Filtering bed file for masked regions"
 			bedtools intersect -v \
-				-a quick_synt_${ref}/${ref}_synteny.bed \
+				-a quick_synt_${ref}/${ref}_quick_synteny.bed \
 				-b ${mask_regions} > quick_synt_${ref}/tmp
-			mv quick_synt_${ref}/tmp quick_synt_${ref}/${ref}_synteny.bed
+			mv quick_synt_${ref}/tmp quick_synt_${ref}/${ref}_quick_synteny.bed
 		fi
 		#Add to list of data for allmaps
-		position_data="${i}_primers/primers.bed ${position_data}"
-		#Add to list of data for allmaps
-		position_data="quick_synt_${ref}/${ref}_synteny.bed ${position_data}"
+		position_data="quick_synt_${ref}/${ref}_quick_synteny.bed ${position_data}"
 	done
 fi
 

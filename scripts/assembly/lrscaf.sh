@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=40
 #SBATCH --mem=500GB
 #SBATCH --job-name lrscaf
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=40
 datatype="ont"
-reads="clean.fastq.gz"
+reads="fail.fastq.gz"
 input="" #Input assembly, if left blank, will search for fasta file
 
 #Change to current directory
