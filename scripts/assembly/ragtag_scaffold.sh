@@ -1,5 +1,5 @@
 #!/bin/bash --login
-#SBATCH --time=24:00:00
+#SBATCH --time=48:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
@@ -105,7 +105,6 @@ do
 		-s ${min_orient_score} ${gaps}\
 		-u \
 		${ref} ${input}
-	cd ../
 done
 
 echo "Done"
