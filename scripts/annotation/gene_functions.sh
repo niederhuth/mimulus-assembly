@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
-proteins=
+proteins="maker_round2/S1-v1.all.maker.proteins.fasta"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
