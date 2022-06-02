@@ -1,4 +1,0 @@
-NONTOL_synteny 2
-primers 2
-TOL_synteny 1
-IM62_synteny 1

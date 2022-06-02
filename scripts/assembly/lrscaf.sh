@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=40
 #SBATCH --mem=500GB
 #SBATCH --job-name lrscaf
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -33,7 +33,7 @@ path2=$(pwd | sed s/${genotype}\\/${sample}.*/${genotype}\\/${sample}/)
 path3="lrscaf"
 
 #Path to LRScaf
-LRScaf="${path1}/assembly/LRScaf-1.1.11.jar"
+LRScaf="${path1}/assembly/jar/LRScaf-1.1.11.jar"
 
 #Change preset based on datatype
 if [ ${datatype} = "ont" ]
