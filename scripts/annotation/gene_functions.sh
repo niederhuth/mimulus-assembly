@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
-proteins="maker_round2/S1-v1.all.maker.proteins.fasta"
+proteins="../maker_round2/S1-v1.all.maker.proteins.fasta"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -32,29 +32,6 @@ species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
 path3="gene_functions"
-
-#Look for fasta file, there can only be one!
-if [ -z ${fasta} ]
-then
-	echo "No input fasta provided, looking for fasta"
-	if ls *.fa >/dev/null 2>&1
-	then
-		fasta=$(ls *fa | sed s/.*\ //)
-		echo "Fasta file ${fasta} found"
-	elif ls *.fasta >/dev/null 2>&1
-	then
-		fasta=$(ls *fasta | sed s/.*\ //)
-		echo "Fasta file ${fasta} found"
-	elif ls *.fna >/dev/null 2>&1
-	then
-		fasta=$(ls *fna | sed s/.*\ //)
-		echo "Fasta file ${fasta} found"
-	else
-		echo "No fasta file found, please check and restart"
-	fi
-else
-	echo "Input fasta: ${fasta}"
-fi
 
 #Make & cd to directory
 if [ -d ${path3} ]
@@ -81,7 +58,7 @@ interproscan.sh \
 	-iprlookup \
 	-t p \
     -f TSV \
-	-i ${proteins} \
+	-i ../${proteins} \
 	-o ${proteins}.iprscan
 
 #
