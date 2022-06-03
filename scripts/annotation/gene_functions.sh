@@ -12,7 +12,11 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
+<<<<<<< HEAD
 proteins="maker_round2/*.all.maker.proteins.fasta"
+=======
+proteins="../maker_round2/S1-v1.all.maker.proteins.fasta"
+>>>>>>> d7f9e7e8c661168b7516b2575d531ffab4642500
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -59,8 +63,13 @@ interproscan.sh \
 	-iprlookup \
 	-t p \
     -f TSV \
+<<<<<<< HEAD
 	-i ${proteins} \
 	-o ${output}.iprscan
+=======
+	-i ../${proteins} \
+	-o ${proteins}.iprscan
+>>>>>>> d7f9e7e8c661168b7516b2575d531ffab4642500
 
 #
 echo "Making diamond blast DB for "
