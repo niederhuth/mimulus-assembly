@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
-proteins=$(ls ../maker_round2/*.all.maker.proteins.fasta | sed s/.*\ //)
+protein_fasta="../maker_round2/*.all.maker.proteins.fasta"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -47,6 +47,10 @@ fi
 export TMPDIR=$(pwd)
 export TMP=$(pwd)
 export TEMP=$(pwd)
+
+#Print ${proteins} path to command line make sure everything is working correctly
+proteins=$(ls ${protein_fasta} | sed s/.*\ //))
+echo ${proteins}
 
 #Run interproscan
 echo "Running interproscan"
