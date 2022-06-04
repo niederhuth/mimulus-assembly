@@ -49,7 +49,7 @@ export TMP=$(pwd)
 export TEMP=$(pwd)
 
 #Print ${proteins} path to command line make sure everything is working correctly
-proteins=$(ls ${protein_fasta} | sed s/.*\ //))
+proteins=$(ls ${protein_fasta} | sed s/.*\ //)
 echo ${proteins}
 
 #Run interproscan
