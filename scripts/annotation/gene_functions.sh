@@ -31,7 +31,6 @@ path2=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
-output=$(echo ${proteins} | sed s/.*\\/// | sed s/\\..*//)
 path3="gene_functions"
 
 #Make & cd to directory
@@ -48,8 +47,9 @@ export TMPDIR=$(pwd)
 export TMP=$(pwd)
 export TEMP=$(pwd)
 
-#Print ${proteins} path to command line make sure everything is working correctly
+#Set some more variables
 proteins=$(ls ${protein_fasta} | sed s/.*\ //)
+output=$(echo ${proteins} | sed s/.*\\/// | sed s/\\..*//)
 echo ${proteins}
 
 #Run interproscan
