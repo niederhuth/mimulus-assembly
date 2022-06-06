@@ -49,3 +49,16 @@ cd build
 unset F90
 unset F90FLAGS
 ../mpich-4.0.1/configure FFLAGS=-fallow-argument-mismatch FCFLAGS=-fallow-argument-mismatch --prefix=/mnt/home/niederhu/miniconda3/envs/maker_mpi/bin/ 2>&1 | tee c.txt
+
+
+#Download and setup Interproscan
+cd scripts/annotation
+wget https://ftp.ebi.ac.uk/pub/software/unix/iprscan/5/5.56-89.0/interproscan-5.56-89.0-64-bit.tar.gz
+tar -pxzvf interproscan-5.56-89.0-64-bit.tar.gz
+mv interproscan-5.56-89.0 interproscan
+rm interproscan-5.56-89.0-64-bit.tar.gz
+cd interproscan
+python initial_setup.py
+
+
+
