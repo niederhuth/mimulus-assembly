@@ -241,6 +241,7 @@ while ( my $line = <PFAM> ) {
 
     #$line =~ s/\s+/\t/g;
     my @elems = split "\t", $line;
+    print @elems
     my $annotation_short = $elems[0];
     my $annotation_long = join(" ", @elems[18,]);
     my $query_name = $elems[2];
