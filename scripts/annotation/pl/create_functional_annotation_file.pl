@@ -187,7 +187,7 @@ close IN;
 # Functional annotations from the model genome blast results will be prefered over pfam annotations.
 # Start with the model genome blast results.
 my ($query_name, $subject_name, %annotations);
-my $searchio = Bio::SearchIO->new( -format => 'blast',
+my $searchio = Bio::SearchIO->new( -format => 'blast-tab',
 				   -file   => $model_blast_file,               
     );
 
