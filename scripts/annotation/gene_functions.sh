@@ -103,4 +103,8 @@ perl ${path2}/annotation/pl/create_functional_annotation_file.pl \
 	--max_hits 5 \
 	--output prot_func_desc_list.txt
 
+#
+wget https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/gene_association.tair.gz
+gunzip gene_association.tair.gz
+
 echo "Done"
