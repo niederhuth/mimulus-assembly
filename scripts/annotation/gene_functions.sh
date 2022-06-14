@@ -54,26 +54,26 @@ echo ${proteins}
 
 #Run interproscan
 echo "Running interproscan"
-interproscan.sh \
-    -cpu ${threads} \
+${path2}/annotation/interproscan/interproscan.sh \
+	-cpu ${threads} \
 	-appl pfam \
-    -goterms \
-    -pa \
+	-goterms \
+	-pa \
 	-dp \
 	-iprlookup \
 	-t p \
-    -f TSV \
+	-f TSV \
 	-i ${proteins} \
 	-o ${output}.iprscan
 
-#
+#Download Arabidopsis genes and create diamond DB
 echo "Making diamond blast DB for "
 diamond makedb \
     --threads ${threads} \
     --in TAIR10 \
     --db TAIR10.dmnd
 
-#Run diamond blastp against Transposases 
+#Run diamond blastp against Arabidopsis 
 echo "Running diamond blastp on "
 diamond blastp \
     --threads ${threads} \
