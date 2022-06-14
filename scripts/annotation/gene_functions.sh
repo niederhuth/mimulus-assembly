@@ -93,7 +93,7 @@ perl -e  'while (my $line = <>){ my @elems = split "\t", $line; if($elems[2] ne 
 
 #
 echo ""
-create_functional_annotation_file_2020.pl \
+perl ${path2}/annotations/pl/create_functional_annotation_file.pl \
 	--protein_fasta ${proteins} \
 	--model_annot TAIR10_short_functional_descriptions.txt \
 	--model_blast ${output}_TAIR10_blast.out \
