@@ -244,7 +244,7 @@ while ( my $line = <PFAM> ) {
     my $annotation_short = $elems[0];
     my $annotation_long = join(" ", @elems[18,]);
     my $query_name = $elems[2];
-    my $score = $elems[4];
+    my $score = $elems[8];
 
     if (exists($pfam_matched_genes{$query_name})) {
 	# We have already provided this gene with a pfam domain annotation.

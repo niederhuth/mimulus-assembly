@@ -67,33 +67,35 @@ ${path2}/annotation/interproscan/interproscan.sh \
 	-o ${output}.iprscan
 
 #Download Arabidopsis genes and create diamond DB
+echo "Downloading Arabidopsis TAIR10 proteins"
+wget https://www.arabidopsis.org/download_files/Proteins/TAIR10_protein_lists/TAIR10_pep_20110103_representative_gene_model
 echo "Making diamond blast DB for "
 diamond makedb \
-    --threads ${threads} \
-    --in TAIR10 \
-    --db TAIR10.dmnd
+	--threads ${threads} \
+	--in TAIR10_pep_20110103_representative_gene_model \
+	--db TAIR10.dmnd
 
 #Run diamond blastp against Arabidopsis 
 echo "Running diamond blastp on "
 diamond blastp \
-    --threads ${threads} \
-    --db TAIR10.dmnd \
-    --query ${proteins} \
-    --out ${output}_TAIR10_blast.out \
-    --evalue 1e-6 \
-    --max-hsps 1 \
-    --max-target-seqs 5 \
-    --outfmt 6
+	--threads ${threads} \
+	--db TAIR10.dmnd \
+	--query ${proteins} \
+	--out ${output}_TAIR10_blast.out \
+	--evalue 1e-6 \
+	--max-hsps 1 \
+	--max-target-seqs 5 \
+	--outfmt 6
 
-#
-echo ""
-wget
-perl -e  'while (my $line = <>){ my @elems = split "\t", $line; if($elems[2] ne "")\
-{print "$elems[0]\t$elems[2]\n"}}' TAIR10_functional_descriptions > TAIR10_short_functional_descriptions.txt
+#Download and format Arabidopsis TAIR10 functional descriptions
+echo "Downloading and formatting Arabidopsis TAIR10 functional descriptions"
+wget https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_functional_descriptions
+perl -e  'while (my $line = <>){ my @elems = split "\t", $line; if($elems[2] ne "") {print "$elems[0]\t$elems[2]\n"}}' \
+TAIR10_functional_descriptions > TAIR10_short_functional_descriptions.txt
 
-#
-echo ""
-perl ${path2}/annotations/pl/create_functional_annotation_file.pl \
+#Format annotations 
+echo "Creating functional annotation file"
+perl ${path2}/annotation/pl/create_functional_annotation_file.pl \
 	--protein_fasta ${proteins} \
 	--model_annot TAIR10_short_functional_descriptions.txt \
 	--model_blast ${output}_TAIR10_blast.out \
