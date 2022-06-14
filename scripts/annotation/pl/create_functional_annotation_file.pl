@@ -239,7 +239,7 @@ while ( my $line = <PFAM> ) {
 	next;
     }
 
-    $line =~ s/\s+/\t/g;
+    #$line =~ s/\s+/\t/g;
     my @elems = split "\t", $line;
     my $annotation_short = $elems[0];
     my $annotation_long = join(" ", @elems[18,]);
