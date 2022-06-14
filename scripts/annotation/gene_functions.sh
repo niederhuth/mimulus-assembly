@@ -85,7 +85,7 @@ diamond blastp \
 	--evalue 1e-6 \
 	--max-hsps 1 \
 	--max-target-seqs 5 \
-	--outfmt 5
+	--outfmt 0
 
 #Download and format Arabidopsis TAIR10 functional descriptions
 echo "Downloading and formatting Arabidopsis TAIR10 functional descriptions"
