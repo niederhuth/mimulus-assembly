@@ -241,10 +241,9 @@ while ( my $line = <PFAM> ) {
 
     #$line =~ s/\s+/\t/g;
     my @elems = split "\t", $line;
-    print @elems
-    my $annotation_short = $elems[0];
-    my $annotation_long = join(" ", @elems[18,]);
-    my $query_name = $elems[2];
+    my $annotation_short = $elems[6];
+    my $annotation_long = join(" ", @elems[13,]);
+    my $query_name = $elems[0];
     my $score = $elems[8];
 
     if (exists($pfam_matched_genes{$query_name})) {
