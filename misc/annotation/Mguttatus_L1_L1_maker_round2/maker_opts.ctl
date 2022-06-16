@@ -3,7 +3,7 @@ genome= #genome sequence (fasta file or fasta embeded in GFF3 file)
 organism_type=eukaryotic #eukaryotic or prokaryotic. Default is eukaryotic
 
 #-----Re-annotation Using MAKER Derived GFF3
-maker_gff=../maker_round1/maker.gff #MAKER derived GFF3 file
+maker_gff=../maker_round1/L1-v1.all.gff #MAKER derived GFF3 file
 est_pass=1 #use ESTs in maker_gff: 1 = yes, 0 = no
 altest_pass=0 #use alternate organism ESTs in maker_gff: 1 = yes, 0 = no
 protein_pass=1 #use protein alignments in maker_gff: 1 = yes, 0 = no
@@ -33,7 +33,7 @@ softmask=1 #use soft-masking rather than hard-masking in BLAST (i.e. seg and dus
 #-----Gene Prediction
 snaphmm=../snap_training/SNAP.hmm #SNAP HMM file
 gmhmm= #GeneMark HMM file
-augustus_species= #Augustus gene prediction species model
+augustus_species=Mguttatus-L1-L1 #Augustus gene prediction species model
 fgenesh_par_file= #FGENESH parameter file
 pred_gff= #ab-initio predictions from an external GFF3 file
 model_gff= #annotated gene models from an external GFF3 file (annotation pass-through)
