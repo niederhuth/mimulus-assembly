@@ -33,7 +33,7 @@ softmask=1 #use soft-masking rather than hard-masking in BLAST (i.e. seg and dus
 #-----Gene Prediction
 snaphmm=../snap_training/SNAP.hmm #SNAP HMM file
 gmhmm= #GeneMark HMM file
-augustus_species=Mguttatus-S1-S1 #Augustus gene prediction species model
+augustus_species= #Augustus gene prediction species model
 fgenesh_par_file= #FGENESH parameter file
 pred_gff= #ab-initio predictions from an external GFF3 file
 model_gff= #annotated gene models from an external GFF3 file (annotation pass-through)
