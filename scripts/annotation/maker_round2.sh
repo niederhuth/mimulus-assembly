@@ -81,8 +81,8 @@ maker \
 	${path1}/annotation/maker_round2/*
 
 #Get gff & fasta files
-gff3_merge -d ${fasta/.f*/}.output/${fasta/.f*/}_master_datastore_index.log
-fasta_merge -d ${fasta/.f*/}.output/${fasta/.f*/}_master_datastore_index.log
+gff3_merge -d ${fasta/.f*/}.maker.output/${fasta/.f*/}_master_datastore_index.log
+fasta_merge -d ${fasta/.f*/}.maker.output/${fasta/.f*/}_master_datastore_index.log
 
 echo "Done"
 

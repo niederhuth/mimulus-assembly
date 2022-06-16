@@ -77,11 +77,11 @@ then
 fi
 if [ -z ${input_gff} ]
 then
-	input_gff="${maker_dir}/maker.gff"
+	input_gff="${maker_dir}/${fasta/.f*/}.all.gff"
 fi
 if [ -z ${transcripts} ]
 then
-	transcripts="${maker_dir}/maker_transcripts.fa"
+	transcripts="${maker_dir}/${fasta/.f*/}.all.maker.transcripts.fasta"
 fi
 
 
