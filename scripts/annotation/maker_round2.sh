@@ -78,7 +78,7 @@ maker \
 	-q \
 	-genome ../${fasta} \
 	-cpus ${blast_threads} \
-	${path1}/annotation/maker_round2/*
+	${path1}/annotation/${species}_${genotype}_${sample}_${path3}/*
 
 #Get gff & fasta files
 gff3_merge -d ${fasta/.f*/}.output/${fasta/.f*/}_master_datastore_index.log
