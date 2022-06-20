@@ -78,11 +78,15 @@ maker \
 	-q \
 	-genome ../${fasta} \
 	-cpus ${blast_threads} \
+<<<<<<< HEAD
 	${path1}/annotation/${species}_${genotype}_${sample}_${path3}/*
+=======
+	${path1}/annotation/${species}_${genotype}_${sample}_maker_round2/*
+>>>>>>> d04a0f48e5f7f078706b52675b0126cdc7af8af0
 
 #Get gff & fasta files
-gff3_merge -d ${fasta/.f*/}.output/${fasta/.f*/}_master_datastore_index.log
-fasta_merge -d ${fasta/.f*/}.output/${fasta/.f*/}_master_datastore_index.log
+gff3_merge -d ${fasta/.f*/}.maker.output/${fasta/.f*/}_master_datastore_index.log
+fasta_merge -d ${fasta/.f*/}.maker.output/${fasta/.f*/}_master_datastore_index.log
 
 echo "Done"
 
