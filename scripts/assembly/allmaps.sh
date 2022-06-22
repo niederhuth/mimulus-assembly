@@ -363,7 +363,7 @@ python -m jcvi.assembly.allmaps path \
 	--cpus=${threads} \
 	--distance=${distance} \
 	--noplot \
-	allmaps.bed input.fa \
+	allmaps.bed input.fa
 
 #Cleanup
 mkdir fasta_other

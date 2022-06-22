@@ -68,7 +68,7 @@ ${path2}/annotation/interproscan/interproscan.sh \
 
 #Download Arabidopsis genes and create diamond DB
 echo "Downloading Arabidopsis TAIR10 proteins"
-wget https://www.arabidopsis.org/download_files/Proteins/TAIR10_protein_lists/TAIR10_pep_20110103_representative_gene_model
+wget -q https://www.arabidopsis.org/download_files/Proteins/TAIR10_protein_lists/TAIR10_pep_20110103_representative_gene_model
 echo "Making diamond blast DB for "
 diamond makedb \
 	--threads ${threads} \
@@ -89,7 +89,7 @@ diamond blastp \
 
 #Download and format Arabidopsis TAIR10 functional descriptions
 echo "Downloading and formatting Arabidopsis TAIR10 functional descriptions"
-wget https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_functional_descriptions
+wget -q https://www.arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_functional_descriptions
 perl -e  'while (my $line = <>){ my @elems = split "\t", $line; if($elems[2] ne "") {print "$elems[0]\t$elems[2]\n"}}' \
 TAIR10_functional_descriptions > TAIR10_short_functional_descriptions.txt
 
@@ -104,7 +104,7 @@ perl ${path2}/annotation/pl/create_functional_annotation_file.pl \
 	--output prot_func_desc_list.txt
 
 #
-wget https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/gene_association.tair.gz
+wget -q https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/gene_association.tair.gz
 gunzip gene_association.tair.gz
 
 echo "Done"
