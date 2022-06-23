@@ -79,7 +79,7 @@ while (my $line = <$gff_in_fh>) {
 
     if ($elems[1] ne 'maker') {
 	# All non-maker features will be retained.
-	print $gff_out_fh "$line\n";
+	#print $gff_out_fh "$line\n";
 	next;
     }
 
