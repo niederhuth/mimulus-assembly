@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=50
 #SBATCH --mem=100GB
-#SBATCH --job-name find_TE_like_genes
+#SBATCH --job-name filter_genes
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
