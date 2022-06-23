@@ -22,11 +22,6 @@ input_geneList = args.input_geneList
 if os.path.isfile(input_geneList) == False:
 	print('ERROR: he file ' + input_geneList + ' does not exist.\n')
 	sys.exit()
-#Check to see if output file already exists
-output_file = args.output_file
-if os.path.isfile(output_file):
-	print('ERROR: The file ' + output_file + ' already exists.\n')
-	sys.exit()
 
 #Create an empty set of TE genes to be filtered
 TEgeneSet = set()
