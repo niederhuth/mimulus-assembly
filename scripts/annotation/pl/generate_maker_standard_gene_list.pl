@@ -26,7 +26,7 @@ Getopt::Long::GetOptions( "input_gff=s" => \$input_gff,
                           "pfam_results=s" => \$pfam_results,
                           "pfam_cutoff=f" => \$pfam_cutoff,
                           "output_file=s" => \$output_file,
-                          "filtered_genes=s" => \$filtered_genes,
+                          "filtered_genes=s" => \my $filtered_genes,
                           "help" => \$help) || die;
 
 if (defined($help)) {
