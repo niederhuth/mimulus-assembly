@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#declare {BPM_USERNAME,BPM_PASSWORD,HOST,TARGET_IP,OVERRIDE_STATUS}=''
-
 OPTS=`getopt -a --longoptions chrUN,prefix:,justify:,zeros_at_end:,input_gff:,input_protein_fa:,input_transcript_fa:,output_prefix: -n "$0" -- "$@"`
 
 eval set -- "${OPTS}"
@@ -66,7 +64,7 @@ do
 		${line}.gff | awk -v a=${ZEROS} '{if ($2 ~ /-R/) print $0; else print $0a}' | sed s/-R/${ZEROS}./ > ${line}_renamed.map
 	elif [[ CHRUN ]]
 	then
-		awk -v a=${line} '$1==a' ../${GFF} > chrUN.gff
+		awk -v a=${line} '$1==a' ../${GFF} >> chrUN.gff
 	else
 		awk -v a=${line} '$1==a' ../${GFF} > ${line}.gff
 		maker_map_ids \
@@ -91,7 +89,7 @@ fi
 #Combine files
 cd ..
 cat tmp/*_renamed.map > ${OUTPUT}-renamed-genes.map
-#rm -R tmp
+#rm -R tmp chr_list
 
 #Rename gff & fasta files
 map_gff_ids ${OUTPUT}-renamed-genes.map ${GFF} > ${OUTPUT}_renamed.gff
