@@ -196,7 +196,7 @@ python ${path2}/annotation/py/create_TE_noTE_genelist.py \
 #Filter out potential TEs
 echo "Making no TE gff"
 perl ${path2}/annotation/pl/create_maker_standard_gff.pl \
-	--maker_standard_gene_list noTE_gene_list.txt \
+	--maker_standard_gene_list noTE_mRNA_list.txt \
 	--input_gff ${fasta/.fa/}.gff \
 	--output_gff ${fasta/.fa/}-noTE.gff
 
