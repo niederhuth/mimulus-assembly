@@ -192,37 +192,34 @@ my $searchio = Bio::SearchIO->new( -format => 'blast',
     );
 
 while ( my $result = $searchio->next_result() ) {
-    my $query_name = $result->query_name;
-
-    my $annotation;
-    my $hit_counter = 0;
-    while( my $hit = $result->next_hit ) {
-        my $subject_name = $hit->name;
-        $hit_counter++;
-
-        $annotation = $model_annots{$subject_name};
-
-        if (defined($annotation) || $hit_counter >= $max_hits) {
-	    last;
-        }        
+	my $query_name = $result->query_name;
+	my $annotation;
+	my $blast_hit;
+	my $hit_counter = 0;
+	while( my $hit = $result->next_hit ) {
+		my $subject_name = $hit->name;
+		$hit_counter++;
+		$annotation = $model_annots{$subject_name};
+		$blast_hit = $subject_name;
+		if (defined($annotation) || $hit_counter >= $max_hits) {
+			last;
+		}        
     }
-    
-    if (!defined($annotation) && defined($has_transcript_support{$query_name}) &&
-	$has_transcript_support{$query_name} == 1) {
-	# If there was no model genome homology but there was transcript support,
-	# use this generic description.
-	# This may be replaced by a Pfam description.
-	$annotation = "Expressed gene of unknown function";
-    }
-    elsif (!defined($annotation)) {
-	# If there was no model genome homology but there was no transcript support,
-	# use this generic description.
-	# This may be replaced by a Pfam description.
-	$annotation = "Hypothetical gene of unknown function";
-    }
-
-    $annotations{$query_name} = $annotation;
-
+	if (!defined($annotation) && defined($has_transcript_support{$query_name}) && $has_transcript_support{$query_name} == 1) {
+		# If there was no model genome homology but there was transcript support,
+		# use this generic description.
+		# This may be replaced by a Pfam description.
+		$annotation = "Expressed gene of unknown function";
+		$blast_hit = "NA"
+	} elsif (!defined($annotation)) {
+		# If there was no model genome homology but there was no transcript support,
+		# use this generic description.
+		# This may be replaced by a Pfam description.
+		$annotation = "Hypothetical gene of unknown function";
+		$blast_hit = "NA"
+	}
+	$annotations{$query_name} = $annotation;
+	$blast_genes{$query_name} = $blast_hit;
 }
 
 
@@ -286,14 +283,13 @@ while ( my $line = <PFAM> ) {
 	$annotations{$query_name} = "$annotation_short domain containing protein";
 
 	$pfam_matched_genes{$query_name} = 1;
-    }
-
+	}
 }
 
 # Print everything out to a file.
 open OUT, ">$output_file" || die "\nUnable to open $output_file for writing.\n\n";
 foreach my $id (keys(%annotations)) {
-    print OUT "$id\t$annotations{$id}\n";
+	print OUT "$id\t$blast_genes{$id}\t$annotations{$id}\n";
 }
 close OUT;
 
