@@ -37,7 +37,7 @@ if (!defined($input_gff) ||  !(-e $input_gff) ||
     !defined($pfam_results) ||  !(-e $pfam_results) ||
     !defined($pfam_cutoff) || 
     !defined($output_file) ||  (-e $output_file)) ||
-    !defined($filtered_genes) ||  (-e $filtered_genes)) {
+    !defined(my $filtered_genes) ||  (-e my $filtered_genes)) {
     die $usage;
 }
 
