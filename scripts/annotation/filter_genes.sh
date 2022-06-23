@@ -183,7 +183,7 @@ diamond blastp \
 
 #Create a genelist with no TEs
 echo "Creating gene list with TEs removed"
-python ${path2}/annotations/py/create_TE_noTE_genelist.py \
+python ${path2}/annotation/py/create_TE_noTE_genelist.py \
 	--input_geneList ${fasta/.fa/}_prefilter_mRNA.txt \
 	--pfamhmm prot_domains.out \
 	--TEpfam_list ${path1}/TE_Pfam_domains.txt \
@@ -194,7 +194,7 @@ python ${path2}/annotations/py/create_TE_noTE_genelist.py \
 
 #Filter out potential TEs
 echo "Making no TE gff"
-perl ${path2}/annotation/create_maker_standard_gff.pl \
+perl ${path2}/annotation/pl/create_maker_standard_gff.pl \
 	--maker_standard_gene_list noTE_gene_list.txt \
 	--input_gff ${fasta/.fa/}.gff \
 	--output_gff ${fasta/.fa/}-noTE.gff
@@ -206,7 +206,7 @@ perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
 	-o ${fasta/.fa/}-transcripts-noTE.fa
 
 echo "Making no TE proteins fasta"
-perl ${path2}/annotation/get_subset_of_fastas.pl \
+perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
 	-l noTE_mRNA_list.txt \
 	-f ${fasta/.fa/}-proteins.fa \
 	-o ${fasta/.fa/}-proteins-noTE.fa

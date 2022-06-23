@@ -16,6 +16,7 @@ my $usage = "\n$0\n    --input_gff   <path_to_input_gff_file>\n" .
             "    --pfam_results  <path_to_pfam_results_file>\n" .
             "    --pfam_cutoff   <pfam p-value cutoff>\n" .
             "    --output_file   <MAKER-standard gene list output file>\n" .
+            "    --bad_genes   <output list of genes filtered\n" .
             "    [--help]\n\n";
 
 my ($input_gff, $pfam_results, $pfam_cutoff, $output_file);
@@ -88,40 +89,43 @@ close PFAM;
 #print "number of pfam genes: " . scalar(keys(%pfam_genes)) . "\n";
 
 open GFF, $input_gff or die "\nUnable to open $input_gff for reading.\n\n";
-open OUT, ">$output_file" or die "\nUnable to open $output_file for writing.\n\n";
+open OUT1, ">$output_file" or die "\nUnable to open $output_file for writing.\n\n";
+open OUT2, ">$bad_genes" or die "\nUnable to open $bad_genes for writing.\n\n";
 
 my %maker_standard_genes;
 while (my $line = <GFF>) {
-    chomp $line;
-
+	chomp $line;
+	#Skip over header lines
     if ($line =~ /#FASTA/) {
-    last;
-    }
+		last;
+	}
     if ($line =~ /^#/) {
-    next;
-    }
-
-    my @elems = split "\t", $line;
-
-    if ($elems[1] eq 'maker' && $elems[2] eq 'mRNA') {
-    if ($elems[8] =~ /^ID=([^;]+)/) {
-            my $id = $1;
-            if ($elems[8] =~ /_AED=([\.\d]+);/) {
-        my $aed = $1;
-        #print "$aed\t$id\n";
-        if (!exists($bad_genes{$id}) && ($aed < 1 || exists($pfam_genes{$id}))) {
-            # This is the MAKER-standard gene set.
-            print OUT "$id\n";
-        }
-            }
-            else {
-        print "Failed to regex AED value.\n$line\n";
-            }
-    }
-    }
-
+		next;
+	}
+	#Split gff line on tab
+	my @elems = split "\t", $line;
+	#Only work with maker annotations & mRNAs
+	if ($elems[1] eq 'maker' && $elems[2] eq 'mRNA') {
+		if ($elems[8] =~ /^ID=([^;]+)/) {
+			my $id = $1;
+			if ($elems[8] =~ /_AED=([\.\d]+);/) {
+				my $aed = $1;
+				#print "$aed\t$id\n";
+				if ($aed < 1 || exists($pfam_genes{$id})) {
+					# This is the MAKER-standard gene set.
+					print OUT1 "$id\n";
+				} else {
+					print OUT2 "$id\n";
+				}
+			}
+			else {
+				print "Failed to regex AED value.\n$line\n";
+			}
+		}
+	}
 }
 close GFF;
-close OUT;
+close OUT1;
+close OUT2;
 
 exit;
