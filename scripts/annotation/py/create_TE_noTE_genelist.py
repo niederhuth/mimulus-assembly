@@ -138,7 +138,7 @@ for each_element in newGeneSet:
 	output_non_TEs_fh.write("%s\n"%(each_element))
 output_non_TEs_fh.close()
 #Output list of putative TE genes
-output_TE_fh = open(args.output_TE_like_genes, 'w')
+output_TEs_fh = open(args.output_TE_like_genes, 'w')
 for each_element in newGeneSet:
 	output_TEs_fh.write("%s\n"%(each_element))
 output_TEs_fh.close()
