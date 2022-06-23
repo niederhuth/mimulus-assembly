@@ -112,8 +112,6 @@ while (my $line = <GFF>) {
 				if ($aed < 1 || exists($pfam_genes{$id})) {
 					# This is the MAKER-standard gene set.
 					print OUT "$id\n";
-				} else {
-					print "$id\n"
 				}
 			}
 			else {
