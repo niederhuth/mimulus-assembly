@@ -47,7 +47,7 @@ done
 
 #Combine files
 cd ..
-cat tmp/${line}_renamed.map > ${species}_${genotype}_${sample}_renamed_genes.map
+cat tmp/*_renamed.map > ${species}_${genotype}_${sample}_renamed_genes.map
 #rm -R tmp
 
 #Rename gff & fasta files
