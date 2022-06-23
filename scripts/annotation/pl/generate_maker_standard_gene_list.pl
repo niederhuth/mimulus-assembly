@@ -36,7 +36,7 @@ if (defined($help)) {
 if (!defined($input_gff) ||  !(-e $input_gff) ||
     !defined($pfam_results) ||  !(-e $pfam_results) ||
     !defined($pfam_cutoff) || 
-    !defined($output_file) ||  (-e $output_file)) 
+    !defined($output_file) ||  (-e $output_file)) ||
 	!defined($filtered_genes) ||  (-e $filtered_genes)) {
     die $usage;
 }
@@ -91,8 +91,8 @@ close PFAM;
 #print "number of pfam genes: " . scalar(keys(%pfam_genes)) . "\n";
 
 open GFF, $input_gff or die "\nUnable to open $input_gff for reading.\n\n";
-open OUT1, ">$output_file" or die "\nUnable to open $output_file for writing.\n\n";
-open OUT2, ">$filtered_genes" or die "\nUnable to open $filtered_genes for writing.\n\n";
+open my $OUT1, ">$output_file" or die "\nUnable to open $output_file for writing.\n\n";
+open my $OUT2, ">$filtered_genes" or die "\nUnable to open $filtered_genes for writing.\n\n";
 
 my %maker_standard_genes;
 while (my $line = <GFF>) {
@@ -127,7 +127,7 @@ while (my $line = <GFF>) {
 	}
 }
 close GFF;
-close OUT1;
-close OUT2;
+close my $OUT1;
+close my $OUT2;
 
 exit;
