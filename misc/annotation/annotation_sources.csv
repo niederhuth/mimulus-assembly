@@ -1,3 +1,3 @@
-species,genotype,sample,proteins(species_genotype_sample),short_read(species_genotype_sample),long_read(species_genotype_sample_datatype(can be ont-direct-rna; ont-2D-rna; or pb-rna))
-Mguttatus,S1,S1,Athaliana-v11 Osativa-v7 Slycopersicum-v4 Uniprot-plant,Mguttatus_S1_PooledPE Mguttatus_S1_PooledSE,Mguttatus_IM767_IM767_pb-rna
-Mguttatus,L1,L1,Athaliana-v11 Osativa-v7 Slycopersicum-v4 Uniprot-plant,Mguttatus_L1_PooledPE Mguttatus_L1_PooledSE,Mguttatus_IM767_IM767_pb-rna
+species,genotype,sample,proteins(species_genotype_sample),short_read(species_genotype_sample),long_read(species_genotype_sample_datatype(can be ont-direct-rna; ont-2D-rna; or pb-rna)),
+Mguttatus,S1,S1,Athaliana-v11 Osativa-v7 Slycopersicum-v4 Uniprot-plant,Mguttatus_S1_PooledPE Mguttatus_S1_PooledSE,Mguttatus_IM767_IM767_pb-rna,
+Mguttatus,L1,L1,Athaliana-v11 Osativa-v7 Slycopersicum-v4 Uniprot-plant,Mguttatus_L1_PooledPE Mguttatus_L1_PooledSE,Mguttatus_IM767_IM767_pb-rna,
