@@ -77,6 +77,10 @@ export TMP=$(pwd)
 export TEMP=$(pwd)
 
 #Set various datasets
+if [ -z ${gff} ]
+then
+	gff=${maker_dir}/${fasta/.fa/}.all.gff
+fi
 if [ -z ${transcripts} ]
 then
 	transcripts=${maker_dir}/${fasta/.fa/}.all.maker.transcripts.fasta
@@ -85,39 +89,10 @@ if [ -z ${proteins} ]
 then
 	proteins=${maker_dir}/${fasta/.fa/}.all.maker.proteins.fasta
 fi
-if [ -z ${gff} ]
-then
-	gff=${maker_dir}/${fasta/.fa/}.all.gff
-fi
-
-#Generate maker standard gene list
-echo "Generating Pfam filtered Gene List"
-perl ${path2}/annotation/pl/generate_maker_standard_gene_list.pl \
-	--input_gff ${gff} \
-	--output_file ${fasta/.fa/}_unfiltered.txt
-
-#Make Maker Standard Files
-echo "Making Initial Transcripts fasta"
-perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
-	-l ${fasta/.fa/}_unfiltered.txt \
-	-f ${transcripts} \
-	-o ${fasta/.fa/}-transcripts.fa
-	
-echo "Making Initial Protein fasta"
-perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
-	-l ${fasta/.fa/}_unfiltered.txt \
-	-f ${proteins} \
-	-o ${fasta/.fa/}-proteins.fa
-
-echo "Making Initial GFF file"
-perl ${path2}/annotation/pl/create_maker_standard_gff.pl \
-	--maker_standard_gene_list ${fasta/.fa/}_unfiltered.txt \
-	--input_gff ${gff} \
-	--output_gff ${fasta/.fa/}.gff
 
 #Download Pfam A hmm database
 echo "Downloading Pfam-A"
-wget http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
+wget -q http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
 gunzip Pfam-A.hmm.gz
 
 #Prepare Pfam A hmm-database
@@ -135,9 +110,36 @@ hmmscan \
 	Pfam-A.hmm \
 	${proteins}
 
+#Prefilter genes for those without any support (AED=1, or non-sig pfam result)
+#Generate maker standard gene list
+echo "Generating prefiltered list of mRNAs"
+perl ${path2}/annotation/pl/generate_maker_standard_gene_list.pl \
+	--input_gff ${gff} \
+	--pfam_results prot_domains.out \
+    --pfam_cutoff 1e-10 \
+	--output_file ${fasta/.fa/}_prefilter_mRNA.txt
+
+echo "Making prefiltered gff file"
+perl ${path2}/annotation/pl/create_maker_standard_gff.pl \
+	--maker_standard_gene_list ${fasta/.fa/}_prefilter_mRNA.txt \
+	--input_gff ${gff} \
+	--output_gff ${fasta/.fa/}.gff
+
+echo "Making prefiltered transcripts fasta"
+perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
+	-l ${fasta/.fa/}_prefilter_mRNA.txt \
+	-f ${transcripts} \
+	-o ${fasta/.fa/}-transcripts.fa
+	
+echo "Making prefiltered protein fasta"
+perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
+	-l ${fasta/.fa/}_prefilter_mRNA.txt \
+	-f ${proteins} \
+	-o ${fasta/.fa/}-proteins.fa
+
 #Download and make Transposase blast DB
 echo "Downloading Tpases020812"
-wget http://www.hrt.msu.edu/uploads/535/78637/Tpases020812.gz
+wget -q http://www.hrt.msu.edu/uploads/535/78637/Tpases020812.gz
 gunzip Tpases020812.gz
 #remove trailing white space in the Tpases020812 file
 sed -i 's/[ \t]*$//' Tpases020812
@@ -182,12 +184,12 @@ diamond blastp \
 #Create a genelist with no TEs
 echo "Creating gene list with TEs removed"
 python ${path2}/annotations/py/create_TE_noTE_genelist.py \
-	--input_geneList ${fasta/.fa/}_unfiltered.txt \
+	--input_geneList ${fasta/.fa/}_prefilter_mRNA.txt \
 	--pfamhmm prot_domains.out \
 	--TEpfam_list ${path1}/TE_Pfam_domains.txt \
 	--TEblast TE_blast.out \
-	--output_non_TE_genes noTE_gene_list.txt \
-	--output_TE_like_genes potential_TE_like_gene_list.txt
+	--output_non_TE_genes noTE_mRNA_list.txt \
+	--output_TE_like_genes potential_TE_like_mRNA_list.txt
 	#--TEhmm gypsyHMM_analysis.out #Eliminated gypsy hmmscan as this resulted in large amount of false positives
 
 #Filter out potential TEs
@@ -199,15 +201,19 @@ perl ${path2}/annotation/create_maker_standard_gff.pl \
 
 echo "Making no TE Transcripts fasta"
 perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
-	-l noTE_gene_list.txt \
+	-l noTE_mRNA_list.txt \
 	-f ${fasta/.fa/}-transcripts.fa \
 	-o ${fasta/.fa/}-transcripts-noTE.fa
 
 echo "Making no TE proteins fasta"
 perl ${path2}/annotation/get_subset_of_fastas.pl \
-	-l noTE_gene_list.txt \
+	-l noTE_mRNA_list.txt \
 	-f ${fasta/.fa/}-proteins.fa \
 	-o ${fasta/.fa/}-proteins-noTE.fa
+
+#Convert mRNA id to gene id in noTE and potential_TE_like lists
+sed s/-mRNA.*// noTE_mRNA_list.txt > noTE_gene_list.txt
+sed s/-mRNA.*// potential_TE_like_mRNA_list.txt > potential_TE_like_gene_list.txt
 
 echo "Done"
 
