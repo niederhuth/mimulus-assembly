@@ -117,7 +117,8 @@ perl ${path2}/annotation/pl/generate_maker_standard_gene_list.pl \
 	--input_gff ${gff} \
 	--pfam_results prot_domains.out \
     --pfam_cutoff 1e-10 \
-	--output_file ${fasta/.fa/}_prefilter_mRNA.txt
+	--output_file ${fasta/.fa/}_prefilter_mRNA.txt \
+	> prefiltered_mRNAs.txt
 
 echo "Making prefiltered gff file"
 perl ${path2}/annotation/pl/create_maker_standard_gff.pl \

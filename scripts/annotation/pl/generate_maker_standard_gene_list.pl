@@ -16,7 +16,6 @@ my $usage = "\n$0\n    --input_gff   <path_to_input_gff_file>\n" .
             "    --pfam_results  <path_to_pfam_results_file>\n" .
             "    --pfam_cutoff   <pfam p-value cutoff>\n" .
             "    --output_file   <MAKER-standard gene list output file>\n" .
-            "    --filtered_genes   <list of filtered genes\n" .
             "    [--help]\n\n";
 
 my ($input_gff, $pfam_results, $pfam_cutoff, $output_file);
@@ -26,7 +25,6 @@ Getopt::Long::GetOptions( "input_gff=s" => \$input_gff,
                           "pfam_results=s" => \$pfam_results,
                           "pfam_cutoff=f" => \$pfam_cutoff,
                           "output_file=s" => \$output_file,
-                          "filtered_genes=s" => \my $filtered_genes,
                           "help" => \$help) || die;
 
 if (defined($help)) {
@@ -36,8 +34,7 @@ if (defined($help)) {
 if (!defined($input_gff) ||  !(-e $input_gff) ||
     !defined($pfam_results) ||  !(-e $pfam_results) ||
     !defined($pfam_cutoff) || 
-    !defined($output_file) ||  (-e $output_file)) ||
-    !defined(my $filtered_genes) ||  (-e my $filtered_genes)) {
+    !defined($output_file) ||  (-e $output_file)) {
     die $usage;
 }
 
@@ -92,7 +89,7 @@ close PFAM;
 
 open GFF, $input_gff or die "\nUnable to open $input_gff for reading.\n\n";
 open OUT, ">$output_file" or die "\nUnable to open $output_file for writing.\n\n";
-open OUT2 ">$filtered_genes" or die "\nUnable to open $filtered_genes for writing.\n\n";
+
 
 my %maker_standard_genes;
 while (my $line = <GFF>) {
@@ -117,7 +114,7 @@ while (my $line = <GFF>) {
 					# This is the MAKER-standard gene set.
 					print OUT "$id\n";
 				} else {
-					print OUT2 "$id\n";
+					print "$id\n";
 				}
 			}
 			else {
@@ -128,6 +125,5 @@ while (my $line = <GFF>) {
 }
 close GFF;
 close OUT;
-close OUT2;
 
 exit;
