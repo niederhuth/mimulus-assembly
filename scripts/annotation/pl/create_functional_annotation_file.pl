@@ -64,30 +64,29 @@ my $result = GetOptions(
 			'protein_fasta|f=s'        => \$protein_fasta_file,
 			'output|o=s'          => \$output_file,
 			'help|h'              => \$help,
-		       );
+);
 
 if (defined($help)) {
-    die "\n$0  --model_annot model_genome_annotation_file  --model_blast model_genome_blast_file  --pfam_results_file pfam_results_file  --max_hits max_number_uniref_hits_to_use  --output  path_to_output_file\n\n";
+	die "\n$0  --model_annot model_genome_annotation_file  --model_blast model_genome_blast_file  --pfam_results_file pfam_results_file  --max_hits max_number_uniref_hits_to_use  --output  path_to_output_file\n\n";
 }
 unless (defined($protein_fasta_file) && -e $protein_fasta_file) {
-    die "\nMust provide the protein fasta file with --protein_fasta flag\n\n";
+	die "\nMust provide the protein fasta file with --protein_fasta flag\n\n";
 }
 unless (defined($model_blast_file) && -e $model_blast_file) {
-    die "\nMust provide raw blast results file with --model_blast flag\n\n";
+	die "\nMust provide raw blast results file with --model_blast flag\n\n";
 }
 unless (defined($model_annot_file) && -e $model_annot_file) {
-    die "\nMust provide model genome annotation file with --model_annot flag\n\n";
+	die "\nMust provide model genome annotation file with --model_annot flag\n\n";
 }
 #unless (defined($pfam_results_file) && -e $pfam_results_file) {
 #    die "\nMust provide raw pfam results file with --pfam_results_file flag\n\n";
 #}
 unless (defined($max_hits)) {
-    die "\nMust provide the max number of blast hits to consider with --max_hits flag\n\n";
+	die "\nMust provide the max number of blast hits to consider with --max_hits flag\n\n";
 }
 unless (defined($output_file) && !(-e $output_file)) {
-    die "\nMust provide output file name with --output flag\n\n";
+	die "\nMust provide output file name with --output flag\n\n";
 }
-
 
 $protein_fasta_file = abs_path($protein_fasta_file);
 $model_blast_file = abs_path($model_blast_file);
@@ -128,59 +127,54 @@ while ( my $seq = $in->next_seq() ) {
 # Read in the model genome functional descriptions.
 # This file should consist of protein IDs and functional descriptions separated by tabs.
 # The protein IDs should match the IDs that are found in the model genome blast results.
-
 my %model_annots;
 open IN, $model_annot_file or die "\nUnable to read the $model_annot_file file.\n\n";
-
 while (my $line = <IN>) {
-    chomp $line;
-
-    my ($gene_id, $annot) = split "\t", $line;
-
-    my $short_gene_id;
-    if ($gene_id =~ /(\w+)\.\d+/) {
-	$short_gene_id = $1;
-    }
-
-    $annot =~ s/\, putative\, expressed//;
-    $annot =~ s/\, expressed//;
-    if ($annot =~ /^Expressed gene of unknown function/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /^Hypothetical gene of unknown function/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /^expressed gene/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /^expressed protein/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /unknown function domain containing protein/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /unknown function containing protein/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /protein of unknown function containing protein/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /domain of unknown function DUF\d+ domain containing protein/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /domain of unknown function, DUF\d+ domain containing protein/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /protein of unknown function, DUF\d+ domain containing protein/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /protein of unknown function DUF\d+ domain containing protein/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    if ($annot =~ /domain of unknown function family protein/) {
-	$annot = "Homology to rice gene $short_gene_id";
-    }
-    $model_annots{$gene_id} = $annot;
+	chomp $line;
+	my ($gene_id, $annot) = split "\t", $line;
+	my $short_gene_id;
+	if ($gene_id =~ /(\w+)\.\d+/) {
+		$short_gene_id = $1;
+	}
+	$annot =~ s/\, putative\, expressed//;
+	$annot =~ s/\, expressed//;
+	if ($annot =~ /^Expressed gene of unknown function/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /^Hypothetical gene of unknown function/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /^expressed gene/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /^expressed protein/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /unknown function domain containing protein/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /unknown function containing protein/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /protein of unknown function containing protein/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /domain of unknown function DUF\d+ domain containing protein/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /domain of unknown function, DUF\d+ domain containing protein/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /protein of unknown function, DUF\d+ domain containing protein/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /protein of unknown function DUF\d+ domain containing protein/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	if ($annot =~ /domain of unknown function family protein/) {
+		$annot = "Homology to rice gene $short_gene_id";
+	}
+	$model_annots{$gene_id} = $annot;
 }
 close IN;
 
@@ -188,9 +182,8 @@ close IN;
 # Start with the model genome blast results.
 my ($query_name, $subject_name, %annotations, %blast_genes);
 my $searchio = Bio::SearchIO->new( -format => 'blast',
-				   -file   => $model_blast_file,               
+					-file   => $model_blast_file,               
     );
-
 while ( my $result = $searchio->next_result() ) {
 	my $query_name = $result->query_name;
 	my $annotation;
@@ -222,67 +215,46 @@ while ( my $result = $searchio->next_result() ) {
 	$blast_genes{$query_name} = $blast_hit;
 }
 
-
-
-
 # Functional annotations from the best pfam domain match
 # will be used if the model genome annotation was poor or absent.
 my %pfam_matched_genes;
 open PFAM, $pfam_results_file or die "\nUnable to open pfam results file: $pfam_results_file\n\n";
 while ( my $line = <PFAM> ) {
-    chomp $line;
-
-    if ($line =~ /^#/) {
-	next;
+	chomp $line;
+	if ($line =~ /^#/) {
+		next;
+	}
+	my @elems = split "\t", $line;
+	my $annotation_short = $elems[5];
+	my $annotation_long = join(" ", @elems[12,]);
+	my $query_name = $elems[0];
+	my $score = $elems[8];
+	if (exists($pfam_matched_genes{$query_name})) {
+		# We have already provided this gene with a pfam domain annotation.
+		# We don't need to reassign a weaker pfam domain.
+		next;
     }
-
-    #$line =~ s/\s+/\t/g;
-    my @elems = split "\t", $line;
-    my $annotation_short = $elems[5];
-    my $annotation_long = join(" ", @elems[12,]);
-    my $query_name = $elems[0];
-    my $score = $elems[8];
-
-    if (exists($pfam_matched_genes{$query_name})) {
-	# We have already provided this gene with a pfam domain annotation.
-	# We don't need to reassign a weaker pfam domain.
-	next;
-    }
-
-    if ($annotation_long =~ /^(.+?)\s+Molecular Function:/) {
-	$annotation_long = $1;
-    }
-    if ($annotation_long =~ /rotein of unknown function,* \(*(DUF\d+)\)*/) {
-	$annotation_long = $1;
-    }
-    if ($annotation_long =~ /omain of unknown function,* \(*(DUF\d+)\)*/) {
-	$annotation_long = $1;
-    }
-
-    $annotation_long =~ s/ domain$//;
-    if ($score > 1e-5) {
-	# Let's only work with scores better than 1e-5.
-	next;
-    }
-
-    if ($query_name =~ /__124_/) {
-	# The pipes in the rice names have to be re-added.
-	$query_name =~ s/__124_/\|/g;
-    }
-
-    if (!exists($annotations{$query_name}) || $annotations{$query_name} =~ /unknown function$/) {
-	#print "Using pfam annotation.\n";
-	#print "$query_name\t$annotation\n";
-	#$annotations{$query_name} = "$annotation_short domain containing protein"; # Pick this or the next line, but not both.
-	#$annotations{$query_name} = "$annotation_long";
-
-	#print "$query_name\t$annotation\n";
-	#$annotations{$query_name} = "$annotation domain containing protein";
-
-	#print "$query_name\t$annotation_short\n";
-	$annotations{$query_name} = "$annotation_short domain containing protein";
-
-	$pfam_matched_genes{$query_name} = 1;
+	if ($annotation_long =~ /^(.+?)\s+Molecular Function:/) {
+		$annotation_long = $1;
+	}
+	if ($annotation_long =~ /rotein of unknown function,* \(*(DUF\d+)\)*/) {
+		$annotation_long = $1;
+	}
+	if ($annotation_long =~ /omain of unknown function,* \(*(DUF\d+)\)*/) {
+		$annotation_long = $1;
+	}
+	$annotation_long =~ s/ domain$//;
+	if ($score > 1e-5) {
+		# Let's only work with scores better than 1e-5.
+		next;
+	}
+	if ($query_name =~ /__124_/) {
+		# The pipes in the rice names have to be re-added.
+		$query_name =~ s/__124_/\|/g;
+	}
+	if (!exists($annotations{$query_name}) || $annotations{$query_name} =~ /unknown function$/) {
+		$annotations{$query_name} = "$annotation_short domain containing protein";
+		$pfam_matched_genes{$query_name} = 1;
 	}
 }
 
