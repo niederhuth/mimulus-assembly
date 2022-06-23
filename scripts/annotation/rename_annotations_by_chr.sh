@@ -1,15 +1,13 @@
 #!/bin/bash
 
-#Set variables from command line
-while getopts p:j:z:
-
-
+#Arguments
 prefix=$1
 justify=$2
 zeros_at_end=$3
-input_gff=
-input_proteins=
-input_transcripts=
+input_gff=$4
+input_proteins=$5
+input_transcripts=$6
+output=$7
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
