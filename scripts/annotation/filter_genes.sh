@@ -187,7 +187,7 @@ echo "Creating gene list with TEs removed"
 python ${path2}/annotation/py/create_TE_noTE_genelist.py \
 	--input_geneList ${fasta/.fa/}_prefilter_mRNA.txt \
 	--pfamhmm prot_domains.out \
-	--TEpfam_list ${path1}/TE_Pfam_domains.txt \
+	--TEpfam_list ${path1}/annotation/TE_Pfam_domains.txt \
 	--TEblast TE_blast.out \
 	--output_non_TE_genes noTE_mRNA_list.txt \
 	--output_TE_like_genes potential_TE_like_mRNA_list.txt

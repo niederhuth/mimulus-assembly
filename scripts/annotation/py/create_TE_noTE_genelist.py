@@ -13,8 +13,8 @@ parser.add_argument("--pfamhmm", help="hmmscan output of pfam domains (requires 
 parser.add_argument("--TEpfam_list", help="List of TE-related Pfam IDs.", required = False)
 parser.add_argument("--TEhmm", help="hmmscan output of TE-related genes (e.g. gypsy hmm)", required = False)
 parser.add_argument("--TEblast", help="Blast results against TE sequences (requires outfmt 6).", required = False)
-parser.add_argument("--output_non_TE_genes", help="Path to output file.", required = True)
-parser.add_argument("--output_TE_like_genes", help="Path to output file.", required = True)
+parser.add_argument("--output_non_TE_genes", help="Path to output file for non TE genes.", required = True)
+parser.add_argument("--output_TE_like_genes", help="Path to output file for possible TE-like genes.", required = True)
 args = parser.parse_args()
 
 #Check for input_geneList
@@ -133,12 +133,12 @@ newGeneSet = oldGeneSet.difference(TEgeneSet)
 print("Length of original gene list: ", len(oldGeneSet))
 print("Length of non-TE gene list: ", len(newGeneSet))
 #Output list of non-TE genes
-output_non_TEs_fh = open(output_non_TE_genes, 'w')
+output_non_TEs_fh = open(args.output_non_TE_genes, 'w')
 for each_element in newGeneSet:
 	output_non_TEs_fh.write("%s\n"%(each_element))
 output_non_TEs_fh.close()
 #Output list of putative TE genes
-output_TE_fh = open(output_TE_like_genes, 'w')
+output_TE_fh = open(args.output_TE_like_genes, 'w')
 for each_element in newGeneSet:
 	output_TEs_fh.write("%s\n"%(each_element))
 output_TEs_fh.close()
