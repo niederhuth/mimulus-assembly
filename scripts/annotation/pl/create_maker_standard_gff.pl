@@ -71,7 +71,7 @@ while (my $line = <$gff_in_fh>) {
 	last;
     }
     if ($line =~ /^#/) {
-	print $gff_out_fh "$line\n";
+	#print $gff_out_fh "$line\n";
 	next;
     }
 
