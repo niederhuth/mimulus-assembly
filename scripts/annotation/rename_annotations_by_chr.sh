@@ -1,15 +1,22 @@
-#!/bin/bash --login
-#SBATCH --time=3:59:00
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
-#SBATCH --mem=1GB
-#SBATCH --job-name=rename_annotations_by_chr
-#SBATCH --output=../job_reports/%x-%j.SLURMout
+#!/bin/bash
 
+#Set variables from command line
+while getopts p:j:z:
+
+
+prefix=$1
+justify=$2
+zeros_at_end=$3
 input_gff=
-prefix="MgL1"
-justify=4
+input_proteins=
+input_transcripts=
+
+#Set this variable to the path to wherever you have conda installed
+conda="${HOME}/miniconda3"
+
+#Export paths to conda
+export PATH="${conda}/envs/maker/bin:${PATH}"
+export LD_LIBRARY_PATH="${conda}/envs/maker/lib:${LD_LIBRARY_PATH}"
 
 #Get chromosome list
 cut -f1 ${input_gff} | grep -v \# | sort | uniq > chr_list
@@ -21,39 +28,33 @@ cat ../chr_list | while read line
 do
 	echo "Working on ${line}"
 	awk -v a=${line} '$1==a' ../${input_gff} > ${line}.gff
+	if [[ ${line:0:3} = "chr" ]]
+	then
+		if [ $(echo ${line} | wc -c) -gt 5 ]
+		then
+			chr=$(echo ${line} | sed s/chr//)
+		else
+			chr=$(echo ${line} | sed s/chr/0/)
+		fi
+	else
+		chr="UN"
+	fi
 	maker_map_ids \
-		--prefix ${prefix}${line}G \
+		--prefix ${prefix}${chr}g \
 		--justify ${justify} \
 		--iterate 1 \
-		${line}.gff | awk '{if ($2 ~ /-R/) print $0; else print $0"0"}' | sed s/-R/0./ > ${line}_renamed.gff
+		${line}.gff | awk -v a=${zeros_at_end} '{if ($2 ~ /-R/) print $0; else print $0a}' | sed s/-R/${zeros_at_end}./ > ${line}_renamed.map
+	chr=
 done
 
+#Combine files
+cd ..
+cat tmp/${line}_renamed.map > ${species}_${genotype}_${sample}_renamed_genes.map
+#rm -R tmp
 
+#Rename gff & fasta files
+map_gff_ids ${species}_${genotype}_${sample}_renamed_genes.map ${input_gff} > ${output}_renamed.gff
+map_fasta_ids ${species}_${genotype}_${sample}_renamed_genes.map ${input_proteins} > ${output}-transcripts_renamed.fa
+map_fasta_ids ${species}_${genotype}_${sample}_renamed_genes.map ${input_proteins} > ${output}-proteins_renamed.fa
 
-
-#
-
-#
-
-maker2eval ${gff}
-
-validate_gtf.pl ${gtf} > maker_std_noTE_with_fasta.gtf_validation
-
-get_general_stats.pl
-  -g: Input files are gtf not lists
-  -q: Quick load the gtf file.  Do not check them for errors.
-  -A: Do not get stats for alternative splices. (Faster)
-  -v: Verbose mode
-  -h: Display this help message and exit
-
-  # create naming table (there are additional options for naming beyond defaults)
-maker_map_ids --prefix BoaCon --justify 5  Bcon_rnd3.all.maker.gff > Bcon_rnd3.all.maker.name.map
-# replace names in GFF files
-map_gff_ids Bcon_rnd3.all.maker.name.map Bcon_rnd3.all.maker.gff
-map_gff_ids Bcon_rnd3.all.maker.name.map Bcon_rnd3.all.maker.noseq.gff
-# replace names in FASTA headers
-map_fasta_ids Bcon_rnd3.all.maker.name.map Bcon_rnd3.all.maker.transcripts.fasta
-map_fasta_ids Bcon_rnd3.all.maker.name.map Bcon_rnd3.all.maker.proteins.fasta
-
-
-maker_map_ids --prefix MgS1_ --suffix . --iterate 1 --justify 8 S1-v1.gff > test
+echo "Done"

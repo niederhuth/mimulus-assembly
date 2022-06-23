@@ -3,8 +3,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=50
-#SBATCH --mem=50GB
-#SBATCH --job-name filter_genes
+#SBATCH --mem=100GB
+#SBATCH --job-name find_TE_like_genes
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -12,6 +12,8 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
+hmmscan_evalue='1e-5' #Cutoff evalue for hmmscan against pfam
+blast_evalue='1e-10' #Cutoff evalue for blast
 fasta= #genome fasta, if left blank will search for in submission directory
 gff= #input gff, if left blank will search in maker_dir
 transcripts= #input transcripts fa, if left blank will search in maker_dir
@@ -88,7 +90,32 @@ then
 	gff=${maker_dir}/${fasta/.fa/}.all.gff
 fi
 
-#Check for Pfam A
+#Generate maker standard gene list
+echo "Generating Pfam filtered Gene List"
+perl ${path2}/annotation/pl/generate_maker_standard_gene_list.pl \
+	--input_gff ${gff} \
+	--output_file ${fasta/.fa/}_unfiltered.txt
+
+#Make Maker Standard Files
+echo "Making Initial Transcripts fasta"
+perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
+	-l ${fasta/.fa/}_unfiltered.txt \
+	-f ${transcripts} \
+	-o ${fasta/.fa/}-transcripts.fa
+	
+echo "Making Initial Protein fasta"
+perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
+	-l ${fasta/.fa/}_unfiltered.txt \
+	-f ${proteins} \
+	-o ${fasta/.fa/}-proteins.fa
+
+echo "Making Initial GFF file"
+perl ${path2}/annotation/pl/create_maker_standard_gff.pl \
+	--maker_standard_gene_list ${fasta/.fa/}_unfiltered.txt \
+	--input_gff ${gff} \
+	--output_gff ${fasta/.fa/}.gff
+
+#Download Pfam A hmm database
 echo "Downloading Pfam-A"
 wget http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz
 gunzip Pfam-A.hmm.gz
@@ -100,40 +127,13 @@ hmmpress Pfam-A.hmm
 #Search Pfam A hmm domains
 echo "Searching against Pfam A hmm profiles"
 hmmscan \
-	--domE 1e-5 \
-	-E 1e-5 \
+	--domE ${hmmscan_evalue} \
+	-E ${hmmscan_evalue} \
 	--cpu ${threads} \
 	-o pfam_alignments.out \
 	--tblout prot_domains.out \
 	Pfam-A.hmm \
 	${proteins}
-
-#Generate maker standard gene list
-echo "Generating Pfam filtered Gene List"
-perl ${path2}/annotation/pl/generate_maker_standard_gene_list.pl \
-	--input_gff ${gff} \
-	--pfam_results prot_domains.out \
-	--pfam_cutoff 1e-10 \
-	--output_file pfam_filtered_gene_list.txt
-
-#Make Maker Standard Files
-echo "Making Initial Transcripts fasta"
-perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
-	-l pfam_filtered_gene_list.txt \
-	-f ${transcripts} \
-	-o pfam_filtered_transcripts.fa
-	
-echo "Making Initial Protein fasta"
-perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
-	-l pfam_filtered_gene_list.txt \
-	-f ${proteins} \
-	-o pfam_filtered_proteins.fa
-
-echo "Making Initial GFF file"
-perl ${path2}/annotation/pl/create_maker_standard_gff.pl \
-	--input_gff ${gff} \
-	--output_gff pfam_filtered.gff \
-	--maker_standard_gene_list pfam_filtered_gene_list.txt
 
 #Download and make Transposase blast DB
 echo "Downloading Tpases020812"
@@ -141,7 +141,7 @@ wget http://www.hrt.msu.edu/uploads/535/78637/Tpases020812.gz
 gunzip Tpases020812.gz
 #remove trailing white space in the Tpases020812 file
 sed -i 's/[ \t]*$//' Tpases020812
-
+#Make diamond blast DB
 echo "Making Transposase diamond blast DB"
 diamond makedb \
 	--threads ${threads} \
@@ -155,57 +155,59 @@ diamond blastp \
 	--db Tpases020812.dmnd \
 	--query ${proteins} \
 	--out TE_blast.out\
-	--evalue 0.0000000001 \
+	--evalue ${blast_evalue} \
 	--outfmt 6
 
+#Eliminated gypsy hmmscan as this resulted in large amount of false positives
 #Download Gypsy DB hmm files and format the hmm database
-echo "Downloading GyDB_collection"
-wget https://gydb.org/extensions/Collection/collection/db/GyDB_collection.zip
-unzip GyDB_collection.zip
-echo "Combining GyDB hmm profiles"
-cat GyDB_collection/profiles/*hmm > all_gypsy.hmm
-echo "Formatting all_gypsy.hmm database"
-hmmpress all_gypsy.hmm
+#echo "Downloading GyDB_collection"
+#wget https://gydb.org/extensions/Collection/collection/db/GyDB_collection.zip
+#unzip GyDB_collection.zip
+#echo "Combining GyDB hmm profiles"
+#cat GyDB_collection/profiles/*hmm > all_gypsy.hmm
+#echo "Formatting all_gypsy.hmm database"
+#hmmpress all_gypsy.hmm
 
 #Search gypsy hmm profiles
-echo "Searching against gypsy hmm profiles"
-hmmscan \
-	--domE 1e-5 \
-	-E 1e-5 \
-	--cpu ${threads} \
-	-o gypsy_alignments.out \
-	--tblout gypsyHMM_analysis.out \
-	all_gypsy.hmm \
-	${proteins}
+#echo "Searching against gypsy hmm profiles"
+#hmmscan \
+#	--domE 1e-5 \
+#	-E 1e-5 \
+#	--cpu ${threads} \
+#	-o gypsy_alignments.out \
+#	--tblout gypsyHMM_analysis.out \
+#	all_gypsy.hmm \
+#	${proteins}
 
 #Create a genelist with no TEs
 echo "Creating gene list with TEs removed"
-python ${path2}/annotation/py/create_no_TE_genelist.py \
-	--input_file_TEpfam ${path1}/annotation/TE_Pfam_domains.txt \
-	--input_file_maxPfam prot_domains.out \
-	--input_file_geneList_toKeep pfam_filtered_gene_list.txt \
-	--input_file_TEhmm gypsyHMM_analysis.out \
-	--input_file_TEblast TE_blast.out \
-	--output_file noTE_gene_list.txt
+python ${path2}/annotations/py/create_TE_noTE_genelist.py \
+	--input_geneList ${fasta/.fa/}_unfiltered.txt \
+	--pfamhmm prot_domains.out \
+	--TEpfam_list ${path1}/TE_Pfam_domains.txt \
+	--TEblast TE_blast.out \
+	--output_non_TE_genes noTE_gene_list.txt \
+	--output_TE_like_genes potential_TE_like_gene_list.txt
+	#--TEhmm gypsyHMM_analysis.out #Eliminated gypsy hmmscan as this resulted in large amount of false positives
 
-#Generate noTE files
+#Filter out potential TEs
+echo "Making no TE gff"
+perl ${path2}/annotation/create_maker_standard_gff.pl \
+	--maker_standard_gene_list noTE_gene_list.txt \
+	--input_gff ${fasta/.fa/}.gff \
+	--output_gff ${fasta/.fa/}-noTE.gff
+
 echo "Making no TE Transcripts fasta"
 perl ${path2}/annotation/pl/get_subset_of_fastas.pl \
 	-l noTE_gene_list.txt \
-	-f pfam_filtered_transcripts.fa \
-	-o ${fasta/.fa/}_transcripts_noTE.fa
+	-f ${fasta/.fa/}-transcripts.fa \
+	-o ${fasta/.fa/}-transcripts-noTE.fa
 
 echo "Making no TE proteins fasta"
 perl ${path2}/annotation/get_subset_of_fastas.pl \
 	-l noTE_gene_list.txt \
-	-f pfam_filtered_proteins.fa \
-	-o ${fasta/.fa/}_proteins_noTE.fa
-
-echo "Making no TE gff"
-perl ${path2}/annotation/create_maker_standard_gff.pl \
-	--maker_standard_gene_list noTE_gene_list.txt \
-	--input_gff pfam_filtered.gff \
-	--output_gff ${fasta/.fa/}_noTE.gff
+	-f ${fasta/.fa/}-proteins.fa \
+	-o ${fasta/.fa/}-proteins-noTE.fa
 
 echo "Done"
 
