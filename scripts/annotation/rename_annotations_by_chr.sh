@@ -89,11 +89,11 @@ fi
 #Combine files
 cd ..
 cat tmp/*_renamed.map > ${OUTPUT}-renamed-genes.map
-#rm -R tmp chr_list
+rm -R tmp chr_list
 
 #Rename gff & fasta files
-map_gff_ids ${OUTPUT}-renamed-genes.map ${GFF} > ${OUTPUT}_renamed.gff
-map_fasta_ids ${OUTPUT}-renamed-genes.map ${TRANSCRIPTS} > ${OUTPUT}-transcripts_renamed.fa
-map_fasta_ids ${OUTPUT}-renamed-genes.map ${PROTEINS} > ${OUTPUT}-proteins_renamed.fa
+map_gff_ids ${OUTPUT}-renamed-genes.map ${GFF}
+map_fasta_ids ${OUTPUT}-renamed-genes.map ${TRANSCRIPTS}
+map_fasta_ids ${OUTPUT}-renamed-genes.map ${PROTEINS}
 
 echo "Done"
