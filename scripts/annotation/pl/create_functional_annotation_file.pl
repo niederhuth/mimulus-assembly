@@ -192,7 +192,7 @@ while ( my $result = $searchio->next_result() ) {
 	while( my $hit = $result->next_hit ) {
 		my $subject_name = $hit->name;
 		$hit_counter++;
-		$annotation = "Arabidopsis blast: $model_annots{$subject_name}";
+		$annotation = "Arabidopsis blast: "$model_annots{$subject_name};
 		$blast_hit = $subject_name;
 		if (defined($model_annots{$subject_name}) || $hit_counter >= $max_hits) {
 			last;
