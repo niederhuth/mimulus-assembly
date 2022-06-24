@@ -203,7 +203,7 @@ while ( my $result = $searchio->next_result() ) {
 		# use this generic description.
 		# This may be replaced by a Pfam description.
 		$annotation = "Expressed gene of unknown function";
-		if (!defined($blast_hit) {
+		if (defined($blast_hit)) {
 			$blast_hit = "NA";
 		}
 	} elsif (!defined($annotation)) {
@@ -211,9 +211,9 @@ while ( my $result = $searchio->next_result() ) {
 		# use this generic description.
 		# This may be replaced by a Pfam description.
 		$annotation = "Hypothetical gene of unknown function";
-		if (!defined($blast_hit) {
+		if (defined($blast_hit)) {
 			$blast_hit = "NA";
-		}
+		}	
 	}
 	$annotations{$query_name} = "Arabidopsis blast: $annotation";
 	$blast_genes{$query_name} = $blast_hit;
