@@ -100,8 +100,8 @@ perl ${path2}/annotation/pl/create_functional_annotation_file.pl \
 	--model_annot TAIR10_short_functional_descriptions.txt \
 	--model_blast ${output}_TAIR10_blast.out \
 	--pfam_results_file ${output}.iprscan \
-	--max_hits 5 \
-	--output ${output}-functional-description.tsv
+	--max_hits 1 \
+	--output ${output}-description.tsv
 
 #Download Arabidopsis GO terms
 echo "Downloading Arabidopsis GO terms"
@@ -111,13 +111,13 @@ gunzip gene_association.tair.gz
 #Combine and format data sources
 echo "Formatting functional annotations files"
 #Create header for output file
-echo "Locus Arabidopsis_blast_hit Arabidopsis_GO_terms PFAM_hits PFAM_GO_terms Short_functional_description" | \
+echo "Transcript Locus Arabidopsis_blast_hit Arabidopsis_GO_terms PFAM_hits PFAM_GO_terms Short_functional_description" | \
 tr ' ' '\t' > ${output}-functional-annotations.tsv
 #Loop over each gene and format data
-cut -f1 ${output}-functional-description.tsv | while read line
+cut -f1 ${output}-description.tsv | while read line
 do
-	AT_ID=$(grep ${line} ${output}-functional-description.tsv | cut -f2)
-	func_desc=$(grep ${line} ${output}-functional-description.tsv | cut -f3 | tr ' ' ';')
+	AT_ID=$(grep ${line} ${output}-description.tsv | cut -f2)
+	func_desc=$(grep ${line} ${output}-description.tsv | cut -f3 | tr ' ' ';')
 	grep ${line} ${output}.iprscan > tmp
 	if [ -s tmp ]
 	then
@@ -137,7 +137,7 @@ do
 	else
 		AT_GO=NA
 	fi
-	echo "${line} ${AT_ID} ${AT_GO} ${PFAM_ID} ${PFAM_GO} ${func_desc}" | tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
+	echo "${line} ${line/\.*/} ${AT_ID} ${AT_GO} ${PFAM_ID} ${PFAM_GO} ${func_desc}" | tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
 	rm tmp
 done
 

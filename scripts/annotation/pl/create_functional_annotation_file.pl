@@ -99,21 +99,17 @@ my %has_transcript_support;
 my $in  = Bio::SeqIO->new(-file => "$protein_fasta_file" ,
 			  -format => 'Fasta');
 while ( my $seq = $in->next_seq() ) {
-
 	my $seq_id = $seq->display_id();
 	my $desc = $seq->desc();
-
 	# >Csco26g01220.1 protein AED:0.00 eAED:0.00 QI:0|-1|0|1|-1|1|1|0|69
 	# QI:0|-1|0|1|-1|1|1|0|69
 	my @elems = split " ", $desc;
 	my @qi = split /\|/, $elems[3];
-
 	#print "$seq_id\n";
 	#print "$desc\n";
 	#print "$elems[0]\n";
 	#print "$elems[3]\n";
 	#print "$qi[2]\n";
-
 	if ($qi[2] > 0) {
 		$has_transcript_support{$seq_id} = 1;
 	}
