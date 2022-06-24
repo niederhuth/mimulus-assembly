@@ -205,7 +205,7 @@ while ( my $result = $searchio->next_result() ) {
 		if (!defined($blast_hit)) {
 			$blast_hit = "NA";
 		}
-		$annotations{$query_name} = "Arabidopsis blast: $annotation";
+		$annotations{$query_name} = $annotation;
 	} elsif (!defined($annotation)) {
 		# If there was no model genome homology but there was no transcript support,
 		# use this generic description.
@@ -214,7 +214,7 @@ while ( my $result = $searchio->next_result() ) {
 		if (!defined($blast_hit)) {
 			$blast_hit = "NA";
 		}
-		$annotations{$query_name} = "Arabidopsis blast: $annotation";
+		$annotations{$query_name} = $annotation;
 	}
 	$blast_genes{$query_name} = $blast_hit;
 }
