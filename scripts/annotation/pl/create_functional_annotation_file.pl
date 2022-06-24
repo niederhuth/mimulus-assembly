@@ -191,6 +191,9 @@ while ( my $result = $searchio->next_result() ) {
 		$annotation = $model_annots{$subject_name};
 		$blast_hit = $subject_name;
 		if (defined($annotation) || $hit_counter >= $max_hits) {
+			if (defined($annotation) {
+				$annotations{$query_name} = "Arabidopsis blast: $annotation";
+			}
 			last;
 		}        
     }
@@ -202,6 +205,7 @@ while ( my $result = $searchio->next_result() ) {
 		if (!defined($blast_hit)) {
 			$blast_hit = "NA";
 		}
+		$annotations{$query_name} = "Arabidopsis blast: $annotation";
 	} elsif (!defined($annotation)) {
 		# If there was no model genome homology but there was no transcript support,
 		# use this generic description.
@@ -209,9 +213,9 @@ while ( my $result = $searchio->next_result() ) {
 		$annotation = "Hypothetical gene of unknown function";
 		if (!defined($blast_hit)) {
 			$blast_hit = "NA";
-		}	
+		}
+		$annotations{$query_name} = "Arabidopsis blast: $annotation";
 	}
-	$annotations{$query_name} = "Arabidopsis blast: $annotation";
 	$blast_genes{$query_name} = $blast_hit;
 }
 
