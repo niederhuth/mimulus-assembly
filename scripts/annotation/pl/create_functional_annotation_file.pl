@@ -191,7 +191,7 @@ while ( my $result = $searchio->next_result() ) {
 		$annotation = $model_annots{$subject_name};
 		$blast_hit = $subject_name;
 		if (defined($annotation) || $hit_counter >= $max_hits) {
-			if (defined($annotation) {
+			if (defined($annotation)) {
 				$annotations{$query_name} = "Arabidopsis blast: $annotation";
 			}
 			last;
