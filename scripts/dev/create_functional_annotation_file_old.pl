@@ -192,9 +192,9 @@ while ( my $result = $searchio->next_result() ) {
 	while( my $hit = $result->next_hit ) {
 		my $subject_name = $hit->name;
 		$hit_counter++;
-		$annotation = "Arabidopsis blast: $model_annots{$subject_name}";
+		$annotation = $model_annots{$subject_name};
 		$blast_hit = $subject_name;
-		if (defined($model_annots{$subject_name}) || $hit_counter >= $max_hits) {
+		if (defined($annotation) || $hit_counter >= $max_hits) {
 			last;
 		}        
     }
@@ -253,7 +253,7 @@ while ( my $line = <PFAM> ) {
 		$query_name =~ s/__124_/\|/g;
 	}
 	if (!exists($annotations{$query_name}) || $annotations{$query_name} =~ /unknown function$/) {
-		$annotations{$query_name} = "PFAM: $annotation_short domain containing protein";
+		$annotations{$query_name} = "$annotation_short domain containing protein";
 		$pfam_matched_genes{$query_name} = 1;
 	}
 }
