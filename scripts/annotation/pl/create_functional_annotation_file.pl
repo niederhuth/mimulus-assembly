@@ -204,7 +204,7 @@ while ( my $result = $searchio->next_result() ) {
 		# This may be replaced by a Pfam description.
 		$annotation = "Expressed gene of unknown function";
 		if (!defined($annotation) {
-			$blast_hit = "NA"
+			$blast_hit = "NA";
 		}
 	} elsif (!defined($annotation)) {
 		# If there was no model genome homology but there was no transcript support,
@@ -212,7 +212,7 @@ while ( my $result = $searchio->next_result() ) {
 		# This may be replaced by a Pfam description.
 		$annotation = "Hypothetical gene of unknown function";
 		if (!defined($annotation) {
-			$blast_hit = "NA"
+			$blast_hit = "NA";
 		}
 	}
 	$annotations{$query_name} = "Arabidopsis blast: $annotation";
