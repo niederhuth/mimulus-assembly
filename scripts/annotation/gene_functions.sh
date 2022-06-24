@@ -114,7 +114,7 @@ echo "Formatting functional annotations files"
 echo "Transcript Locus Arabidopsis_blast_hit Arabidopsis_GO_terms PFAM_hits PFAM_GO_terms Short_functional_description" | \
 tr ' ' '\t' > ${output}-functional-annotations.tsv
 #Loop over each gene and format data
-cut -f1 ${output}-description.tsv | while read line
+cut -f1 ${output}-description.tsv | sort | while read line
 do
 	AT_ID=$(grep ${line} ${output}-description.tsv | cut -f2)
 	func_desc=$(grep ${line} ${output}-description.tsv | cut -f3 | tr ' ' ';')
