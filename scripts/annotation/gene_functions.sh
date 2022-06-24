@@ -49,7 +49,7 @@ export TEMP=$(pwd)
 
 #Set some more variables
 proteins=$(ls ${protein_fasta} | sed s/.*\ //)
-output=$(echo ${proteins} | sed s/.*\\/// | sed s/\\..*//)
+output=$(echo ${proteins} | sed s/.*\\/// | sed s/\-proteins.*//)
 echo ${proteins}
 
 #Run interproscan
@@ -94,17 +94,51 @@ perl -e  'while (my $line = <>){ my @elems = split "\t", $line; if($elems[2] ne 
 TAIR10_functional_descriptions > TAIR10_short_functional_descriptions.txt
 
 #Format annotations 
-echo "Creating functional annotation file"
+echo "Creating short functional descriptions file"
 perl ${path2}/annotation/pl/create_functional_annotation_file.pl \
 	--protein_fasta ${proteins} \
 	--model_annot TAIR10_short_functional_descriptions.txt \
 	--model_blast ${output}_TAIR10_blast.out \
 	--pfam_results_file ${output}.iprscan \
 	--max_hits 5 \
-	--output prot_func_desc_list.txt
+	--output ${output}-functional-description.tsv
 
-#
+#Download Arabidopsis GO terms
+echo "Downloading Arabidopsis GO terms"
 wget -q https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/gene_association.tair.gz
 gunzip gene_association.tair.gz
+
+#Combine and format data sources
+echo "Formatting functional annotations files"
+#Create header for output file
+echo "Locus Arabidopsis_blast_hit Arabidopsis_GO_terms PFAM_hits PFAM_GO_terms Short_functional_description" | \
+tr ' ' '\t' > ${output}-functional-annotations.tsv
+#Loop over each gene and format data
+cut -f1 ${output}-functional-description.tsv | while read line
+do
+	AT_ID=$(grep ${line} ${output}-functional-description.tsv | cut -f2)
+	func_desc=$(grep ${line} ${output}-functional-description.tsv | cut -f3 | tr ' ' ';')
+	grep ${line} ${output}.iprscan > tmp
+	if [ -s tmp ]
+	then
+		PFAM_ID=$(cut -f5 tmp | sort | uniq | tr '\n' '|' | sed s/\|$//)
+		PFAM_GO=$(cut -f14 tmp | tr '|' '\n' | sort | uniq | grep -v "-" | tr '\n' '|' | sed s/\|$//)
+		if [ -z ${PFAM_GO} ]
+		then
+			PFAM_GO=NA
+		fi
+	else
+		PFAM_GO=NA
+		PFAM_ID=NA
+	fi
+	if [ ${AT_ID} != "NA" ]
+	then
+		AT_GO=$(grep ${AT_ID} gene_association.tair | cut -f5 | tr '|' '\n' | sort | uniq | tr '\n' '|' | sed s/\|$//)
+	else
+		AT_GO=NA
+	fi
+	echo "${line} ${AT_ID} ${AT_GO} ${PFAM_ID} ${PFAM_GO} ${func_desc}" | tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
+	rm tmp
+done
 
 echo "Done"
