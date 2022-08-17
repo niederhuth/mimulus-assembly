@@ -15,6 +15,7 @@ threads=10
 datatype="ont"
 minimum_length="10k"
 asm=""
+reads="fastq/ont/clean.fastq.gz"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -35,7 +36,10 @@ path2="purge_dups"
 echo "Purging Duplicates for ${species} ${genotype} ${sample} ${assembly}"
 
 #Extract reads from assembly job report
-reads="$(grep reads: ${path1}/job_reports/${sample}-*.SLURMout | head -1 | cut -d ' ' -f2)"
+if [ -z ${reads} ]
+then
+	reads="$(grep reads: ${path1}/job_reports/${sample}-*.SLURMout | head -1 | cut -d ' ' -f2)"
+fi
 
 #Change preset based on datatype
 if [ ${datatype} = "ont" ]
