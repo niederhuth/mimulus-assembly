@@ -2,8 +2,11 @@
 pgdb <- fread("results/L1_pangenomeDB.txt.gz",na.strings = c("", "NA"))
 pgff <- fread("results/gffWithOgs.txt.gz",na.strings = c("", "NA"))
 
-#
-tmp <- merge(pgdb,pgff[,c(2,15)],by="id")
+#Add the arrayID
+pge <- setorder(merge(pgdb,pgff[,c(2,15)],by="id"), pgChr, pgOrd, na.last = T)
+
+arraycount <- as.data.frame(table(pge$arrayID))
+tandem <- setorder(pge[pge$arrayID %in% arraycount[arraycount$Freq > 1,]$Var1,], arrayID)
 
 #Create two new tables for each of the genomes, removing genes not in the pangenome
 L1 <- subset(pgdb, genome=="L1" & !is.na(pgChr))
