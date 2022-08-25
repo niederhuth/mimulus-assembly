@@ -1,11 +1,10 @@
-#Set variable
+#Set variables
 gids <- sids <- vids <- c("L1","S1")
 ploidy <- c(1,1)
 outgroup <- NULL
 runwd <- getwd()
 nCores <- 4
 path2mcscanx <- "MCScanX"
-
 
 #Check for BiocManager & install
 if (!require("BiocManager", quietly = TRUE))
@@ -51,11 +50,11 @@ gpar <- init_genespace(
 parse_annotations(
 	gsParam = gpar,
 	gffEntryType = "mRNA",
-	gffIdColumn = "locus",
-	gffStripText = "locus=",
+	gffIdColumn = "Name",
+	gffStripText = "Name=",
 	headerEntryIndex = 1,
 	headerSep = " ",
-	headerStripText = "locus="
+	headerStripText = ""
 )
 
 #Run orthofinder
@@ -68,9 +67,10 @@ gpar <- set_syntenyParams(gsParam = gpar)
 gpar <- synteny(gsParam = gpar)
 
 #Call the pangenome
-pg <- pangenome(gpar)
+pg <- pangenome(gpar, genomeIDs = c("L1","S1"))
 
-
+#Save the workspace
+save.image("genespace.RData")
 
 
 
