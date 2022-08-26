@@ -1,6 +1,7 @@
 #Maker without MPI
 #Install condo environment - has most of prerequisites
 conda env create -f maker.yml
+
 <<<<<<< HEAD
 
 wget https://www.mpich.org/static/downloads/4.0.1/mpich-4.0.1.tar.gz
