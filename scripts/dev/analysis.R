@@ -1,6 +1,14 @@
+#Load libraries
+library(GENESPACE)
+library(ggplot2)
+library(dply4)
+
 #Read in the pangenome database
 pgdb <- fread("results/L1_pangenomeDB.txt.gz",na.strings = c("", "NA"))
 pgff <- fread("results/gffWithOgs.txt.gz",na.strings = c("", "NA"))
+
+#Simple CNV definition
+cnv <- dcast(subset(pgdb, !is.na(pgChr)), pgChr + pgOrd + pgID ~ genome, value.var = "id",fun.aggregate = length)
 
 #Add the arrayID
 pge <- setorder(merge(pgdb,pgff[,c(2,15)],by="id"), pgChr, pgOrd, na.last = T)
@@ -24,10 +32,7 @@ L1_NSog <- subset(nonsynt, id.y %in% synt$id.y)
 S1_NSog <- subset(nonsynt, id.x %in% synt$id.x)
 
 #
-tmp <- setdiff(setdiff(nonsynt,L1_NSog),S1_NSog)
-
-
-
+NS <- setdiff(setdiff(nonsynt,L1_NSog),S1_NSog)
 
 pc <- pgdb
 #pgff <- fread("results/gffWithOgs.txt.gz",na.strings = c("", "NA"))
