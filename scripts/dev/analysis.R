@@ -29,7 +29,7 @@ cnv <- dcast(subset(pgdb, !is.na(pgChr)), pgChr + pgOrd + pgID ~ genome, value.v
 synt <- subset(LS, isArrayRep.x & isDirectSyn.x & isArrayRep.y & isDirectSyn.y)
 write.table(unique(synt$id.x),file="results/L1_syntelogs.txt",
 	quote=FALSE,col.names=FALSE,row.names=FALSE)
-write.table(unique(synt$id.y),file="results/S1_ssyntelogs.txt",
+write.table(unique(synt$id.y),file="results/S1_syntelogs.txt",
 	quote=FALSE,col.names=FALSE,row.names=FALSE)
 #Get High-confidence 1x1 syntelogs and write out lists of these genes
 synt1x1 <- subset(synt, pgID %in% subset(cnv, L1==1 & S1==1)$pgID)
@@ -54,25 +54,26 @@ arraycount <- as.data.frame(table(unique(pge[,c(1,15)])$arrayID))
 #subset out those genes with an array count of more than 1
 arraypairs <- setorder(subset(pge, arrayID %in% subset(arraycount, Freq > 1)$Var1), arrayID)
 #Create output dataframe
-columns=c("arrayID","id","isTandem","geneCount","arrayGenes")
+columns=c("genome","arrayID","id","isTandem","geneCount","arrayGenes")
 tandem <- data.frame(matrix(nrow = 0, ncol = length(columns)))
 colnames(tandem) <- columns
 #Now for a complicated loop to identify tandem arrays
 for(i in unique(arraypairs$arrayID)){
 	#some arraypairs arrays may belong to multiple orthogroups, collapse these so each gene is represented once
-	x <- setorder(unique(subset(arraypairs, arrayID==i)[,c(1,9,10,15)]), ord)
+	x <- setorder(unique(subset(arraypairs, arrayID==i)[,c(1,8,9,10,15)]), ord)
+	genome <- unique(x$genome)
 	#Check to make sure all of these are on the same chromosome!
 	if(uniqueN(x$chr)==1){
 		#Most array pairs are simple arraypairs duplicates and faster to process
 		#If the number of genes is 2 and the distance is <= our cutoff classify as arraypairs duplicates
 		if(nrow(x)==2 & abs(x[1]$ord - x[2]$ord) <= tandem_cutoff){
 			for(gene in x$id){
-				tandem <- rbind(tandem,data.frame(arrayID=i,id=gene,isTandem=TRUE,geneCount=2,
+				tandem <- rbind(tandem,data.frame(genome=genome,arrayID=i,id=gene,isTandem=TRUE,geneCount=2,
 								arrayGenes=paste(x$id,collapse=", ")))
 			} 
 		#If the number of genes is 2 and distance > cutoff, classify as a dispersed
 		} else if(nrow(x)==2 & abs(x[1]$ord - x[2]$ord) > tandem_cutoff) {
-			tandem <- rbind(tandem,data.frame(arrayID=i,id=gene,isTandem=FALSE,geneCount=NA,
+			tandem <- rbind(tandem,data.frame(genome=genome,arrayID=i,id=gene,isTandem=FALSE,geneCount=NA,
 							arrayGenes=NA))
 		#If the arraypairs have more than one gene, it requires more work
 		} else {
@@ -88,7 +89,7 @@ for(i in unique(arraypairs$arrayID)){
 				#tandem if a gene's closest array pair is greater than the cutoff
 				#If so, classify as FALSE
 				if(min(x2[x2[,gene] != 0,gene]) > tandem_cutoff){
-					tandem <- rbind(tandem,data.frame(arrayID=i,id=gene,isTandem=FALSE,geneCount=NA,
+					tandem <- rbind(tandem,data.frame(genome=genome,arrayID=i,id=gene,isTandem=FALSE,geneCount=NA,
 									arrayGenes=NA))
 				#Otherwise, the gene is part of an arraypairs array
 				} else {
@@ -114,7 +115,7 @@ for(i in unique(arraypairs$arrayID)){
 						x3 <- x4
 					}
 					#Now we wll report it
-					tandem <- rbind(tandem,data.frame(arrayID=i,id=gene,isTandem=TRUE,
+					tandem <- rbind(tandem,data.frame(genome=genome,arrayID=i,id=gene,isTandem=TRUE,
 								geneCount=length(x3),arrayGenes=paste(x3,collapse=", ")))
 				}
 			}
@@ -124,6 +125,14 @@ for(i in unique(arraypairs$arrayID)){
 		print(paste("Warning! Array ID",unique(x$arrayID),"genes on different chromosomes. Skipping",sep=" "))
 	}
 }
+#Cleanup
+rm(x,x2,x3,x4,gene,gene2,i,columns)
+#Output tables of the tandem arrays
+write.table(subset(tandem,genome=="L1" & isTandem),file="results/L1_tandem_arrays.tsv",sep="\t",quote=FALSE,row.names=FALSE)
+write.table(subset(tandem,genome=="S1" & isTandem),file="results/S1_tandem_arrays.tsv",sep="\t",quote=FALSE,row.names=FALSE)
+
+#
+
 
 
 
@@ -137,21 +146,6 @@ S1_NSog <- subset(nonsynt, id.x %in% synt$id.x)
 
 #
 NS <- setdiff(setdiff(nonsynt,L1_NSog),S1_NSog)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

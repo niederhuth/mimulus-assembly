@@ -4,16 +4,16 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=500GB
-#SBATCH --job-name protein2genome-Athaliana
+#SBATCH --job-name S1_L1_nonsynt_hits
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-fasta=$(ls -l repeatmasker/*.fa.masked | sed s/.*\ //)
-proteins=$(ls -l proteins/*.fa | sed s/.*\ //)
-
+model=protein2genome
+seqs="L1_nonsynt-protein.fa"
+genome="S1-v1.fa"
 minintron=10
 maxintron=5000
 bestn=5
@@ -31,10 +31,6 @@ export TMP=$(pwd | sed s/data.*/data/)
 export TEMP=$(pwd | sed s/data.*/data/)
 
 #The following shouldn't need to be changed, but should set automatically
-path1=$(pwd | sed s/data.*/misc/)
-species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
-genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
 path2="nonsyntenic"
 
 #Make & cd to directory
@@ -46,22 +42,19 @@ else
 	cd ${path2}
 fi
 
-#Extract sequences for GOI
-seqtk subseq ${} ${genelist} > ${}
-
-#Search genome
-echo ""
+#Run Exonerate
+echo "Running exonerate"
 exonerate \
-	--model est2genome \
+	--model ${model} \
 	--bestn 5 \
 	--minintron 10 \
 	--maxintron 5000 \
-	--query L1_nonsyn-cds.fa \
-	--target ../S1/pseudomolecule/S1-v1.fa \
+	--query ${seq} \
+	--target ${genome} \
 	--showtargetgff yes \
 	--showalignment no \
 	--showvulgar no \
-	--ryo "${ryo}" > S1_L1_nonsyn-cds.output
+	--ryo "${ryo}" > target_${genome/-*/}_query_${seqs/.fa}.output
 
 echo "Done"
 
