@@ -62,6 +62,7 @@ do
 				--showalignment no \
 				--showvulgar no \
 				--ryo "${ryo}" > target_${genome/-*/}_query_${seqs/.fa}_chunk_${a}.output
+			a=$(expr ${a} + 1)
 		fi
 	fi
 done
