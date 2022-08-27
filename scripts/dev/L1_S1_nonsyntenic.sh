@@ -14,6 +14,7 @@ conda="${HOME}/miniconda3"
 model=protein2genome
 seqs="S1_nonsynt-protein.fa"
 genome="L1-v1.fa"
+query_chunks=10
 minintron=10
 maxintron=5000
 bestn=5
@@ -31,18 +32,39 @@ export TMP=$(pwd | sed s/data.*/data/)
 export TEMP=$(pwd | sed s/data.*/data/)
 
 #Run Exonerate
-echo "Running exonerate"
-exonerate \
-	--model ${model} \
-	--bestn 5 \
-	--minintron 10 \
-	--maxintron 5000 \
-	--query ${seq} \
-	--target ${genome} \
-	--showtargetgff yes \
-	--showalignment no \
-	--showvulgar no \
-	--ryo "${ryo}" > target_${genome/-*/}_query_${seqs/.fa}.output
+#Run Exonerate
+while [ ${a} -le ${query_chunks} ]
+do
+	if [ -s target_${genome/-*/}_query_${seqs/.fa}_chunk_${a}.output ]
+	then
+		if [ $(wc -l target_${genome/-*/}_query_${seqs/.fa}_chunk_${a}.output | cut -d ' ' -f1) -gt 20 ]
+		then
+			echo "target_${genome/-*/}_query_${seqs/.fa}_chunk_${a}.output already complete" 
+			echo "Skipping to next chunk"
+			a=$(expr ${a} + 1)
+		else
+			rm target_${genome/-*/}_query_${seqs/.fa}_chunk_${a}.output
+		fi
+	fi
+	if [ ! -s target_${genome/-*/}_query_${seqs/.fa}_chunk_${a}.output ]
+	then
+		if [ ${a} -le ${query_chunks} ]
+		then
+			echo "Aligning chunk_${a}"
+			exonerate \
+				--model ${model} \
+				--bestn 5 \
+				--minintron 10 \
+				--maxintron 5000 \
+				--query ${seq} \
+				--target ${genome} \
+				--showtargetgff yes \
+				--showalignment no \
+				--showvulgar no \
+				--ryo "${ryo}" > target_${genome/-*/}_query_${seqs/.fa}_chunk_${a}.output
+		fi
+	fi
+done
 
 echo "Done"
 
