@@ -30,18 +30,6 @@ export TMPDIR=$(pwd | sed s/data.*/data/)
 export TMP=$(pwd | sed s/data.*/data/)
 export TEMP=$(pwd | sed s/data.*/data/)
 
-#The following shouldn't need to be changed, but should set automatically
-path2="nonsyntenic"
-
-#Make & cd to directory
-if [ -d ${path2} ]
-then
-	cd ${path2}
-else
-	mkdir ${path2}
-	cd ${path2}
-fi
-
 #Run Exonerate
 echo "Running exonerate"
 exonerate \
