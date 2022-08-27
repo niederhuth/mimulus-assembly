@@ -57,6 +57,8 @@ do
 				--maxintron 5000 \
 				--query ${seq} \
 				--target ${genome} \
+				--querychunkid ${a} \
+				--querychunktotal ${query_chunks} \
 				--showtargetgff yes \
 				--showalignment no \
 				--showvulgar no \
