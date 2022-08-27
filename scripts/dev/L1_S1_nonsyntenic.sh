@@ -32,7 +32,7 @@ export TMP=$(pwd | sed s/data.*/data/)
 export TEMP=$(pwd | sed s/data.*/data/)
 
 #Run Exonerate
-#Run Exonerate
+a=1
 while [ ${a} -le ${query_chunks} ]
 do
 	if [ -s target_${genome/-*/}_query_${seqs/.fa}_chunk_${a}.output ]
