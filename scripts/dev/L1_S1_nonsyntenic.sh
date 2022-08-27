@@ -56,7 +56,7 @@ do
 				--bestn 5 \
 				--minintron 10 \
 				--maxintron 5000 \
-				--query ${seq} \
+				--query ${seqs} \
 				--target ${genome} \
 				--querychunkid ${a} \
 				--querychunktotal ${query_chunks} \
