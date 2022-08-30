@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-gene_list="../L1_nonsyntenic.txt"
+gene_list=""
 chroms="../chroms.txt"
 target_fa="../S1-v1.fa"
 ref_fa="../L1-v1.fa"
@@ -30,10 +30,16 @@ export TMP=$(pwd | sed s/data.*/data/)
 export TEMP=$(pwd | sed s/data.*/data/)
 
 #Subset gff
-fgrep -f ${gene_list} ${ref_gff} > search.gff
+if [ ${gene_list} ]
+then
+	fgrep -f ${gene_list} ${ref_gff} > search.gff
+else
+	cat ${ref_gff} > search.gff
+fi
 
 #Run liftoff
 liftoff \
+	-cds \
 	-polish \
 	-o mapped.gff \
 	-g search.gff \
@@ -79,9 +85,7 @@ fgrep -f newgenes mapped.gff_polished | bedtools sort > newgenes.gff
 cat ${target_gff} newgenes.gff | bedtools sort > combined.gff
 
 #
-awk '$3=="gene"' combined.gff | cut -f9 | sed 's/ID\=//' | sed 's/\;.*//' > combined_order
-
-
+awk '$3=="gene"' combined.gff | cut -f1,2,4,5,9 | sed 's/ID\=//' | sed 's/\;.*//' > combined_order
 
 
 
