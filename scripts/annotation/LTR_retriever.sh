@@ -41,14 +41,17 @@ then
 	echo "No fasta fasta provided, looking for fasta"
 	if ls *.fa >/dev/null 2>&1
 	then
+		fasta_name=$(ls *fa | sed s/.*\ //)
 		fasta=${path2}/$(ls *fa | sed s/.*\ //)
 		echo "Fasta file ${fasta} found"
 	elif ls *.fasta >/dev/null 2>&1
 	then
+		fasta_name=$(ls *fasta | sed s/.*\ //)
 		fasta=${path2}/$(ls *fasta | sed s/.*\ //)
 		echo "Fasta file ${fasta} found"
 	elif ls *.fna >/dev/null 2>&1
 	then
+		fasta_name=$(ls *fna | sed s/.*\ //)
 		fasta=${path2}/$(ls *fna | sed s/.*\ //)
 		echo "Fasta file ${fasta} found"
 	else
@@ -66,17 +69,17 @@ then
 	then
 		echo "EDTA output directory found"
 		echo "Checking for LTR Harvest output scn file"
-		if [ -f edta/${fasta}.mod.EDTA.raw/LTR/${fasta}.mod.rawLTR.scn ]
+		if [ -f edta/${fasta_name}.mod.EDTA.raw/LTR/${fasta_name}.mod.rawLTR.scn ]
 		then
 			echo "LTR Harvest output scn file found"
-			inharvest="${path2}/edta/${fasta}.mod.EDTA.raw/LTR/${fasta}.mod.rawLTR.scn"
+			inharvest="${path2}/edta/${fasta_name}.mod.EDTA.raw/LTR/${fasta_name}.mod.rawLTR.scn"
 		else
 			echo "LTR Harvest output scn file found"
-			echo "Please provide a LTR Harves scn file and restart"
+			echo "Please provide a LTR Harvest scn file and restart"
 		fi
 	else
 		echo "EDTA output directory not found"
-		echo "Please provide a LTR Harves scn file and restart"
+		echo "Please provide a LTR Harvest scn file and restart"
 	fi
 fi
 
