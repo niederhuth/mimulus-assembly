@@ -106,9 +106,13 @@ fi
 if [ -d ${path3} ]
 then
 	cd ${path3}
+	cp ${fasta} ./
+	fasta=${fasta_name}
 else
 	mkdir ${path3}
 	cd ${path3}
+	cp ${fasta} ./
+	fasta=${fasta_name}
 fi
 
 #Run LTR Harvest if run_LTR_harvest=TRUE
