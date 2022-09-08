@@ -12,7 +12,9 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 fasta= #genome fasta, if left blank will look in the current directory
-inharvest= #if left blank, will look for edta output in current directory
+run_LTR_harvest=TRUE #TRUE/FALSE, run LTR harvest to find LTRs, will ignore inharvest and EDTA
+inharvest= #results from previous LTR_harvest run, ignored if run_LTR_harvest=TRUE, mutually exclusive to EDTA
+EDTA="edta" #directory for EDTA results, ignored if run_LTR_harvest=TRUE, mutually exclusive to inharvest
 threads=40
 
 #Change to current directory
@@ -61,26 +63,42 @@ else
 	echo "input fasta: ${fasta}"
 fi
 
-#If LTR Harvest not provided, look for EDTA output
-if [ -z ${inharvest} ]
+#Set path EDTA results
+if [ ${run_LTR_harvest} = FALSE ]
 then
-	echo "No LTR Harvest file provided, looking for EDTA output directory"
-	if [ -d edta ]
+	if [ ${inharvest} & -z ${EDTA} ]
 	then
-		echo "EDTA output directory found"
-		echo "Checking for LTR Harvest output scn file"
-		if [ -f edta/${fasta_name}.mod.EDTA.raw/LTR/${fasta_name}.mod.rawLTR.scn ]
+		if [ -f ${inharvest} ]
 		then
-			echo "LTR Harvest output scn file found"
-			inharvest="${path2}/edta/${fasta_name}.mod.EDTA.raw/LTR/${fasta_name}.mod.rawLTR.scn"
+			echo "LTR Harvest output scn found."
+			scn=${inharvest}
 		else
-			echo "LTR Harvest output scn file found"
-			echo "Please provide a LTR Harvest scn file and restart"
+			echo "LTR Harvest output scn not found."
+			echo "Please check that all paths are correct and restart"
+		fi
+	elif [ -z ${inharvest} & ${EDTA} ]
+	then
+		if [ -d ${EDTA} ]
+		then
+			echo "EDTA output directory found"
+			echo "Checking for LTR Harvest output scn file"
+			if [ -f ${EDTA}/${fasta_name}.mod.EDTA.raw/LTR/${fasta_name}.mod.rawLTR.scn ]
+			then
+				echo "LTR Harvest output scn file found"
+				scn="${path2}/${EDTA}/${fasta_name}.mod.EDTA.raw/LTR/${fasta_name}.mod.rawLTR.scn"
+			else
+				echo "EDTA LTR Harvest output scn file not found"
+				echo "Please check that all paths are correct and restart"
+			fi
+		else
+			echo "EDTA output directory not found"
+			echo "Please check that all paths are correct and restart"
 		fi
 	else
-		echo "EDTA output directory not found"
-		echo "Please provide a LTR Harvest scn file and restart"
-	fi
+		echo "No input file found and run_LTR_harvest = FALSE"
+		echo "inharvest & EDTA are mutually exclusive."
+		echo "You must provide either an LTR Harvest output scn file or the path to a previous EDTA run."
+		echo "Check your settings and restart."
 fi
 
 #Make & cd to output directory
@@ -92,11 +110,48 @@ else
 	cd ${path3}
 fi
 
+#Run LTR Harvest if run_LTR_harvest=TRUE
+if [ ${run_LTR_harvest} = TRUE ]
+then
+	#Run gt suffixerator
+	echo "Running genometools suffixerator"
+	gt suffixerator \
+		-db ${fasta} \
+		-indexname ${fasta} \
+		-tis -suf -lcp -des -ssp -sds -dna
+	#Run LTR harvest
+	echo "Running LTR Harvest"
+	gt ltrharvest \
+		-index ${fasta} \
+		-minlenltr 100 \
+		-maxlenltr 7000 \
+		-mintsd 4 \
+		-maxtsd 6 \
+		-motif TGCA \
+		-motifmis 1 \
+		-similar 85 \
+		-vic 10 \
+		-seed 20 \
+		-seqids yes > ${fasta}.harvest.scn
+	#Run LTR_Finder
+	echo "Running LTR_Finder"
+	LTR_FINDER_parallel \
+		-seq ${fasta} \
+		-threads ${threads} \
+		-harvest_out \
+		-size 1000000 \
+		-time 300
+	#Combine results into rawLTR.scn
+	cat ${fasta}.harvest.scn ${fasta}.finder.combine.scn > ${fasta}.rawLTR.scn
+	#Set scn
+	scn=${fasta}.rawLTR.scn
+fi
+
 #Run LTR_retriever using EDTA results
 echo "Running LTR_retriever"
 ${path1}/annotation/LTR_retriever/LTR_retriever \
 	-threads ${threads}	\
 	-genome ${fasta} \
-	-inharvest ${inharvest}
+	-inharvest ${scn}
 
 echo "Done"
