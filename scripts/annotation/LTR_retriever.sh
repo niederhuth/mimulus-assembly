@@ -99,6 +99,7 @@ then
 		echo "inharvest & EDTA are mutually exclusive."
 		echo "You must provide either an LTR Harvest output scn file or the path to a previous EDTA run."
 		echo "Check your settings and restart."
+	fi
 fi
 
 #Make & cd to output directory
