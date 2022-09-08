@@ -29,7 +29,7 @@ export TMP=$(pwd | sed s/data.*/data/)
 export TEMP=$(pwd | sed s/data.*/data/)
 
 #The following shouldn't need to be changed, but should set automatically
-path1=$(pwd | sed s/data.*/scripts/)
+path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*/${species}\\/${genotype}\\/// | sed s/\\/.*//)
@@ -140,7 +140,7 @@ then
 		-seqids yes > ${fasta}.harvest.scn
 	#Run LTR_Finder
 	echo "Running LTR_Finder"
-	LTR_FINDER_parallel \
+	${conda}/envs/EDTA//share/EDTA/bin/LTR_FINDER_parallel/LTR_FINDER_parallel \
 		-seq ${fasta} \
 		-threads ${threads} \
 		-harvest_out \
@@ -154,7 +154,7 @@ fi
 
 #Run LTR_retriever using EDTA results
 echo "Running LTR_retriever"
-${path1}/transposons/LTR_retriever/LTR_retriever \
+LTR_retriever \
 	-threads ${threads}	\
 	-genome ${fasta} \
 	-inharvest ${scn}
