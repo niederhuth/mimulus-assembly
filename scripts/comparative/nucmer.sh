@@ -74,7 +74,7 @@ do
 	mkdir ${i}_alignment
 	cd ${i}_alignment
 	#Set path to query genome
-	qver=$(ls ${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa) | head -1 | sed s/.*\-v// | sed s/\.fa//)
+	qver=$(ls ${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa | head -1 | sed s/.*\-v// | sed s/\.fa//)
 	if [ ${masked} = FALSE ]
 	then
 		query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${qver}.fa"
