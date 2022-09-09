@@ -28,7 +28,7 @@ path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
-condition="genome-alignment"
+condition="genome_alignment"
 datatype="genome"
 path2=$(pwd | sed s/data.*/data/)
 path3="nucmer"
@@ -38,6 +38,7 @@ if [ -z ${ref} ]
 then
 	echo "No reference genome provided, looking for reference genome"
 	ref="${path2}/${species}/${genotype}/ref/${genotype}-v*.fa"
+	echo "Reference genome ${ref} found"
 fi
 
 #Check for and make/cd working directory
