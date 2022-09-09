@@ -2,8 +2,8 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=200GB
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=400GB
 #SBATCH --job-name nucmer
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
