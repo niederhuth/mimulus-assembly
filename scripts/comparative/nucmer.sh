@@ -68,7 +68,7 @@ genomes=$(awk -v FS="," \
 	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $7}' \
 	${path1}/samples.csv)
 
-#Run nucmer alignments
+#Loop over genomes and run nucmer
 for i in ${genomes}
 do
 	mkdir ${i}_alignment

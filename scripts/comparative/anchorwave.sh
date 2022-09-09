@@ -53,7 +53,26 @@ then
 	ref_gff="${path2}/${species}/${genotype}/ref/annotations/${genotype}-v${anno_ver}.gff"
 fi
 
-#
+#Check for and make/cd working directory
+if [ -d ${path3} ]
+then
+	cd ${path3}
+else
+	mkdir ${path3}
+	cd ${path3}
+fi
+
+#Get list of genomes
+genomes=$(awk -v FS="," \
+	-v a=${species} \
+	-v b=${genotype} \
+	-v c=${sample} \
+	-v d=${condition} \
+	-v e=${datatype} \
+	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $7}' \
+	${path1}/samples.csv)
+
+#Loop over genomes and run anchorwave
 for i in ${genomes}
 do
 	mkdir ${i}_alignment
