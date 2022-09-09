@@ -1,9 +1,9 @@
 #!/bin/bash --login
-#SBATCH --time=48:00:00
+#SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
-#SBATCH --mem=100GB
+#SBATCH --mem=200GB
 #SBATCH --job-name nucmer
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 ref= #reference genome, if left blank, will look for in the ref directory for that genotype
-masked=TRUE #TRUE/FALSE, look for repeatmasked files named
+threads=20
 breaklen=500 #distance to attempt to extend poor scoring regions before giving up, default 200
 mincluster=100 #min length of a cluster of matches, default 65
 minmatch=50 #min length for single match, default 20
@@ -69,6 +69,7 @@ do
 	#Run nucmer
 	echo "Aligning ${i} against ${species}_${genotype} with nucmer"
 	nucmer \
+		--threads ${threads} \
 		--maxmatch \
 		-b ${breaklen} \
 		-c ${mincluster} \
