@@ -80,7 +80,7 @@ do
 	#Set path to query genome
 	query_ver=$(ls ${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa | head -1 | \
 		sed s/.*\-v// | sed s/\.fa//)
-	query_fasta="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${qver}.fa"
+	query_fasta="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${query_ver}.fa"
 	#Liftover annotations
 	echo "Extract the CDS sequences"
 	anchorwave gff2seq \
@@ -112,7 +112,7 @@ do
 	then
 		#Run genoAli
 		echo "Aligning ${i} to ${species}_${genotype} with genoAli"
-		anchrowave genoAli \
+		anchorwave genoAli \
 			-t ${threads} \
 			-IV \
 			-i ${ref_gff} \
@@ -128,7 +128,7 @@ do
 	then
 		#Run proali
 		echo "Aligning ${i} to ${species}_${genotype} with proali"
-		anchrowave proali \
+		anchorwave proali \
 			-t ${threads} \
 			-R ${ref_coverage} \
 			-Q ${query_coverage} \
