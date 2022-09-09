@@ -82,6 +82,7 @@ do
 	then
 		query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${qver}-sm.fa"
 	fi
+	echo "Query genome ${query} found"
 	#Run nucmer
 	echo "Aligning ${i} against ${species}_${genotype} with nucmer"
 	nucmer \
@@ -90,9 +91,8 @@ do
 		-b ${breaklen} \
 		-c ${mincluster} \
 		-l ${minmatch} \
-		-p ${i}.delta \	
-		${ref} \
-		${query}
+		-p ${i} ${ref} ${query}
+	#Change out of that directory
 	cd ../
 done
 
