@@ -12,6 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 ref= #reference genome, if left blank, will look for in the ref directory for that genotype
+masked=FALSE #TRUE/FALSE, use softmasked genome, will look for files ending in -sm.fa
 threads=20
 breaklen=500 #distance to attempt to extend poor scoring regions before giving up, default 200
 mincluster=100 #min length of a cluster of matches, default 65
@@ -37,7 +38,14 @@ path3="nucmer"
 if [ -z ${ref} ]
 then
 	echo "No reference genome provided, looking for reference genome"
-	ref="${path2}/${species}/${genotype}/ref/${genotype}-v*.fa"
+	ver=$(ls ${path2}/${species}/${genotype}/ref/${genotype}-v*.fa | head -1 | sed s/.*\-v// | sed s/\.fa//)
+	if [ ${masked} = FALSE ]
+	then
+		ref="${path2}/${species}/${genotype}/ref/${genotype}-v${ver}.fa"
+	elif [ ${masked} = TRUE ]
+	then
+		ref="${path2}/${species}/${genotype}/ref/${genotype}-v${ver}-sm.fa"
+	fi
 	echo "Reference genome ${ref} found"
 fi
 
@@ -66,7 +74,14 @@ do
 	mkdir ${i}_alignment
 	cd ${i}_alignment
 	#Set path to query genome
-	query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa"
+	qver=$(ls "${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa" | head -1 | sed s/.*\-v// | sed s/\.fa//)
+	if [ ${masked} = FALSE ]
+	then
+		query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${qver}.fa"
+	elif [ ${masked} = TRUE ]
+	then
+		query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${qver}-sm.fa"
+	fi
 	#Run nucmer
 	echo "Aligning ${i} against ${species}_${genotype} with nucmer"
 	nucmer \
