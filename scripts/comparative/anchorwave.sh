@@ -83,7 +83,7 @@ do
 	query_fasta="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${qver}.fa"
 	#Liftover annotations
 	echo "Extract the CDS sequences"
-	anchorwave ggf2seq \
+	anchorwave gff2seq \
 		-i ${ref_gff} \
 		-r ${ref_fasta} \
 		-o cds.fa
