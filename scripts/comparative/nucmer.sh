@@ -37,13 +37,14 @@ path3="nucmer"
 if [ -z ${ref} ]
 then
 	echo "No reference genome provided, looking for reference genome"
-	ver=$(ls ${path2}/${species}/${genotype}/ref/${genotype}-v*.fa | head -1 | sed s/.*\-v// | sed s/\.fa//)
+	genome_ver=$(ls ${path2}/${species}/${genotype}/ref/${genotype}-v*.fa | head -1 | 
+		sed s/.*\-v// | sed s/\.fa//)
 	if [ ${masked} = FALSE ]
 	then
-		ref="${path2}/${species}/${genotype}/ref/${genotype}-v${ver}.fa"
+		ref="${path2}/${species}/${genotype}/ref/${genotype}-v${genome_ver}.fa"
 	elif [ ${masked} = TRUE ]
 	then
-		ref="${path2}/${species}/${genotype}/ref/${genotype}-v${ver}-sm.fa"
+		ref="${path2}/${species}/${genotype}/ref/${genotype}-v${genome_ver}-sm.fa"
 	fi
 	echo "Reference genome ${ref} found"
 fi
@@ -73,13 +74,14 @@ do
 	mkdir ${i}_alignment
 	cd ${i}_alignment
 	#Set path to query genome
-	qver=$(ls ${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa | head -1 | sed s/.*\-v// | sed s/\.fa//)
+	query_ver=$(ls ${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa | head -1 | \
+		sed s/.*\-v// | sed s/\.fa//)
 	if [ ${masked} = FALSE ]
 	then
-		query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${qver}.fa"
+		query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${query_ver}.fa"
 	elif [ ${masked} = TRUE ]
 	then
-		query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${qver}-sm.fa"
+		query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${query_ver}-sm.fa"
 	fi
 	echo "Query genome ${query} found"
 	#Run nucmer
