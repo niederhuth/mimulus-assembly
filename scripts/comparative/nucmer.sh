@@ -12,9 +12,10 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 ref= #reference genome, if left blank, will look for in the ref directory for that genotype
+masked=TRUE #TRUE/FALSE, look for repeatmasked files named
 breaklen=500 #distance to attempt to extend poor scoring regions before giving up, default 200
-mincluster= #min length of a cluster of matches, default 65
-minmatch= #min length for single match, default 20
+mincluster=100 #min length of a cluster of matches, default 65
+minmatch=50 #min length for single match, default 20
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -63,13 +64,16 @@ for i in ${genomes}
 do
 	mkdir ${i}_alignment
 	cd ${i}_alignment
+	#Set path to query genome
 	query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa"
+	#Run nucmer
 	echo "Aligning ${i} against ${species}_${genotype} with nucmer"
 	nucmer \
 		--maxmatch \
 		-b ${breaklen} \
 		-c ${mincluster} \
-		-l ${minmatch} \	
+		-l ${minmatch} \
+		-p ${i}.delta \	
 		${ref} \
 		${query}
 	cd ../
