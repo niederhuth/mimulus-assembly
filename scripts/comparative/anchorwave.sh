@@ -55,7 +55,7 @@ then
 	if [[ ! -z ${seqs} ]]
 	then
 		echo ${seqs} | tr ' ' '\n' > regions
-		samtools faidx ${ref_fasta} -f regions > ${genotype}-v${genome_ver}.fa
+		samtools faidx ${ref_fasta} -r regions > ${genotype}-v${genome_ver}.fa
 		ref_fasta="$(pwd)/${genotype}-v${genome_ver}.fa"
 	fi
 fi 
@@ -93,9 +93,9 @@ do
 	query_ver=$(ls ${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa | head -1 | \
 		sed s/.*\-v// | sed s/\.fa//)
 	query_fasta="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${query_ver}.fa"
-	if [[ ! -z ${seqs} ]]]
+	if [[ ! -z ${seqs} ]]
 	then
-		samtools faidx ${query_fasta} -f ../regions > ${i/*_/}-v${query_ver}.fa
+		samtools faidx ${query_fasta} -r ../regions > ${i/*_/}-v${query_ver}.fa
 		query_fasta="$(pwd)/${i/*_/}-v${query_ver}.fa"
 	fi
 	#Liftover annotations
