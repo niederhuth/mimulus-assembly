@@ -17,6 +17,7 @@ ref_gff= #reference gff, if left blank, will look for in the ref directory for t
 threads=1
 ref_coverage=1 #For proali use only, set max coverage for reference genome
 query_coverage=1 #For proali use only, set max coverage for query genome
+seqs="chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -34,6 +35,15 @@ datatype="genome"
 path2=$(pwd | sed s/data.*/data/)
 path3="anchorwave"
 
+#Check for and make/cd working directory
+if [ -d ${path3} ]
+then
+	cd ${path3}
+else
+	mkdir ${path3}
+	cd ${path3}
+fi
+
 #find the reference fasta if not provided
 if [ -z ${ref_fasta} ]
 then
@@ -42,7 +52,13 @@ then
 		sed s/.*\-v// | sed s/\.fa//)
 	#Set the ref_fasta path
 	ref_fasta="${path2}/${species}/${genotype}/ref/${genotype}-v${genome_ver}.fa"
-fi
+	if [ ! -z ${seqs} ]
+	then
+		echo ${seqs} | tr ' ' '\n' > regions
+		samtools faidx ${ref_fasta} > ${genotype}-v${genome_ver}.fa
+		ref_fasta="$(pwd)/${genotype}-v${genome_ver}.fa"
+	fi
+fi 
 #Find the reference gff if not provided
 if [ -z ${ref_gff} ]
 then
@@ -51,15 +67,11 @@ then
 		sed s/.*\-v// | sed s/\.gff//)
 	#Set the ref_gff path
 	ref_gff="${path2}/${species}/${genotype}/ref/annotations/${genotype}-v${anno_ver}.gff"
-fi
-
-#Check for and make/cd working directory
-if [ -d ${path3} ]
-then
-	cd ${path3}
-else
-	mkdir ${path3}
-	cd ${path3}
+	if [ ! -z ${seqs} ]
+	then
+		fgrep -f regions ${ref_gff} > ${genotype}-v${genome_ver}.gff
+		ref_gff="$(pwd)/${genotype}-v${genome_ver}.gff"
+	fi
 fi
 
 #Get list of genomes
@@ -81,6 +93,12 @@ do
 	query_ver=$(ls ${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa | head -1 | \
 		sed s/.*\-v// | sed s/\.fa//)
 	query_fasta="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${query_ver}.fa"
+	if [ ! -z ${seqs} ]
+	then
+		echo ${seqs} | tr ' ' '\n' > regions
+		samtools faidx ${query_fasta} > ${i/*_/}-v${query_ver}.fa
+		query_fasta="$(pwd)/${i/*_/}-v${query_ver}.fa"
+	fi
 	#Liftover annotations
 	echo "Extract the CDS sequences"
 	anchorwave gff2seq \
