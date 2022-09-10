@@ -52,10 +52,10 @@ then
 		sed s/.*\-v// | sed s/\.fa//)
 	#Set the ref_fasta path
 	ref_fasta="${path2}/${species}/${genotype}/ref/${genotype}-v${genome_ver}.fa"
-	if [ ! -z ${seqs} ]
+	if [[ ! -z ${seqs} ]]
 	then
 		echo ${seqs} | tr ' ' '\n' > regions
-		samtools faidx ${ref_fasta} > ${genotype}-v${genome_ver}.fa
+		samtools faidx ${ref_fasta} regions > ${genotype}-v${genome_ver}.fa
 		ref_fasta="$(pwd)/${genotype}-v${genome_ver}.fa"
 	fi
 fi 
@@ -67,7 +67,7 @@ then
 		sed s/.*\-v// | sed s/\.gff//)
 	#Set the ref_gff path
 	ref_gff="${path2}/${species}/${genotype}/ref/annotations/${genotype}-v${anno_ver}.gff"
-	if [ ! -z ${seqs} ]
+	if [[ ! -z ${seqs} ]]
 	then
 		fgrep -f regions ${ref_gff} > ${genotype}-v${genome_ver}.gff
 		ref_gff="$(pwd)/${genotype}-v${genome_ver}.gff"
@@ -93,10 +93,9 @@ do
 	query_ver=$(ls ${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v*.fa | head -1 | \
 		sed s/.*\-v// | sed s/\.fa//)
 	query_fasta="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${query_ver}.fa"
-	if [ ! -z ${seqs} ]
+	if [[ ! -z ${seqs} ]]]
 	then
-		echo ${seqs} | tr ' ' '\n' > regions
-		samtools faidx ${query_fasta} > ${i/*_/}-v${query_ver}.fa
+		samtools faidx ${query_fasta} ../regions > ${i/*_/}-v${query_ver}.fa
 		query_fasta="$(pwd)/${i/*_/}-v${query_ver}.fa"
 	fi
 	#Liftover annotations
