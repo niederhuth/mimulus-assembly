@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=100
 #SBATCH --mem=300GB
 #SBATCH --job-name orthofinder
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -61,7 +61,7 @@ do
 	path4="${path2}/${species2}/${genotype2}/ref/annotations"
 	version=$(ls ${path4}/${genotype2}-v*-${datatype}.fa | sed s/.*\-v// | sed s/.fa//)
 	input_seqs="${path4}/${genotype2}-v${version2}-${datatype}.fa" ${datatype}/${species2}_${genotype2}.fa
-fi
+done
 
 #Set msa options
 if [ ${msa} = TRUE ]
