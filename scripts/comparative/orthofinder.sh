@@ -14,10 +14,10 @@ conda="${HOME}/miniconda3"
 threads=100 #sequence search threads
 threads2=10 #analysis threads
 inflation=1.3 #Inflation parameter, default 1.5
-seq_searc_program="diamond_ultra_sens" #blast/diamond/diamond_ultra_sens/blast_gz/mmseqs/blast_nucl sequence search program 
-msa_program="mafft" #mafft/muscle
-msa=TRUE #TRUE/FALSE use multiple sequence alignment
-tree_program="fasttree" #fasttree/raxml/raxml-ng/iqtree only applies if msa=TRUE
+seq_search_program=diamond #blast/diamond/diamond_ultra_sens/blast_gz/mmseqs/blast_nucl sequence search program 
+msa=FALSE #TRUE/FALSE use multiple sequence alignment
+msa_program=mafft #mafft/muscle
+tree_program=fasttree #fasttree/raxml/raxml-ng/iqtree only applies if msa=TRUE
 tree= #path to a user provided tree, if left blank, orthofinder will generate its own
 is_DNA=FALSE #TRUE/FALSE, sequences are DNA
 
@@ -57,10 +57,10 @@ for i in ${genomes}
 do
 	#Find input sequences
 	species2=$(echo ${i} | sed s/_.*//)
-	genotype2=$(echo ${i} | sed s/${species2}_// | sed s/_.*//)
+	genotype2=$(echo ${i} | sed s/${species2}_//)
 	path4="${path2}/${species2}/${genotype2}/ref/annotations"
-	version=$(ls ${path4}/${genotype2}-v*-${datatype}.fa | sed s/.*\-v// | sed s/.fa//)
-	input_seqs="${path4}/${genotype2}-v${version2}-${datatype}.fa" ${datatype}/${species2}_${genotype2}.fa
+	version=$(ls ${path4}/${genotype2}-v*-${datatype}.fa | sed s/.*\-v// | sed s/\-${datatype}.fa//)
+	cp ${path4}/${genotype2}-v${version}-${datatype}.fa ${datatype}/${species2}_${genotype2}.fa
 done
 
 #Set msa options
@@ -69,7 +69,7 @@ then
 	settings="-M msa -A ${msa_program} -T ${tree_program}"
 elif [ ${msa} = FALSE ]
 then
-	settings="-M dendroblast -A ${msa_program}"
+	settings="-M dendroblast"
 else
 	echo "msa must be set to either TRUE or FALSE"
 fi
@@ -91,11 +91,11 @@ orthofinder \
 	-t ${threads} \
 	-a ${threads2} \
 	${settings} \
-	-S ${seq_searc_program} \
+	-S ${seq_search_program} \
 	-I ${inflation}\
 	-y \
-	-o ${path2} \
-	-f ${datatype}
+	-o ${path3} \
+	-f ${datatype}/
 
 echo "Done"
 
