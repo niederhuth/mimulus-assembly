@@ -7,61 +7,95 @@
 #SBATCH --job-name orthofinder
 #SBATCH --output=%x-%j.SLURMout
 
+#Set this variable to the path to wherever you have conda installed
+conda="${HOME}/miniconda3"
+
+#Set variables
+threads=100 #sequence search threads
+threads2=10 #analysis threads
+inflation=1.3 #Inflation parameter, default 1.5
+seq_searc_program="diamond_ultra_sens" #blast/diamond/diamond_ultra_sens/blast_gz/mmseqs/blast_nucl sequence search program 
+msa_program="mafft" #mafft/muscle
+msa=TRUE #TRUE/FALSE use multiple sequence alignment
+tree_program="fasttree" #fasttree/raxml/raxml-ng/iqtree only applies if msa=TRUE
+tree= #path to a user provided tree, if left blank, orthofinder will generate its own
+is_DNA=FALSE #TRUE/FALSE, sequences are DNA
+
+#Change to current directory
 cd ${PBS_O_WORKDIR}
-export PATH="${HOME}/miniconda3/envs/orthofinder/bin:${PATH}"
-export LD_LIBRARY_PATH="${HOME}/miniconda3/envs/orthofinder/lib:${LD_LIBRARY_PATH}"
+#Export paths to conda
+export PATH="${conda}/envs/orthofinder/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/orthofinder/lib:$LD_LIBRARY_PATH"
 
-#Set Variables
-species=$(cut -d ',' -f1 ../../misc/genomes.csv | sed '1d' | tr '\n' ' ')
-threads=100
-threads2=6
+#The following shouldn't need to be changed, but should set automatically
+path1=$(pwd | sed s/data.*/misc/)
+species="comparative"
+genotype="orthofinder"
+sample="orthofinder"
+condition="orthofinder"
+datatype="proteins-primary"
+path2=$(pwd | sed s/data.*/data/)
+path3="orthofinder"
 
-#Run OrthoFinder
+#Get list of genomes
+genomes=$(awk -v FS="," \
+	-v a=${species} \
+	-v b=${genotype} \
+	-v c=${sample} \
+	-v d=${condition} \
+	-v e=${datatype} \
+	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $7}' \
+	${path1}/samples.csv)
+
+#Copy over input sequences
 echo "Copying sequence files"
-mkdir seqs
-for i in ${species}
+if [[ ! -d seqs ]]
+then
+	mkdir ${datatype}
+fi
+for i in ${genomes}
 do
-	cp ../${i}/ref/mcscanx/${i}-protein.fa  seqs/${i}.fa
-done
+	#Find input sequences
+	species2=$(echo ${i} | sed s/_.*//)
+	genotype2=$(echo ${i} | sed s/${species2}_// | sed s/_.*//)
+	path4="${path2}/${species2}/${genotype2}/ref/annotations"
+	version=$(ls ${path4}/${genotype2}-v*-${datatype}.fa | sed s/.*\-v// | sed s/.fa//)
+	input_seqs="${path4}/${genotype2}-v${version2}-${datatype}.fa" ${datatype}/${species2}_${genotype2}.fa
+fi
 
+#Set msa options
+if [ ${msa} = TRUE ]
+then
+	settings="-M msa -A ${msa_program} -T ${tree_program}"
+elif [ ${msa} = FALSE ]
+then
+	settings="-M dendroblast -A ${msa_program}"
+else
+	echo "msa must be set to either TRUE or FALSE"
+fi
+#Set user provided tree
+if [[ ! -z ${tree} ]]
+then
+	echo "User provided rooted tree supplied"
+	settings="${settings} -s ${tree}"
+fi
+#Are sequences DNA?
+if [ ${is_DNA} = TRUE ]
+then
+	settings="${settings} -d"
+fi
+
+#Run Orthofinder
 echo "Running OrthoFinder"
 orthofinder \
 	-t ${threads} \
 	-a ${threads2} \
-	-M dendroblast \
-	-S diamond_ultra_sens \
-	-I 1.3 \
+	${settings} \
+	-S ${seq_searc_program} \
+	-I ${inflation}\
 	-y \
-	-s ../../misc/SpeciesTree_rooted.txt \
-	-o orthofinder \
-	-f seqs/
-
-echo "Create orthogroup list"
-if [ -f orthogroup_list.tsv ]
-then
-	rm orthogroup_list.tsv
-fi
-sed '1d' orthofinder/*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv | while read line
-do
-	og=$(echo ${line} | cut -d ' ' -f1 | sed s/\\:$//) 
-	echo ${line} | cut -d ' ' -f4- | tr -d $'\r' | sed s/,//g | tr ' ' ',' | sed s/,$// | tr ',' '\n' | awk -v OFS='\t' -v a=${og} '{print $0,a}' | sed s/gene_BVRB/gene:BVRB/ >> orthogroup_list.tsv 
-done
-
-echo "Get orthogroups for each species & gene"
-for i in $species
-do
-	echo ${i}
-	cut -f2 ../${i}/ref/mcscanx/${i}.gff > tmp
-	fgrep -f tmp orthogroup_list.tsv > ../${i}/ref/mcscanx/${i}_orthogroups.tsv
-	cut -f1 ../${i}/ref/mcscanx/${i}_orthogroups.tsv > tmp2
-	a=1
-	fgrep -w -v -f tmp2 tmp | while read line
-	do
-		echo $line ${i}_${a} | tr ' ' '\t' >> ../${i}/ref/mcscanx/${i}_orthogroups.tsv
-		a=$(expr ${a} + 1)
-	done
-done
-rm tmp tmp2
+	-o ${path2} \
+	-f ${datatype}
 
 echo "Done"
 
