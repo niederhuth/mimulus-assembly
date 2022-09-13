@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 ref= #reference genome, if left blank, will look for in the ref directory for that genotype
 masked=TRUE #TRUE/FALSE, use softmasked genome, will look for files ending in -sm.fa
-by_chr=TRUE #TRUE/FALSE, only align the sequences defined in misc/, otherwise align all against all
+by_seq=TRUE #TRUE/FALSE, only align the sequences defined in misc/, otherwise align all against all
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -85,23 +85,42 @@ do
 
 
 
-
-
-
-	#Run nucmer
-	echo "Aligning ${i} against ${species}_${genotype} with nucmer"
-
-lastz \
-	${fa1} \
-	${fa2} \
-	--strand=both \
-	--inner=1000 \
-	--format=maf \
-	--output=${fa2}_${fa1}_lastz
-
-
-
-
+	echo "Aligning ${i} against ${species}_${genotype} with lastz"
+	if [ ${by_seq} = TRUE ]
+	then
+		mkdir ref_seqs query_seqs alignments
+		for x in ${}
+		do
+			#Get the sequence from the reference genome
+			seq1=$(echo ${x} | sed s/\\-.*//)
+			samtools faidx ${ref} ${seq1} > ref_seqs/${seq1}.fa
+			#Get the sequence from the query genome
+			seq2=$(echo ${x} | sed s/.*\\-//)
+			samtools faidx ${ref} ${seq2} > query_seqs/${seq2}.fa
+			#Perform alignment with lastz
+			echo "Aligning query sequence ${seq2} against ref sequence ${seq1}"
+			lastz \
+				ref_seqs/${seq1}.fa \
+				query_seqs/${seq2}.fa \
+				--strand=both \
+				--inner=1000 \
+				--format=maf \
+				--output=alignments/${seq2}_${seq1}_lastz
+		done
+	elif [ ${by_seq} = FALSE ]
+	then
+		echo "Warning: aligning all against all with lastz is not recommended!"
+		echo "Aligning query sequence ${seq2} against ref sequence ${seq1}"
+		lastz \
+			${ref} \
+			${query} \
+			--strand=both \
+			--inner=1000 \
+			--format=maf \
+			--output=${query}}_${ref}_lastz
+	else
+		echo "by_seq must be TRUE or FALSE"
+	fi
 	#Change out of that directory
 	cd ../
 done

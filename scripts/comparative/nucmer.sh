@@ -13,6 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 ref= #reference genome, if left blank, will look for in the ref directory for that genotype
 masked=FALSE #TRUE/FALSE, use softmasked genome, will look for files ending in -sm.fa
+by_seq=TRUE #TRUE/FALSE, only align the sequences defined in misc/, otherwise align all against all
 breaklen=500 #distance to attempt to extend poor scoring regions before giving up, default 200
 mincluster=100 #min length of a cluster of matches, default 65
 minmatch=50 #min length for single match, default 20
@@ -86,12 +87,39 @@ do
 	echo "Query genome ${query} found"
 	#Run nucmer
 	echo "Aligning ${i} against ${species}_${genotype} with nucmer"
-	nucmer \
-		--maxmatch \
-		-b ${breaklen} \
-		-c ${mincluster} \
-		-l ${minmatch} \
-		-p ${i} ${ref} ${query}
+	if [ ${by_seq} = TRUE ]
+	then
+		mkdir ref_seqs query_seqs alignments
+		seqs=$(awk -v a=${comparison} -v FS="," '{if ($1==a) print $2}' ${path1}/seq_alignment.csv)
+		for x in ${seqs}
+		do
+			#Get the sequence from the reference genome
+			seq1=$(echo ${x} | sed s/\\-.*//)
+			samtools faidx ${ref} ${seq1} > ref_seqs/${seq1}.fa
+			#Get the sequence from the query genome
+			seq2=$(echo ${x} | sed s/.*\\-//)
+			samtools faidx ${ref} ${seq2} > query_seqs/${seq2}.fa
+			#Perform alignment with lastz
+			echo "Aligning query sequence ${seq2} against ref sequence ${seq1}"
+			nucmer \
+				--maxmatch \
+				-b ${breaklen} \
+				-c ${mincluster} \
+				-l ${minmatch} \
+				-p alignments/${seq1}_${seq2} ref_seqs/${seq1}.fa query_seqs/${seq2}.fa
+		done
+	elif [ ${by_seq} = FALSE ]
+	then
+		echo "Aligning query sequence ${seq2} against ref sequence ${seq1}"
+		nucmer \
+			--maxmatch \
+			-b ${breaklen} \
+			-c ${mincluster} \
+			-l ${minmatch} \
+			-p ${i} ${ref} ${query}
+	else
+		echo "by_seq must be TRUE or FALSE"
+	fi
 	#Change out of that directory
 	cd ../
 done
