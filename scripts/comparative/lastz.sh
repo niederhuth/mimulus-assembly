@@ -82,14 +82,15 @@ do
 		query="${path2}/$(echo ${i} | sed s/_/\\//)/ref/${i/*_/}-v${query_ver}-sm.fa"
 	fi
 	echo "Query genome ${query} found"
-
-
-
+	#Run lastz
 	echo "Aligning ${i} against ${species}_${genotype} with lastz"
 	if [ ${by_seq} = TRUE ]
 	then
 		mkdir ref_seqs query_seqs alignments
-		for x in ${}
+		#Get list of which seqs to align
+		seqs=$(awk -v a=${comparison} -v FS="," '{if ($1==a) print $2}' ${path1}/seq_alignment.csv)
+		#Loop over each set of seqs and align
+		for x in ${seqs}
 		do
 			#Get the sequence from the reference genome
 			seq1=$(echo ${x} | sed s/\\-.*//)

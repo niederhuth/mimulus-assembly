@@ -90,7 +90,10 @@ do
 	if [ ${by_seq} = TRUE ]
 	then
 		mkdir ref_seqs query_seqs alignments
-		seqs=$(awk -v a=${comparison} -v FS="," '{if ($1==a) print $2}' ${path1}/seq_alignment.csv)
+		#Get list of which seqs to align
+		seqs=$(awk -v a=${species}_${genotype}-${i} -v FS="," \
+			'{if ($1==a) print $2}' ${path1}/seq_alignment.csv)
+		#Loop over each set of seqs and align
 		for x in ${seqs}
 		do
 			#Get the sequence from the reference genome
@@ -110,7 +113,6 @@ do
 		done
 	elif [ ${by_seq} = FALSE ]
 	then
-		echo "Aligning query sequence ${seq2} against ref sequence ${seq1}"
 		nucmer \
 			--maxmatch \
 			-b ${breaklen} \
