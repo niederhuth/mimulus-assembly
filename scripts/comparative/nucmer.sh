@@ -101,7 +101,7 @@ do
 			samtools faidx ${ref} ${seq1} > ref_seqs/${seq1}.fa
 			#Get the sequence from the query genome
 			seq2=$(echo ${x} | sed s/.*\\-//)
-			samtools faidx ${ref} ${seq2} > query_seqs/${seq2}.fa
+			samtools faidx ${query} ${seq2} > query_seqs/${seq2}.fa
 			#Perform alignment with lastz
 			echo "Aligning query sequence ${seq2} against ref sequence ${seq1}"
 			nucmer \
