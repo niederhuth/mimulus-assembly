@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-mode="proali" #genoAli or proali
+mode="proali" #genoAli or proali or both (both will run both genoAli & proAli)
 ref_fasta= #reference genome, if left blank, will look for in the ref directory for that genotype
 ref_gff= #reference gff, if left blank, will look for in the ref directory for that genotype
 threads=10
@@ -125,8 +125,9 @@ do
 		-N 20 \
 		${query_fasta} cds.fa > ${i}.sam
 	#Run Genome Alignment
-	if [ ${mode} = "genoAli" ]
+	if [ ${mode} = "genoAli" || ${mode} = "both" ]
 	then
+		mkdir genoAli
 		#Run genoAli
 		echo "Aligning ${i} to ${species}_${genotype} with genoAli"
 		anchorwave genoAli \
@@ -138,11 +139,13 @@ do
 			-a ${i}.sam \
 			-ar ${species}_${genotype}.sam \
 			-s ${query_fasta} \
-			-n ${i}.anchors \
-			-o ${i}.maf \
-			-f ${i}.fragmentation.maf
-	elif [ ${mode} = "proali" ]
+			-n genoAli/${i}.anchors \
+			-o genoAli/${i}.maf \
+			-f genoAli/${i}.fragmentation.maf
+	fi
+	if [ ${mode} = "proali" || ${mode} = "both" ]
 	then
+		mkdir proali
 		#Run proali
 		echo "Aligning ${i} to ${species}_${genotype} with proali"
 		anchorwave proali \
@@ -155,9 +158,9 @@ do
 			-a ${i}.sam \
 			-ar ${species}_${genotype}.sam \
 			-s ${query_fasta} \
-			-n ${i}.anchors \
-			-o ${i}.maf \
-			-f ${i}.fragmentation.maf
+			-n proali/${i}.anchors \
+			-o proali/${i}.maf \
+			-f proali/${i}.fragmentation.maf
 	fi
 	#Change out of that directory
 	cd ../
