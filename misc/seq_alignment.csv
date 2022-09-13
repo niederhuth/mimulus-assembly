@@ -1,3 +1,5 @@
 comparison,seqs_to_align
 Mguttatus_L1-Mguttatus_S1,chr1-chr1 chr2-chr2 chr3-chr3 chr4-chr4 chr5-chr5 chr6-chr6 chr7-chr7 chr8-chr8 chr9-chr9 chr10-chr10 chr11-chr11 chr12-chr12 chr13-chr13 chr14-chr14
 Mguttatus_S1-Mguttatus_L1,chr1-chr1 chr2-chr2 chr3-chr3 chr4-chr4 chr5-chr5 chr6-chr6 chr7-chr7 chr8-chr8 chr9-chr9 chr10-chr10 chr11-chr11 chr12-chr12 chr13-chr13 chr14-chr14
+Mguttatus_L1-Mguttatus_IM62,chr1-scaffold_1 chr2-scaffold_2 chr3-scaffold_3 chr4-scaffold_4 chr5-scaffold_5 chr6-scaffold_6 chr7-scaffold_7 chr8-scaffold_8 chr9-scaffold_9 chr10-scaffold_10 chr11-scaffold_11 chr12-scaffold_12 chr13-scaffold_13 chr14-scaffold_14
+Mguttatus_S1-Mguttatus_IM62,chr1-scaffold_1 chr2-scaffold_2 chr3-scaffold_3 chr4-scaffold_4 chr5-scaffold_5 chr6-scaffold_6 chr7-scaffold_7 chr8-scaffold_8 chr9-scaffold_9 chr10-scaffold_10 chr11-scaffold_11 chr12-scaffold_12 chr13-scaffold_13 chr14-scaffold_14
