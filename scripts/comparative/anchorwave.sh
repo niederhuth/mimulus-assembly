@@ -125,7 +125,7 @@ do
 		-N 20 \
 		${query_fasta} cds.fa > ${i}.sam
 	#Run Genome Alignment
-	if [ ${mode} = "genoAli" || ${mode} = "both" ]
+	if [[ ${mode} = "genoAli" || ${mode} = "both" ]]
 	then
 		mkdir genoAli
 		#Run genoAli
@@ -143,7 +143,7 @@ do
 			-o genoAli/${i}.maf \
 			-f genoAli/${i}.fragmentation.maf
 	fi
-	if [ ${mode} = "proali" || ${mode} = "both" ]
+	if [[ ${mode} = "proali" || ${mode} = "both" ]]
 	then
 		mkdir proali
 		#Run proali
