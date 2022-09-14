@@ -15,7 +15,7 @@ threads=100 #sequence search threads
 threads2=10 #analysis threads
 inflation=1.3 #Inflation parameter, default 1.5
 seq_search_program=diamond #blast/diamond/diamond_ultra_sens/blast_gz/mmseqs/blast_nucl sequence search program 
-msa=FALSE #TRUE/FALSE use multiple sequence alignment
+msa=TRUE #TRUE/FALSE use multiple sequence alignment
 msa_program=mafft #mafft/muscle
 tree_program=fasttree #fasttree/raxml/raxml-ng/iqtree only applies if msa=TRUE
 tree= #path to a user provided tree, if left blank, orthofinder will generate its own
