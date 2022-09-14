@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-mode="proali" #genoAli or proali or both (both will run both genoAli & proAli)
+mode="both" #genoAli or proali or both (both will run both genoAli & proAli)
 ref_fasta= #reference genome, if left blank, will look for in the ref directory for that genotype
 ref_gff= #reference gff, if left blank, will look for in the ref directory for that genotype
 threads=10
