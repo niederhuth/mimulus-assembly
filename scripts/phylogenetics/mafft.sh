@@ -1,5 +1,5 @@
 #!/bin/bash --login
-#SBATCH --time=48:00:00
+#SBATCH --time=3:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
@@ -29,6 +29,12 @@ export LD_LIBRARY_PATH="${conda}/envs/phylo/lib:$LD_LIBRARY_PATH"
 path1=$(pwd | sed s/data.*/misc/)
 path2=$(pwd | sed s/data.*/scripts/)
 
+#Set path to gene of interest list
+if [ -z ${goi} ]
+then
+	goi=${path1}/goi.csv
+fi
+
 #Set mafft settings
 settings="--thread ${threads} --maxiterate ${maxiterate} --op ${op} --ep ${ep}"
 if [ ${mode} = "linsi" ]
@@ -44,7 +50,7 @@ elif [ ${mode} = "ginsi" ]
 	settings="${settings} --globalpair"
 fi
 
-while read line
+sed '1d' ${path1}/goi.csv | while read line
 do
 	name=$(echo ${line} | cut -d ' ' -f1)
 	echo "Working on ${name}"
@@ -66,11 +72,11 @@ do
 		-output paml > ${i}/${i}-${datatype/proteins/cds}.phy
 
 	#gblocks
-	Gblocks cds.fas -t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
-	sed -i s/\ //g cds.fas.gb
+	#Gblocks cds.fas -t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
+	#sed -i s/\ //g cds.fas.gb
 
 	#axt format
-	perl ${scripts}/phylognetics/pl/parseFastaIntoAXT.pl cds.fas
+	#perl ${scripts}/phylognetics/pl/parseFastaIntoAXT.pl cds.fas
 fi
 
 
