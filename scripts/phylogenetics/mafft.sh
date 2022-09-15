@@ -19,7 +19,7 @@ mode="linsi" #linsi/einsi/ginsi, how to run mafft alignments
 datatype=proteins-primary
 op=1.53 #mafft gap opening penalty, default: 1.53
 ep=0.0 #mafft offset (works like gap extension penalty), default: 0.0
-leavegappyregion=TRUE #TRUE/FALSE use --leavegappyregion with mafft
+leavegappyregion=FALSE #TRUE/FALSE use --leavegappyregion with mafft
 prot2cds=TRUE #Convert the protein alignment to a CDS alignment
 trim=gblocks #gblocks/trimal trim alignments with specified tool, if blank, no trimming
 
@@ -64,35 +64,37 @@ sed '1d' ${path1}/goi.csv | while read line
 do
 	name=$(echo ${line} | cut -d ',' -f1)
 	echo "Working on ${name}"
+	input="${name}/${name}-${datatype}"
+	#Remove stop "*" from seqs
+	sed -i s/\\*$// ${name}/${name}-${datatype}.fa
 	if [ ${prefilter} = "prequal" ]
 	then
 		echo "Prefiltering the sequences using PREQUAL"
-		prequal
+		prequal ${input}.fa
+		filter=".filtered"
+	else
+		filter=
 	fi
+	#Run mafft
 	echo "Running mafft on ${name}"
 	mafft \
 		${settings} \
-		${name}/${name}-${datatype}.fa > ${name}/${name}-${datatype}.fas
-
+		${input}.fa${filter} > ${input}.fas
 	#convert to cds nucleotide alignment
 	if [ ${prot2cds} = TRUE ]
 	then
 		echo "Converting ${name}/${name}-${datatype}.fas to CDS alignment"
 		pal2nal.pl \
-			${name}/${name}-${datatype}.fas \
-			${name}/${name}-${datatype/proteins/cds}.fa \
-			-output fasta > ${name}/${name}-${datatype/proteins/cds}.fas
-		#pal2nal.pl \
-		#	${name}/${name}-${datatype}.fas \
-		#	${name}/${name}-${datatype/proteins/cds}.fa \
-		#	-output paml > ${name}/${name}-${datatype/proteins/cds}.phy
+			${input}.fas \
+			${input/proteins/cds}.fa \
+			-output fasta > ${input/proteins/cds}.fas
 	fi
 	#Trim alignments
 	#Trim with gblocks
 	if [ ${trim_method} = "gblocks" ]
 	then
 		echo "Trimming the alignment with Gblocks"
-		Gblocks ${name}/${name}-${datatype/proteins/cds}.fas \
+		Gblocks ${input/proteins/cds}.fas \
 			-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
 		#sed -i s/\ //g cds.fas.gb
 	#Trim with trimAL
@@ -100,8 +102,8 @@ do
 	then
 		echo "Trimming the alignment with trimAL"
 		trimal \
-			-in ${name}/${name}-${datatype/proteins/cds}.fas \
-			-out ${name}/${name}-${datatype/proteins/cds}_trimal.fas
+			-in ${input/proteins/cds}.fas \
+			-out ${input/proteins/cds}.fas.trimal
 	fi	
 
 	#axt format
