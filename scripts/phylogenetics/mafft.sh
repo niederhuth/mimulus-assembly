@@ -18,8 +18,8 @@ mode="linsi" #linsi/einsi/ginsi, how to run mafft alignments
 datatype=proteins-primary
 op=1.53 #Gap opening penalty, default: 1.53
 ep=0.0 #Offset (works like gap extension penalty), default: 0.0
-trim=TRUE #TRUE/FALSE Trim the alignments, if TRUE, will generate files for both trimmed & untrimmed
-trim_method= #gblocks/
+trim=FALSE #TRUE/FALSE Trim the alignments, if TRUE, will generate files for both trimmed & untrimmed
+trim_method= #gblocks/trimal
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -83,13 +83,21 @@ do
 			Gblocks ${i}/${i}-${datatype/proteins/cds}.fas \
 				-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
 			#sed -i s/\ //g cds.fas.gb
+		#Trim with trimAL
+		elif [ ${trim_method} = "trimal" ]
+		then
+			echo "Trimming the alignment with trimAL"
+			trimal \
+				-in ${i}/${i}-${datatype/proteins/cds}.fas \
+				-out ${i}/${i}-${datatype/proteins/cds}_trimal.fas
 		#Trim with
-		elif [ ${trim_method} = "" ]
+		elif [ ${trim_method} = "guidance2" ]
 		then
-		elif [ ${trim_method} = "" ]
+			echo "Trimming the alignment with "
+		#Trim with
+		elif [ ${trim_method} = "something" ]
 		then
-		elif [ ${trim_method} = "" ]
-		then
+			echo "Trimming the alignment with "
 		fi
 	fi	
 
