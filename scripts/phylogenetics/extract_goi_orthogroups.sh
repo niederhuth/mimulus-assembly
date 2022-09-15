@@ -17,6 +17,7 @@ orthogroups= #orthogroups (N0.tsv), if blank, will look for orthofinder results 
 datatype="proteins-primary" #Set this to datatype used for orthofinder, default proteins-primary
 seqs= #Path to input sequences, if blank, will look for dir named ${datatype} in the current dir
 CDS=TRUE #True/FALSE, extract CDS sequences, assumes datatype is proteins-primary or proteins
+trim_p=TRUE #TRUE/FALSE, trim the trailing ".p" from the protein name so matches cds name
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -82,20 +83,24 @@ do
 		#Get species name
 		a=$(echo ${line} | cut -d ' ' -f2 | sed s/\.fa//)
 		#Get the genes for that species
-		genes=$(cut -f ${column} tmp | sed 's/\ //g')
+		genes=$(cut -f ${column} tmp | sed 's/\ //g' | tr ',' '\n' | sed 's/^ *//')
+		proteins=${genes}
+		if [ trim_p = TRUE ]
+		then
+			genes=${cds} $(echo ${gene} | sed s/\.p$//)
+		fi
 		#Count the genes for that species
 		count=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | wc -l)
 		#Output to table
-		echo "${a} ${ogs} ${count} ${genes}" | tr ' ' '\t' >> ${name}/${name}_table.tsv
+		echo "${a} ${ogs} ${count} $(echo ${genes} | tr '\n' ',')" | tr ' ' '\t' >> ${name}/${name}_table.tsv
 		#Extract the sequences
 		seqs=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype}.fa)
-		gene_list=$(echo ${genes} | tr ',' '\n' | sed 's/^ *//')
-		samtools faidx ${seqs} ${gene_list} >> ${name}/${name}-${datatype}.fa
+		samtools faidx ${seqs} ${proteins} >> ${name}/${name}-${datatype}.fa
 		#Extract CDS sequences?
 		if [ ${CDS} = TRUE ]
 		then
 			cds=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype/proteins/cds}.fa)
-			samtools faidx ${cds} ${gene_list} >> ${name}/${name}-${datatype/proteins/cds}.fa
+			samtools faidx ${genes} >> ${name}/${name}-${datatype/proteins/cds}.fa
 		fi
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
