@@ -13,14 +13,15 @@ conda="${HOME}/miniconda3"
 #Set variables
 goi= #path to a csv of genes of interest, if blank, will look for goi.csv in misc dir
 threads=20 #number of threads to use with mafft
-maxiterate=1000 #maximum number of iterations
+prefilter= #prequal filter seqs prior to alignment using specified tool, if blank, no prefiltering
+maxiterate=1000 #mafft maximum number of iterations
 mode="linsi" #linsi/einsi/ginsi, how to run mafft alignments
 datatype=proteins-primary
-op=1.53 #Gap opening penalty, default: 1.53
-ep=0.0 #Offset (works like gap extension penalty), default: 0.0
+op=1.53 #mafft gap opening penalty, default: 1.53
+ep=0.0 #mafft offset (works like gap extension penalty), default: 0.0
+leavegappyregion=TRUE #TRUE/FALSE use --leavegappyregion with mafft
 prot2cds=TRUE #Convert the protein alignment to a CDS alignment
-trim=FALSE #TRUE/FALSE Trim the alignments, if TRUE, will generate files for both trimmed & untrimmed
-trim_method= #gblocks/trimal
+trim=gblocks #gblocks/trimal trim alignments with specified tool, if blank, no trimming
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -53,11 +54,21 @@ then
 	echo "Running mafft in ginsi mode"
 	settings="${settings} --globalpair"
 fi
+if [ ${leavegappyregion} = TRUE ]
+then
+	settings="${settings} --leavegappyregion"
+fi
 
+#Loop over each gene in gene of interest and perform alignments
 sed '1d' ${path1}/goi.csv | while read line
 do
 	name=$(echo ${line} | cut -d ',' -f1)
 	echo "Working on ${name}"
+	if [ ${prefilter} = "prequal" ]
+	then
+		echo "Prefiltering the sequences using PREQUAL"
+		prequal
+	fi
 	echo "Running mafft on ${name}"
 	mafft \
 		${settings} \
@@ -77,37 +88,20 @@ do
 		#	-output paml > ${name}/${name}-${datatype/proteins/cds}.phy
 	fi
 	#Trim alignments
-	if [ ${trim} = TRUE ]
+	#Trim with gblocks
+	if [ ${trim_method} = "gblocks" ]
 	then
-		#Trim with gblocks
-		if [ ${trim_method} = "gblocks" ]
-		then
-			echo "Trimming the alignment with Gblocks"
-			Gblocks ${name}/${name}-${datatype/proteins/cds}.fas \
-				-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
-			#sed -i s/\ //g cds.fas.gb
-		#Trim with trimAL
-		elif [ ${trim_method} = "trimal" ]
-		then
-			echo "Trimming the alignment with trimAL"
-			trimal \
-				-in ${name}/${name}-${datatype/proteins/cds}.fas \
-				-out ${name}/${name}-${datatype/proteins/cds}_trimal.fas
-		#Trim with
-		elif [ ${trim_method} = "prequal" ]
-		then
-			echo "Trimming the alignment with PREQUAL"
-			prequal \
-				${name}/${name}-${datatype/proteins/cds}.fas
-		#Trim with
-		elif [ ${trim_method} = "something" ]
-		then
-			echo "Trimming the alignment with "
-		#Trim with
-		elif [ ${trim_method} = "something" ]
-		then
-			echo "Error: You must specify a trimming method!"
-		fi
+		echo "Trimming the alignment with Gblocks"
+		Gblocks ${name}/${name}-${datatype/proteins/cds}.fas \
+			-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
+		#sed -i s/\ //g cds.fas.gb
+	#Trim with trimAL
+	elif [ ${trim_method} = "trimal" ]
+	then
+		echo "Trimming the alignment with trimAL"
+		trimal \
+			-in ${name}/${name}-${datatype/proteins/cds}.fas \
+			-out ${name}/${name}-${datatype/proteins/cds}_trimal.fas
 	fi	
 
 	#axt format
