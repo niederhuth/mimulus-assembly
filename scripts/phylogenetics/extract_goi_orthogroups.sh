@@ -67,7 +67,8 @@ do
 	name=$(echo ${line} | cut -d ',' -f1)
 	echo "Extracting sequences for ${name}"
 	ref_genes=$(echo ${line} | cut -d ',' -f2)
-	mkdir ${name}
+	mkdir ${name} ${name}/seqs
+	outseqs="${name}/seqs/${name}"
 	#Get the orthogroups
 	for x in ${ref_genes}
 	do
@@ -95,12 +96,12 @@ do
 		echo "${a} ${ogs} ${count} $(echo ${genes} | tr ' ' ',')" | tr ' ' '\t' >> ${name}/${name}_table.tsv
 		#Extract the sequences
 		seqs=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype}.fa)
-		samtools faidx ${seqs} ${proteins} >> ${name}/${name}-${datatype}.fa
+		samtools faidx ${seqs} ${proteins} >> ${outseqs}-${datatype}.fa
 		#Extract CDS sequences?
 		if [ ${CDS} = TRUE ]
 		then
 			cds=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype/proteins/cds}.fa)
-			samtools faidx ${cds} $(echo ${genes} | tr ' ' '\n') >> ${name}/${name}-${datatype/proteins/cds}.fa
+			samtools faidx ${cds} $(echo ${genes} | tr ' ' '\n') >> ${outseqs}-${datatype/proteins/cds}.fa
 		fi
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
