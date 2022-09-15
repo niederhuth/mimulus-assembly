@@ -47,14 +47,23 @@ fi
 while read line
 do
 	name=$(echo ${line} | cut -d ' ' -f1)
+	echo "Working on ${name}"
 	#Run mafft
+	echo "Running mafft on ${name}"
 	mafft \
 		${settings} \
 		${i}/${i}-${datatype}.fa > ${i}/${i}-${datatype}.fas
 
 	#convert to cds nucleotide alignment
-	pal2nal.pl protein.fas combined.fna -output fasta > cds.fas
-	pal2nal.pl protein.fas combined.fna -output paml > cds.phy
+	echo "Converting ${i}/${i}-${datatype}.fas to CDS alignment"
+	pal2nal.pl \
+		${i}/${i}-${datatype}.fas \
+		${i}/${i}-${datatype/proteins/cds}.fa \
+		-output fasta > ${i}/${i}-${datatype/proteins/cds}.fas
+	pal2nal.pl \
+		${i}/${i}-${datatype}.fas \
+		${i}/${i}-${datatype/proteins/cds}.fa \
+		-output paml > ${i}/${i}-${datatype/proteins/cds}.phy
 
 	#gblocks
 	Gblocks cds.fas -t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb

@@ -37,12 +37,12 @@ fi
 #set path to the SpeciesID.txt file
 if [ -z ${speciesIDs} ]
 then
-	speciesIDs="${path2/}orthofinder/*/WorkingDirectory/SpeciesIDs.txt"
+	speciesIDs=$(ls ${path2/}orthofinder/*/WorkingDirectory/SpeciesIDs.txt)
 fi
 #Set path to N0.tsv orthofinder output
 if [ -z ${orthogroups} ]
 then
-	orthogroups="${path2}/orthofinder/*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv"
+	orthogroups=$(ls ${path2}/orthofinder/*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv)
 fi
 #Set path for input sequences
 if [ -z ${seqs} ]
