@@ -48,7 +48,7 @@ fi
 if [ -z ${seqs} ]
 then
 	#seqs="${path2}/${datatype}/${a}.fa"
-	path4=$(pwd | sed s/data.*//)
+	path4=$(pwd | sed s/data.*/data/)
 fi
 
 #Check for and make/cd working directory
@@ -94,7 +94,7 @@ do
 		if [ ${CDS} = TRUE ]
 		then
 			cds=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype/proteins/cds}.fa)
-			samtools faidx ${seqs} ${gene_list} >> ${i}/${i}-${datatype/proteins/cds}.fa
+			samtools faidx ${cds} ${gene_list} >> ${i}/${i}-${datatype/proteins/cds}.fa
 		fi
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
