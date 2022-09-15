@@ -98,6 +98,10 @@ do
 		elif [ ${trim_method} = "something" ]
 		then
 			echo "Trimming the alignment with "
+		#Trim with
+		elif [ ${trim_method} = "something" ]
+		then
+			echo "Error: You must specify a trimming method!"
 		fi
 	fi	
 
