@@ -61,18 +61,18 @@ do
 	echo "Running mafft on ${name}"
 	mafft \
 		${settings} \
-		${i}/${i}-${datatype}.fa > ${i}/${i}-${datatype}.fas
+		${name}/${name}-${datatype}.fa > ${name}/${name}-${datatype}.fas
 
 	#convert to cds nucleotide alignment
-	echo "Converting ${i}/${i}-${datatype}.fas to CDS alignment"
+	echo "Converting ${name}/${name}-${datatype}.fas to CDS alignment"
 	pal2nal.pl \
-		${i}/${i}-${datatype}.fas \
-		${i}/${i}-${datatype/proteins/cds}.fa \
-		-output fasta > ${i}/${i}-${datatype/proteins/cds}.fas
+		${name}/${name}-${datatype}.fas \
+		${name}/${name}-${datatype/proteins/cds}.fa \
+		-output fasta > ${name}/${name}-${datatype/proteins/cds}.fas
 	pal2nal.pl \
-		${i}/${i}-${datatype}.fas \
-		${i}/${i}-${datatype/proteins/cds}.fa \
-		-output paml > ${i}/${i}-${datatype/proteins/cds}.phy
+		${name}/${name}-${datatype}.fas \
+		${name}/${name}-${datatype/proteins/cds}.fa \
+		-output paml > ${name}/${name}-${datatype/proteins/cds}.phy
 	#Trim alignments
 	if [ ${trim} = TRUE ]
 	then
@@ -80,7 +80,7 @@ do
 		if [ ${trim_method} = "gblocks" ]
 		then
 			echo "Trimming the alignment with gblocks"
-			Gblocks ${i}/${i}-${datatype/proteins/cds}.fas \
+			Gblocks ${name}/${name}-${datatype/proteins/cds}.fas \
 				-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
 			#sed -i s/\ //g cds.fas.gb
 		#Trim with trimAL
@@ -88,8 +88,8 @@ do
 		then
 			echo "Trimming the alignment with trimAL"
 			trimal \
-				-in ${i}/${i}-${datatype/proteins/cds}.fas \
-				-out ${i}/${i}-${datatype/proteins/cds}_trimal.fas
+				-in ${name}/${name}-${datatype/proteins/cds}.fas \
+				-out ${name}/${name}-${datatype/proteins/cds}_trimal.fas
 		#Trim with
 		elif [ ${trim_method} = "guidance2" ]
 		then
