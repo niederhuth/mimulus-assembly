@@ -18,6 +18,8 @@ mode="linsi" #linsi/einsi/ginsi, how to run mafft alignments
 datatype=proteins-primary
 op=1.53 #Gap opening penalty, default: 1.53
 ep=0.0 #Offset (works like gap extension penalty), default: 0.0
+trim=TRUE #TRUE/FALSE Trim the alignments, if TRUE, will generate files for both trimmed & untrimmed
+trim_method= #gblocks/
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -70,13 +72,29 @@ do
 		${i}/${i}-${datatype}.fas \
 		${i}/${i}-${datatype/proteins/cds}.fa \
 		-output paml > ${i}/${i}-${datatype/proteins/cds}.phy
-
-	#gblocks
-	#Gblocks cds.fas -t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
-	#sed -i s/\ //g cds.fas.gb
+	#Trim alignments
+	if [ ${trim} = TRUE ]
+	then
+		#Trim with gblocks
+		if [ ${trim_method} = "gblocks" ]
+		then
+			echo "Trimming the alignment with gblocks"
+			Gblocks ${i}/${i}-${datatype/proteins/cds}.fas \
+				-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
+			#sed -i s/\ //g cds.fas.gb
+		#Trim with
+		elif [ ${trim_method} = "" ]
+		then
+		elif [ ${trim_method} = "" ]
+		then
+		elif [ ${trim_method} = "" ]
+		then
+		fi
+	fi	
 
 	#axt format
 	#perl ${scripts}/phylognetics/pl/parseFastaIntoAXT.pl cds.fas
-fi
+	#perl $SCRIPTS/parseFastaIntoAXT.pl cds.fas.gb
+done
 
 
