@@ -73,7 +73,7 @@ do
 		grep ${x} ${orthogroups} >> tmp
 	done
 	#Get the orthogroup(s)
-	ogs=$(cut -f1 tmp | sort | uniq | tr '\n' ',')
+	ogs=$(cut -f1 tmp | sort | uniq | tr '\n' ',' | sed s/\,$//)
 	#First species starts on column 4
 	column=4
 	#Loop over each species
