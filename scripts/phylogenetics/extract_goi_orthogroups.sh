@@ -93,8 +93,8 @@ do
 		#Extract CDS sequences?
 		if [ ${CDS} = TRUE ]
 		then
-			cds=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype/proteins/CDS}.fa)
-			samtools faidx ${seqs} ${gene_list} >> ${i}/${i}-${datatype/proteins/CDS}.fa
+			cds=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype/proteins/cds}.fa)
+			samtools faidx ${seqs} ${gene_list} >> ${i}/${i}-${datatype/proteins/cds}.fa
 		fi
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
