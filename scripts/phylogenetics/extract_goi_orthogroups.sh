@@ -37,7 +37,7 @@ fi
 #set path to the SpeciesID.txt file
 if [ -z ${speciesIDs} ]
 then
-	speciesIDs=$(ls ${path2}orthofinder/*/WorkingDirectory/SpeciesIDs.txt)
+	speciesIDs=$(ls ${path2}/orthofinder/*/WorkingDirectory/SpeciesIDs.txt)
 fi
 #Set path to N0.tsv orthofinder output
 if [ -z ${orthogroups} ]
