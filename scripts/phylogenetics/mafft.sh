@@ -55,9 +55,8 @@ fi
 
 sed '1d' ${path1}/goi.csv | while read line
 do
-	name=$(echo ${line} | cut -d ' ' -f1)
+	name=$(echo ${line} | cut -d ',' -f1)
 	echo "Working on ${name}"
-	#Run mafft
 	echo "Running mafft on ${name}"
 	mafft \
 		${settings} \
@@ -79,7 +78,7 @@ do
 		#Trim with gblocks
 		if [ ${trim_method} = "gblocks" ]
 		then
-			echo "Trimming the alignment with gblocks"
+			echo "Trimming the alignment with Gblocks"
 			Gblocks ${name}/${name}-${datatype/proteins/cds}.fas \
 				-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
 			#sed -i s/\ //g cds.fas.gb
@@ -91,9 +90,11 @@ do
 				-in ${name}/${name}-${datatype/proteins/cds}.fas \
 				-out ${name}/${name}-${datatype/proteins/cds}_trimal.fas
 		#Trim with
-		elif [ ${trim_method} = "guidance2" ]
+		elif [ ${trim_method} = "prequal" ]
 		then
-			echo "Trimming the alignment with "
+			echo "Trimming the alignment with PREQUAL"
+			prequal \
+				${name}/${name}-${datatype/proteins/cds}.fas
 		#Trim with
 		elif [ ${trim_method} = "something" ]
 		then
