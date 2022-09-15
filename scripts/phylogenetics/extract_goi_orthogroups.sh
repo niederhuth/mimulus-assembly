@@ -100,7 +100,7 @@ do
 		if [ ${CDS} = TRUE ]
 		then
 			cds=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype/proteins/cds}.fa)
-			samtools faidx $(echo ${genes} | tr ' ' '\n') >> ${name}/${name}-${datatype/proteins/cds}.fa
+			samtools faidx ${cds} $(echo ${genes} | tr ' ' '\n') >> ${name}/${name}-${datatype/proteins/cds}.fa
 		fi
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
