@@ -92,7 +92,7 @@ do
 		#Count the genes for that species
 		count=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | wc -l)
 		#Output to table
-		echo "${a} ${ogs} ${count} $(echo ${genes} | tr '\n' ',')" | tr ' ' '\t' >> ${name}/${name}_table.tsv
+		echo "${a} ${ogs} ${count} $(echo ${genes} | tr ' ' ',')" | tr ' ' '\t' >> ${name}/${name}_table.tsv
 		#Extract the sequences
 		seqs=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype}.fa)
 		samtools faidx ${seqs} ${proteins} >> ${name}/${name}-${datatype}.fa
@@ -100,7 +100,7 @@ do
 		if [ ${CDS} = TRUE ]
 		then
 			cds=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype/proteins/cds}.fa)
-			samtools faidx ${genes} >> ${name}/${name}-${datatype/proteins/cds}.fa
+			samtools faidx $(echo ${genes} | tr ' ' '\n') >> ${name}/${name}-${datatype/proteins/cds}.fa
 		fi
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
