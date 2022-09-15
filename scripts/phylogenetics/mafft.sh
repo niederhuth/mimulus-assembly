@@ -48,6 +48,7 @@ then
 	echo "Running mafft in einsi mode"
 	settings="${settings} --genafpair"
 elif [ ${mode} = "ginsi" ]
+then
 	echo "Running mafft in ginsi mode"
 	settings="${settings} --globalpair"
 fi
