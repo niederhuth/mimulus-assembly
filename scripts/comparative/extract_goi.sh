@@ -1,23 +1,23 @@
 
 #!/bin/bash --login
-#SBATCH --time=168:00:00
+#SBATCH --time=3:59:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=10
-#SBATCH --mem=400GB
-#SBATCH --job-name anchorwave
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=1GB
+#SBATCH --job-name extract_goi
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-target_species="Mguttatus_L1 Mguttatus_S1"
 goi= #
-speciesIDs= #
-orthogroups= #
-seqs= #
-datatype="proteins-primary" #Set this to datatype used for orthofinder, normally this will be proteins-primary
+speciesIDs= #orthogroup speciesID (SpeciesID.txt), if blank, will look for orthofinder results in current dir
+orthogroups= #orthogroups (N0.tsv), if blank, will look for orthofinder results in current dir
+datatype="proteins-primary" #Set this to datatype used for orthofinder, default proteins-primary
+seqs= #Path to input sequences, if blank, will look for dir named ${datatype} in the current dir
+CDS=TRUE #True/FALSE, extract CDS sequences, assumes datatype is proteins-primary or proteins
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -48,7 +48,9 @@ fi
 #
 if [ -z ${seqs} ]
 then
-	seqs="${path2}/${datatype}/${a}.fa"
+	#seqs="${path2}/${datatype}/${a}.fa"
+	path4=$(pwd | sed s/data.*//)
+fi
 
 #Check for and make/cd working directory
 if [ -d ${path3} ]
@@ -70,6 +72,8 @@ do
 	do
 		grep ${x} ${orthogroups} >> tmp
 	done
+	#Get the orthogroup(s)
+	ogs=$(cut -f1 | sort | uniq | tr '\n' ',')
 	#First species starts on column 4
 	column=4
 	#Loop over each species
@@ -82,9 +86,17 @@ do
 		#Count the genes for that species
 		count=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | wc -l)
 		#Output to table
-		echo "${a} ${count} ${genes}" | tr ' ' '\t' >> ${i}/${i}_table.tsv
+		echo "${a} ${ogs} ${count} ${genes}" | tr ' ' '\t' >> ${i}/${i}_table.tsv
 		#Extract the sequences
-		samtools faidx $(echo ${genes} | tr ',' '\n' | sed 's/^ *//') >> ${i}/${i}.fa
+		seqs=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype}.fa)
+		gene_list=$(echo ${genes} | tr ',' '\n' | sed 's/^ *//')
+		samtools faidx ${seqs} ${gene_list} >> ${i}/${i}-${datatype}.fa
+		#Extract CDS sequences?
+		if [ ${CDS} = TRUE ]
+		then
+			cds=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype/proteins/CDS}.fa)
+			samtools faidx ${seqs} ${gene_list} >> ${i}/${i}-${datatype/proteins/CDS}.fa
+		fi
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
 	done
