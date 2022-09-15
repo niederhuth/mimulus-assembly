@@ -85,9 +85,9 @@ do
 		#Get the genes for that species
 		genes=$(cut -f ${column} tmp | sed 's/\ //g' | tr ',' '\n')
 		proteins=${genes}
-		if [ trim_p = TRUE ]
+		if [ ${trim_p} = TRUE ]
 		then
-			genes=${cds} $(echo ${genes} | sed s/\.p$//)
+			genes=$(echo ${genes} | sed s/\.p$//)
 		fi
 		#Count the genes for that species
 		count=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | wc -l)
