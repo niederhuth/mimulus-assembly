@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-goi= #
+goi= #path to a csv of genes of interest, if blank, will look for goi.csv in misc dir
 speciesIDs= #orthogroup speciesID (SpeciesID.txt), if blank, will look for orthofinder results in current dir
 orthogroups= #orthogroups (N0.tsv), if blank, will look for orthofinder results in current dir
 datatype="proteins-primary" #Set this to datatype used for orthofinder, default proteins-primary
@@ -29,22 +29,22 @@ path1=$(pwd | sed s/data.*/misc/)
 path2=$(pwd)
 path3=goi
 
-#
+#Set path to gene of interest list
 if [ -z ${goi} ]
 then
 	goi=${path1}/goi.csv
 fi
-#
+#set path to the SpeciesID.txt file
 if [ -z ${speciesIDs} ]
 then
 	speciesIDs="${path2/}orthofinder/*/WorkingDirectory/SpeciesIDs.txt"
 fi
-#
+#Set path to N0.tsv orthofinder output
 if [ -z ${orthogroups} ]
 then
 	orthogroups="${path2}/orthofinder/*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv"
 fi
-#
+#Set path for input sequences
 if [ -z ${seqs} ]
 then
 	#seqs="${path2}/${datatype}/${a}.fa"
@@ -60,7 +60,7 @@ else
 	cd ${path3}
 fi
 
-#
+#Loop over each goi and get the relevant data
 while read line 
 do
 	name=$(echo ${line} | cut -d ' ' -f1)
