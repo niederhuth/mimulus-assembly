@@ -105,7 +105,7 @@ do
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
 	done
-	#rm tmp
+	rm tmp
 done
 
 echo "Done"
