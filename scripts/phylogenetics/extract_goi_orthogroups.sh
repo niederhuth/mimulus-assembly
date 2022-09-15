@@ -64,6 +64,7 @@ fi
 sed '1d' ${goi} | while read line 
 do
 	name=$(echo ${line} | cut -d ',' -f1)
+	echo "Extracting sequences for ${name}"
 	ref_genes=$(echo ${line} | cut -d ',' -f2)
 	mkdir ${name}
 	#Get the orthogroups
@@ -72,7 +73,7 @@ do
 		grep ${x} ${orthogroups} >> tmp
 	done
 	#Get the orthogroup(s)
-	ogs=$(cut -f1 | sort | uniq | tr '\n' ',')
+	ogs=$(cut -f1 tmp | sort | uniq | tr '\n' ',')
 	#First species starts on column 4
 	column=4
 	#Loop over each species
