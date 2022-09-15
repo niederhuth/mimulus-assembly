@@ -61,7 +61,7 @@ else
 fi
 
 #Loop over each goi and get the relevant data
-while read line 
+sed '1d' ${goi} | while read line 
 do
 	name=$(echo ${line} | cut -d ' ' -f1)
 	ref_genes=$(echo ${line} | cut -d ' ' -f2)
