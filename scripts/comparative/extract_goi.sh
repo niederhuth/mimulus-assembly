@@ -21,8 +21,8 @@ CDS=TRUE #True/FALSE, extract CDS sequences, assumes datatype is proteins-primar
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/orthofinder/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/orthofinder/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/phylo/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/phylo/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
