@@ -18,6 +18,7 @@ mode="linsi" #linsi/einsi/ginsi, how to run mafft alignments
 datatype=proteins-primary
 op=1.53 #Gap opening penalty, default: 1.53
 ep=0.0 #Offset (works like gap extension penalty), default: 0.0
+prot2cds=TRUE #Convert the protein alignment to a CDS alignment
 trim=FALSE #TRUE/FALSE Trim the alignments, if TRUE, will generate files for both trimmed & untrimmed
 trim_method= #gblocks/trimal
 
@@ -63,15 +64,18 @@ do
 		${name}/${name}-${datatype}.fa > ${name}/${name}-${datatype}.fas
 
 	#convert to cds nucleotide alignment
-	echo "Converting ${name}/${name}-${datatype}.fas to CDS alignment"
-	pal2nal.pl \
-		${name}/${name}-${datatype}.fas \
-		${name}/${name}-${datatype/proteins/cds}.fa \
-		-output fasta > ${name}/${name}-${datatype/proteins/cds}.fas
-	pal2nal.pl \
-		${name}/${name}-${datatype}.fas \
-		${name}/${name}-${datatype/proteins/cds}.fa \
-		-output paml > ${name}/${name}-${datatype/proteins/cds}.phy
+	if [ ${prot2cds} = TRUE ]
+	then
+		echo "Converting ${name}/${name}-${datatype}.fas to CDS alignment"
+		pal2nal.pl \
+			${name}/${name}-${datatype}.fas \
+			${name}/${name}-${datatype/proteins/cds}.fa \
+			-output fasta > ${name}/${name}-${datatype/proteins/cds}.fas
+		#pal2nal.pl \
+		#	${name}/${name}-${datatype}.fas \
+		#	${name}/${name}-${datatype/proteins/cds}.fa \
+		#	-output paml > ${name}/${name}-${datatype/proteins/cds}.phy
+	fi
 	#Trim alignments
 	if [ ${trim} = TRUE ]
 	then
