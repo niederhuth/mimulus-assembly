@@ -74,6 +74,9 @@ do
 	do
 		grep ${x} ${orthogroups} >> tmp
 	done
+	#Remove redundant lines
+	sort tmp | uniq > tmp2
+	mv tmp2 tmp
 	#Get the orthogroup(s)
 	ogs=$(cut -f1 tmp | sort | uniq | tr '\n' ',' | sed s/\,$//)
 	#First species starts on column 4
