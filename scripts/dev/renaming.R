@@ -1,5 +1,5 @@
 #
-df <- read.table("combined_order")
+df <- read.table("final_valid_gene_order.tsv")
 
 colnames(df) <- c("chr","source","start","stop","gene")
 
