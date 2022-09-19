@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 target_fa="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/S1/ref/S1-v1.fa" #target genome fasta to map gff files to, if left blank, look in current directory
-target_gff="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/S1/ref/annotations/v1/S1-v1.gff" #gff file for target genome, only necessary if gffcompare=TRUE
+target_gff="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/S1/ref/annotations/S1-v1.gff" #gff file for target genome, only necessary if gffcompare=TRUE
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -82,9 +82,10 @@ for i in ${genomes}
 do
 	mkdir ${i}
 	cd ${i}
-	ref_fa=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v*.fa)
-	ref_gff=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/annotations/${i/*_/}-v*.gff)
-	chroms=${path1}/annotation/${i}_${species}_${genotype}_chr_mapping.csv
+	version=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
+	ref_fa=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v${version}.fa)
+	ref_gff=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/annotations/${i/*_/}-v${version}.gff)
+	chroms="${path1}/annotation/${i}_${species}_${genotype}_chr_mapping.csv"
 
 	#Run liftoff
 	mkdir liftoff
