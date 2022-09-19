@@ -184,7 +184,7 @@ done
 
 #Copy the final files
 cp ${final_valid} final_valid_genes.gff
-cp ${final_oder} final_valid_gene_order.gff
+cp ${final_order} final_valid_gene_order.tsv
 cp ${final_pseudo} final_pseudogenes.gff
 
 echo "Done"
