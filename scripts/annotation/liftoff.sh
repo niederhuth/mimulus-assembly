@@ -81,9 +81,10 @@ genomes=$(awk -v FS="," \
 for i in ${genomes}
 do
 	mkdir ${i}
+	cd ${i}
 	ref_fa=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v*.fa)
 	ref_gff=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/annotations/${i/*_/}-v*.gff)
-	chroms=${path1}/annotations/${species}_${genotype}_${i}_chr_mapping.csv
+	chroms=${path1}/annotations/${i}_${species}_${genotype}_chr_mapping.csv
 
 	#Run liftoff
 	mkdir liftoff
@@ -97,6 +98,8 @@ do
 		-chroms ${chroms} \
 		${target_fa} \
 		${ref_fa}
+
+	#Change out of directory
 	cd ../
 
 	#Classify annotations with gffcompare
