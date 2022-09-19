@@ -15,7 +15,7 @@ target_fa="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/S1/ref/S1-
 target_gff="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/S1/ref/annotations/v1/S1-v1.gff" #gff file for target genome, only necessary if gffcompare=TRUE
 
 #Change to current directory
-#cd ${PBS_O_WORKDIR}
+cd ${PBS_O_WORKDIR}
 #Export paths to conda
 export PATH="${conda}/envs/liftoff/bin:${PATH}"
 export LD_LIBRARY_PATH="${conda}/envs/liftoff/lib:${LD_LIBRARY_PATH}"
