@@ -11,8 +11,8 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-target_fa="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/S1/ref/S1-v1.fa" #target genome fasta to map gff files to, if left blank, look in current directory
-target_gff="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/S1/ref/annotations/S1-v1.gff" #gff file for target genome, only necessary if gffcompare=TRUE
+target_fa="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/L1/ref/L1-v1.fa" #target genome fasta to map gff files to, if left blank, look in current directory
+target_gff="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/L1/ref/annotations/L1-v1.gff" #gff file for target genome, only necessary if gffcompare=TRUE
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -86,6 +86,10 @@ do
 	ref_fa=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v${version}.fa)
 	ref_gff=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/annotations/${i/*_/}-v${version}.gff)
 	chroms="${path1}/annotation/${i}_${species}_${genotype}_chr_mapping.csv"
+	ignore_transcripts="${path1}/annotation/${i}_ignore_transcripts.txt"
+
+	#Filter the ref_gff
+	fgrep -v -f ${ignore_transcripts} ${ref_gff} > ${i}.gff
 
 	#Run liftoff
 	mkdir liftoff
@@ -95,7 +99,7 @@ do
 		-cds \
 		-polish \
 		-o mapped.gff \
-		-g ${ref_gff} \
+		-g ../${i}.gff \
 		-chroms ${chroms} \
 		${target_fa} \
 		${ref_fa}
