@@ -141,7 +141,7 @@ do
 	grep valid_ORFs=1 newgenes.gff | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//' > new_valid_genes
 	grep valid_ORFs=0 newgenes.gff | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//' > new_pseudogenes
 	echo "$(wc -l new_valid_genes) putative genes with intact ORFs found"
-	echo "$(wc -l new_pseudogenes) putative new_pseudogenes found"
+	echo "$(wc -l new_pseudogenes) putative pseudogenes found"
 
 	#Subset gff of valid genes
 	fgrep -f new_valid_genes newgenes.gff > new_valid_genes.gff
