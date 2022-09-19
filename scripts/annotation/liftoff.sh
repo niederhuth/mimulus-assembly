@@ -160,7 +160,14 @@ do
 	if [ ! -z ${target_gff} ]
 	then
 		cat ${target_gff} newgenes.gff | bedtools sort > all_annot.gff
-		cat ${target_gff} new_valid_genes.gff | bedtools sort > all_valid.gff
+		#If it is first genome, we will combine with all the genes from the target gff
+		#Otherwise, we will use only the final valid genes from the previous round
+		if [ ${i} = ${genomes/\ */} ]
+		then
+			cat ${target_gff} new_valid_genes.gff | bedtools sort > all_valid.gff
+		else
+			cat ${final_valid} new_valid_genes.gff | bedtools sort > all_valid.gff
+		fi
 		cat ${final_pseudo} new_pseudogenes.gff | bedtools sort > all_pseudogenes.gff
 	else
 		cat newgenes.gff | bedtools sort > all_annot.gff
@@ -186,6 +193,21 @@ done
 cp ${final_valid} final_valid_genes.gff
 cp ${final_order} final_valid_gene_order.tsv
 cp ${final_pseudo} final_pseudogenes.gff
+
+#Get transcripts fasta
+echo "Outputing transcripts fasta"
+gffread \
+	-g ${target_fa} \
+	-w ${genotype}-transcripts.fa \
+	final_valid_genes.gff
+
+#Get proteins fasta
+echo "Outputing proteins fasta"
+gffread \
+	-g ${target_fa} \
+	-y ${genotype}-proteins.fa \
+	-S \
+	final_valid_genes.gff
 
 echo "Done"
 
