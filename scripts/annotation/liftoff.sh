@@ -88,18 +88,17 @@ do
 	chroms="${path1}/annotation/${i}_${species}_${genotype}_chr_mapping.csv"
 	ignore_transcripts="${path1}/annotation/${i}_ignore_transcripts.txt"
 
-	#Filter the ref_gff
-	fgrep -v -f ${ignore_transcripts} ${ref_gff} > ${i}.gff
-
 	#Run liftoff
 	mkdir liftoff
 	cd liftoff
+	#Filter the ref_gff
+	fgrep -v -f ${ignore_transcripts} ${ref_gff} > ${i}.gff
 	echo "Lifting over annotations from ${i/_*/} ${i/*_/} to ${species} ${genotype} with liftoff"
 	liftoff \
 		-cds \
 		-polish \
 		-o mapped.gff \
-		-g ../${i}.gff \
+		-g ${i}.gff \
 		-chroms ${chroms} \
 		${target_fa} \
 		${ref_fa}
