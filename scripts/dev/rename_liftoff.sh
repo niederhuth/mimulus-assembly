@@ -26,7 +26,10 @@ do
 	fi
 	awk -v a=${line} -v OFS="\t" '$1==a' ../final_valid_gene_order.tsv | while read genes
 	do
-		if [[ $(expr 6 - $(echo ${count} | wc -c)) = 1 ]]
+		if [[ $(expr 6 - $(echo ${count} | wc -c)) = 0 ]]
+		then
+			zeros=
+		elif [[ $(expr 6 - $(echo ${count} | wc -c)) = 1 ]]
 		then
 			zeros="0"
 		elif [[ $(expr 6 - $(echo ${count} | wc -c)) = 2 ]]
@@ -49,7 +52,10 @@ count=10
 chr="UN"
 grep -v "^chr" ../final_valid_gene_order.tsv | while read genes
 do
-	if [[ $(expr 6 - $(echo ${count} | wc -c)) = 1 ]]
+	if [[ $(expr 6 - $(echo ${count} | wc -c)) = 0 ]]
+	then
+		zeros=
+	elif [[ $(expr 6 - $(echo ${count} | wc -c)) = 1 ]]
 	then
 		zeros="0"
 	elif [[ $(expr 6 - $(echo ${count} | wc -c)) = 2 ]]
@@ -79,7 +85,10 @@ do
 	fi
 	awk -v a=${line} -v OFS="\t" '$1==a' ../final_valid_mRNA_order.tsv | while read genes
 	do
-		if [[ $(expr 6 - $(echo ${count} | wc -c)) = 1 ]]
+		if [[ $(expr 6 - $(echo ${count} | wc -c)) = 0 ]]
+		then
+			zeros=
+		elif [[ $(expr 6 - $(echo ${count} | wc -c)) = 1 ]]
 		then
 			zeros="0"
 		elif [[ $(expr 6 - $(echo ${count} | wc -c)) = 2 ]]
@@ -102,7 +111,10 @@ count=10
 chr="UN"
 grep -v "^chr" ../final_valid_mRNA_order.tsv | while read genes
 do
-	if [[ $(expr 6 - $(echo ${count} | wc -c)) = 1 ]]
+	if [[ $(expr 6 - $(echo ${count} | wc -c)) = 0 ]]
+	then
+		zeros=
+	elif [[ $(expr 6 - $(echo ${count} | wc -c)) = 1 ]]
 	then
 		zeros="0"
 	elif [[ $(expr 6 - $(echo ${count} | wc -c)) = 2 ]]
