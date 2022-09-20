@@ -137,8 +137,9 @@ cd ..
 #Rename the gff
 cat final_valid_genes.gff | while read line
 do
-	mol=$(echo ${line} | cut -f3)
-	id=$(echo ${line} | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//')	
+	mol=$(echo ${line} | cut -d ' ' -f3)
+	id=$(echo ${line} | cut -d ' ' -f9 | sed 's/\;.*//' | sed 's/ID\=//')
+	echo ${id}
 	if [[ ${mol} == "gene" ]]
 	then
 		new=$(awk -v a=${id} '{if ($1==a) print $2}' rename.map)
@@ -146,7 +147,7 @@ do
 	elif [[ ${mol} == "mRNA" ]]
 	then
 		new=$(awk -v a=${id} '{if ($1==a) print $2}' rename.map)
-		parent=$(echo ${line} | cut -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
+		parent=$(echo ${line} | cut -d ' ' -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
 		new_parent=$(awk -v a=${parent} '{if ($1==a) print $2}' rename.map)
 		echo ${line} | awk -v OFS="\t" -v a=${new} -v b=${new_parent} '{print $1,$2,$3,$4,$5,$6,$7,$8,"ID="a";Name="a";Parent="b}' >> renamed.gff
 	elif [[ ${mol} == "exon" ]]
@@ -154,28 +155,28 @@ do
 		id2=$(echo ${id} | sed 's/\.exon.*//' | sed 's/\:.*//')
 		new=$(awk -v a=${id2} '{if ($1==a) print $2}' rename.map)
 		new2=$(echo ${id} | sed s/${id2}/${new}/ | sed 's/\:/\.exon\./')
-		parent=$(echo ${line} | cut -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
+		parent=$(echo ${line} | cut -d ' ' -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
 		new_parent=$(awk -v a=${parent} '{if ($1==a) print $2}' rename.map)
 		echo ${line} | awk -v OFS="\t" -v a=${new2} -v b=${new_parent} '{print $1,$2,$3,$4,$5,$6,$7,$8,"ID="a";Parent="b}' >> renamed.gff
 	elif [[ ${mol} == "CDS" ]]
 	then
 		id2=$(echo ${id} | sed 's/\.CDS.*//' | sed 's/\:.*//')
 		new=$(awk -v a=${id2} '{if ($1==a) print $2}' rename.map | sed 's/$/\.CDS/')
-		parent=$(echo ${line} | cut -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
+		parent=$(echo ${line} | cut -d ' ' -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
 		new_parent=$(awk -v a=${parent} '{if ($1==a) print $2}' rename.map)
 		echo ${line} | awk -v OFS="\t" -v a=${new} -v b=${new_parent} '{print $1,$2,$3,$4,$5,$6,$7,$8,"ID="a";Parent="b}' >> renamed.gff
 	elif [[ ${mol} == "five_prime_UTR" ]]
 	then
 		id2=$(echo ${id} | sed 's/\.five_prime_UTR.*//' | sed 's/\:.*//')
 		new=$(awk -v a=${id2} '{if ($1==a) print $2}' rename.map | sed 's/$/\.five_prime_UTR/')
-		parent=$(echo ${line} | cut -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
+		parent=$(echo ${line} | cut -d ' ' -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
 		new_parent=$(awk -v a=${parent} '{if ($1==a) print $2}' rename.map)
 		echo ${line} | awk -v OFS="\t" -v a=${new} -v b=${new_parent} '{print $1,$2,$3,$4,$5,$6,$7,$8,"ID="a";Parent="b}' >> renamed.gff
 	elif [[ ${mol} == "three_prime_UTR" ]]
 	then
 		id2=$(echo ${id} | sed 's/\.three_prime_UTR.*//' | sed 's/\:.*//')
 		new=$(grep -w ${id2} rename.map  | cut -f2 | sed 's/$/\.three_prime_UTR/')
-		parent=$(echo ${line} | cut -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
+		parent=$(echo ${line} | cut -d ' ' -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
 		new_parent=$(awk -v a=${parent} '{if ($1==a) print $2}' rename.map)
 		echo ${line} | awk -v OFS="\t" -v a=${new} -v b=${new_parent} '{print $1,$2,$3,$4,$5,$6,$7,$8,"ID="a";Parent="b}' >> renamed.gff
 	fi
