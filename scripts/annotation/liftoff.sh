@@ -131,35 +131,39 @@ do
 		#Keep p,s,u,x,y
 		awk '$4=="p" || $4=="s" || $4 =="u" || $4=="x" || $4=="y"' gffcmp.tracking | \
 		cut -f5 | sed 's/q1\://' | sed 's/|.*//' > ../newgenes
+		#Get the transcript name
+		awk '$4=="p" || $4=="s" || $4 =="u" || $4=="x" || $4=="y"' gffcmp.tracking | \
+		cut -f5 | tr '|' '\t' | cut -f2 >../newtranscripts
 		cd ../
 
 		#Subset gff to keep new_genes
 		echo "Subsetting the new annotations"
-		fgrep -f newgenes liftoff/mapped.gff_polished | bedtools sort > newgenes.gff
+		cat newgenes newtranscripts | sort | uniq > newannots
+		fgrep -f newannots liftoff/mapped.gff_polished | sort | uniq | bedtools sort > newannots.gff
 	else
-		cp liftoff/mapped.gff_polished newgenes.gff
+		cp liftoff/mapped.gff_polished newannots.gff
 	fi
 
 	#Get genes with a valid ORF otherwise classify as new_pseudogenes
-	grep valid_ORFs=1 newgenes.gff | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//' > new_valid_genes
-	grep valid_ORFs=0 newgenes.gff | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//' > new_pseudogenes
+	grep valid_ORFs=1 newannots.gff | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//' > new_valid_genes
+	grep valid_ORFs=0 newannots.gff | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//' > new_pseudogenes
 	echo "$(wc -l new_valid_genes | sed s/\ new_valid_genes//) putative genes with intact ORFs found"
 	echo "$(wc -l new_pseudogenes | sed s/\ new_pseudogenes//) putative pseudogenes found"
 
 	#Subset gff of valid genes
-	fgrep -f new_valid_genes newgenes.gff > new_valid_genes.gff
+	fgrep -f new_valid_genes newannots.gff > new_valid_genes.gff
 
 	#Subset gff of new_pseudogenes
 	#Change column 3 from gene to pseudogene
 	#Add attribute pseudo_gene=TRUE
-	fgrep -f new_pseudogenes newgenes.gff | \
+	fgrep -f new_pseudogenes newannots.gff | \
 	awk -v OFS="\t" '{if ($3=="gene") print $1,$2,"pseudogene",$4,$5,$6,$7,$8,$9";putative_pseudogene=TRUE"; 
 					else print$0";putative_pseudogene=TRUE"}' > new_pseudogenes.gff
 
 	#Combine the gff files
 	if [ ! -z ${target_gff} ]
 	then
-		cat ${target_gff} newgenes.gff | bedtools sort > all_annot.gff
+		cat ${target_gff} newannots.gff | bedtools sort > all_annot.gff
 		#If it is first genome, we will combine with all the genes from the target gff
 		#Otherwise, we will use only the final valid genes from the previous round
 		if [ ${i} = ${genomes/\ */} ]
@@ -170,19 +174,21 @@ do
 		fi
 		cat ${final_pseudo} new_pseudogenes.gff | bedtools sort > all_pseudogenes.gff
 	else
-		cat newgenes.gff | bedtools sort > all_annot.gff
+		cat newannots.gff | bedtools sort > all_annot.gff
 		cat new_valid_genes.gff | bedtools sort > all_valid.gff
 		cat new_pseudogenes.gff | bedtools sort > all_pseudogenes.gff
 	fi
 
 	#Get the order of genes for renaming
 	awk '$3=="gene"' all_valid.gff | cut -f1,2,4,5,9 | sed 's/ID\=//' | sed 's/\;.*//' > valid_gene_order.tsv
+	awk '$3=="mRNA"' all_valid.gff | cut -f1,2,4,5,9 | sed 's/ID\=//' | sed 's/\;.*//' > valid_mRNA_order.tsv
 
 	#Change the target_gff
 	target_gff="$(pwd)/all_annot.gff"
 	#Set final outputs
 	final_valid="$(pwd)/all_valid.gff"
-	final_order="$(pwd)/valid_gene_order.tsv"
+	final_gene_order="$(pwd)/valid_gene_order.tsv"
+	final_mRNA_order="$(pwd)/valid_mRNA_order.tsv"
 	final_pseudo="$(pwd)/all_pseudogenes.gff"
 
 	#Change out of the directory
@@ -191,23 +197,9 @@ done
 
 #Copy the final files
 cp ${final_valid} final_valid_genes.gff
-cp ${final_order} final_valid_gene_order.tsv
+cp ${final_gene_order} final_valid_gene_order.tsv
+cp ${final_mRNA_order} final_valid_mRNA_order.tsv
 cp ${final_pseudo} final_pseudogenes.gff
-
-#Get transcripts fasta
-echo "Outputing transcripts fasta"
-gffread \
-	-g ${target_fa} \
-	-w ${genotype}-transcripts.fa \
-	final_valid_genes.gff
-
-#Get proteins fasta
-echo "Outputing proteins fasta"
-gffread \
-	-g ${target_fa} \
-	-y ${genotype}-proteins.fa \
-	-S \
-	final_valid_genes.gff
 
 echo "Done"
 
