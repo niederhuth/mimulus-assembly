@@ -90,7 +90,7 @@ do
 		then 
 			zeros="0000"
 		fi
-		name="MgL1_${chr}g${zeros}${count}"
+		name="MgL1_${chr}g${zeros}${count}.1"
 		count=$(expr ${count} + 10)
 		echo "${genes} ${name}" | tr ' ' '\t' >> ${line}_rename_transcripts.tsv
 	done
@@ -113,7 +113,7 @@ do
 	then 
 		zeros="0000"
 	fi
-	name="MgL1_${chr}g${zeros}${count}"
+	name="MgL1_${chr}g${zeros}${count}.1"
 	count=$(expr ${count} + 10)
 	echo "${genes} ${name}" | tr ' ' '\t' >> chrUN_rename_transcripts.tsv
 done
