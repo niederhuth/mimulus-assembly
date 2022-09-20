@@ -175,7 +175,7 @@ do
 	elif [[ ${mol} == "three_prime_UTR" ]]
 	then
 		id2=$(echo ${id} | sed 's/\.three_prime_UTR.*//' | sed 's/\:.*//')
-		new=$(grep -w ${id2} rename.map  | cut -f2 | sed 's/$/\.three_prime_UTR/')
+		new=$(awk -v a=${id2} '{if ($1==a) print $2}' rename.map | sed 's/$/\.three_prime_UTR/')
 		parent=$(echo ${line} | cut -d ' ' -f9 | sed 's/.*Parent\=//' | sed 's/\;.*//')
 		new_parent=$(awk -v a=${parent} '{if ($1==a) print $2}' rename.map)
 		echo ${line} | awk -v OFS="\t" -v a=${new} -v b=${new_parent} '{print $1,$2,$3,$4,$5,$6,$7,$8,"ID="a";Parent="b}' >> renamed.gff
