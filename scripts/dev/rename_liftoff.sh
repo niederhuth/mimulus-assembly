@@ -7,6 +7,8 @@
 #SBATCH --job-name rename
 #SBATCH --output=%x-%j.SLURMout
 
+species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
+genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 
 #Hack Script for renaming
 mkdir tmp
@@ -37,7 +39,7 @@ do
 		then 
 			zeros="0000"
 		fi
-		name="MgL1_${chr}g${zeros}${count}"
+		name="Mg${genotype}_${chr}g${zeros}${count}"
 		count=$(expr ${count} + 10)
 		echo "${genes} ${name}" | tr ' ' '\t' >> ${line}_rename_genes.tsv
 	done
@@ -60,7 +62,7 @@ do
 	then 
 		zeros="0000"
 	fi
-	name="MgL1_${chr}g${zeros}${count}"
+	name="Mg${genotype}_${chr}g${zeros}${count}"
 	count=$(expr ${count} + 10)
 	echo "${genes} ${name}" | tr ' ' '\t' >> chrUN_rename_genes.tsv
 done
@@ -90,7 +92,7 @@ do
 		then 
 			zeros="0000"
 		fi
-		name="MgL1_${chr}g${zeros}${count}.1"
+		name="Mg${genotype}_${chr}g${zeros}${count}.1"
 		count=$(expr ${count} + 10)
 		echo "${genes} ${name}" | tr ' ' '\t' >> ${line}_rename_transcripts.tsv
 	done
@@ -113,7 +115,7 @@ do
 	then 
 		zeros="0000"
 	fi
-	name="MgL1_${chr}g${zeros}${count}.1"
+	name="Mg${genotype}_${chr}g${zeros}${count}.1"
 	count=$(expr ${count} + 10)
 	echo "${genes} ${name}" | tr ' ' '\t' >> chrUN_rename_transcripts.tsv
 done
