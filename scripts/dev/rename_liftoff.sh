@@ -65,7 +65,7 @@ do
 	echo "${genes} ${name}" | tr ' ' '\t' >> chrUN_rename_genes.tsv
 done
 #Rename chr transcripts
-cut -f1 ../final_valid_gene_order.tsv | sort | uniq | grep "^chr" | while read line
+cut -f1 ../final_valid_mRNA_order.tsv | sort | uniq | grep "^chr" | while read line
 do
 	echo ${line}
 	count=10
@@ -75,7 +75,7 @@ do
 	else 
 		chr=$(echo ${line} | sed s/chr/0/)
 	fi
-	awk -v a=${line} -v OFS="\t" '$1==a' ../final_valid_gene_order.tsv | while read genes
+	awk -v a=${line} -v OFS="\t" '$1==a' ../final_valid_mRNA_order.tsv | while read genes
 	do
 		if [[ $(expr 6 - $(echo ${count} | wc -c)) = 1 ]]
 		then
@@ -98,7 +98,7 @@ done
 #Rename contig transcripts
 count=10
 chr="UN"
-grep -v "^chr" ../final_valid_gene_order.tsv | while read genes
+grep -v "^chr" ../final_valid_mRNA_order.tsv | while read genes
 do
 	if [[ $(expr 6 - $(echo ${count} | wc -c)) = 1 ]]
 	then
