@@ -146,17 +146,21 @@ do
 
 	#Get genes with a valid ORF otherwise classify as new_pseudogenes
 	grep valid_ORFs=1 newannots.gff | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//' > new_valid_genes
+	grep valid_ORF=True newannots.gff | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//' > new_valid_transcripts
+	cat new_valid_genes new_valid_transcripts > new_valid_annots
 	grep valid_ORFs=0 newannots.gff | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//' > new_pseudogenes
+	grep valid_ORF=False newannots.gff | cut -f9 | sed 's/\;.*//' | sed 's/ID\=//' > new_pseudogenes_transcripts
+	cat new_pseudogenes new_pseudogenes_transcripts > new_pseudogenes_annots
 	echo "$(wc -l new_valid_genes | sed s/\ new_valid_genes//) putative genes with intact ORFs found"
 	echo "$(wc -l new_pseudogenes | sed s/\ new_pseudogenes//) putative pseudogenes found"
 
 	#Subset gff of valid genes
-	fgrep -f new_valid_genes newannots.gff > new_valid_genes.gff
+	fgrep -f new_valid_annots newannots.gff | sort | uniq | bedtools sort > new_valid_genes.gff
 
 	#Subset gff of new_pseudogenes
 	#Change column 3 from gene to pseudogene
 	#Add attribute pseudo_gene=TRUE
-	fgrep -f new_pseudogenes newannots.gff | \
+	fgrep -f new_pseudogenes_annots newannots.gff | sort | uniq | bedtools sort | \
 	awk -v OFS="\t" '{if ($3=="gene") print $1,$2,"pseudogene",$4,$5,$6,$7,$8,$9";putative_pseudogene=TRUE"; 
 					else print$0";putative_pseudogene=TRUE"}' > new_pseudogenes.gff
 
