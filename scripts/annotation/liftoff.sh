@@ -160,7 +160,7 @@ do
 	#Subset gff of new_pseudogenes
 	#Change column 3 from gene to pseudogene
 	#Add attribute pseudo_gene=TRUE
-	fgrep -f new_pseudogenes_annots newannots.gff | | sort | uniq | bedtools sort \
+	fgrep -f new_pseudogenes_annots newannots.gff | sort | uniq | bedtools sort \
 	awk -v OFS="\t" '{if ($3=="gene") print $1,$2,"pseudogene",$4,$5,$6,$7,$8,$9";putative_pseudogene=TRUE"; 
 					else print$0";putative_pseudogene=TRUE"}' > new_pseudogenes.gff
 
