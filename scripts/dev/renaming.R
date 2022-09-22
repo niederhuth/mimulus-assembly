@@ -1,47 +1,47 @@
 #
-df <- read.table("final_valid_gene_order.tsv")
+df <- read.table("pseudogene_order.tsv")
 
 colnames(df) <- c("chr","source","start","stop","gene")
 
 df$up_pos <- NA
 new_count=10
 for(i in 1:nrow(df)){
-	if(df[i,]$source == "maker"){
-		maker_pos <- df[i,]$gene
-	} else if(i == 1 & df[i,]$source == "Liftoff"){
-		if(nrow(head(df[df$chr == df[i,]$chr & df$source == "maker",],1)) == 1){
-			pos_num=as.numeric(gsub(".*g","",head(df[df$chr == df[i,]$chr & df$source == "maker",],1)$gene))-10
+	if(df[i,]$source == "gene"){
+		gene_pos <- df[i,]$gene
+	} else if(i == 1 & df[i,]$source == "pseudogene"){
+		if(nrow(head(df[df$chr == df[i,]$chr & df$source == "gene",],1)) == 1){
+			pos_num=as.numeric(gsub(".*g","",head(df[df$chr == df[i,]$chr & df$source == "gene",],1)$gene))-10
 			pos_num=paste(paste(rep(0,5-nchar(pos_num)),collapse=""),pos_num,sep="")
-			df[i,]$up_pos <- maker_pos <- paste("Mg",gsub("Mg","",gsub("_.*","",head(df[df$source=="maker",]$gene,1))),
+			df[i,]$up_pos <- gene_pos <- paste("Mg",gsub("Mg","",gsub("_.*","",head(df[df$source=="gene",]$gene,1))),
 				"_",gsub("contig_.*","UN",gsub("01","1",gsub("chr","0",df[i,]$chr))),"g",pos_num,sep="")
-		} else if(nrow(head(df[df$chr == df[i,]$chr & df$source == "maker",],1)) == 0){
-			pos_num=as.numeric(gsub(".*g","",tail(df[df$source=="maker",],1)$gene))+new_count
+		} else if(nrow(head(df[df$chr == df[i,]$chr & df$source == "gene",],1)) == 0){
+			pos_num=as.numeric(gsub(".*g","",tail(df[df$source=="gene",],1)$gene))+new_count
 			pos_num=paste(paste(rep(0,5-nchar(pos_num)),collapse=""),pos_num,sep="")
-			df[i,]$up_pos <- maker_pos <- paste("Mg",gsub("Mg","",gsub("_.*","",head(df[df$source=="maker",]$gene,1))),
-				"_",gsub("contig_.*","UN",gsub("01","1",gsub("chr","0",df[i,]$chr))),"g",pos_num,sep="")
-			new_count=new_count+10
-		}
-	} else if(df[i,]$chr != df[i-1,]$chr & df[i,]$source == "Liftoff"){
-		if(nrow(head(df[df$chr == df[i,]$chr & df$source == "maker",],1)) == 1){
-			pos_num=as.numeric(gsub(".*g","",head(df[df$chr == df[i,]$chr & df$source == "maker",],1)$gene))-10
-			pos_num=paste(paste(rep(0,5-nchar(pos_num)),collapse=""),pos_num,sep="")
-			df[i,]$up_pos <- maker_pos <- paste("Mg",gsub("Mg","",gsub("_.*","",head(df[df$source=="maker",]$gene,1))),
-				"_",gsub("contig_.*","UN",gsub("01","1",gsub("chr","0",df[i,]$chr))),"g",pos_num,sep="")
-		} else if(nrow(head(df[df$chr == df[i,]$chr & df$source == "maker",],1)) == 0){
-			pos_num=as.numeric(gsub(".*g","",tail(df[df$source=="maker",],1)$gene))+new_count
-			pos_num=paste(paste(rep(0,5-nchar(pos_num)),collapse=""),pos_num,sep="")
-			df[i,]$up_pos <- maker_pos <- paste("Mg",gsub("Mg","",gsub("_.*","",head(df[df$source=="maker",]$gene,1))),
+			df[i,]$up_pos <- gene_pos <- paste("Mg",gsub("Mg","",gsub("_.*","",head(df[df$source=="gene",]$gene,1))),
 				"_",gsub("contig_.*","UN",gsub("01","1",gsub("chr","0",df[i,]$chr))),"g",pos_num,sep="")
 			new_count=new_count+10
 		}
-	} else if(df[i,]$source == "Liftoff") {
-		df[i,]$up_pos <- maker_pos
+	} else if(df[i,]$chr != df[i-1,]$chr & df[i,]$source == "pseudogene"){
+		if(nrow(head(df[df$chr == df[i,]$chr & df$source == "gene",],1)) == 1){
+			pos_num=as.numeric(gsub(".*g","",head(df[df$chr == df[i,]$chr & df$source == "gene",],1)$gene))-10
+			pos_num=paste(paste(rep(0,5-nchar(pos_num)),collapse=""),pos_num,sep="")
+			df[i,]$up_pos <- gene_pos <- paste("Mg",gsub("Mg","",gsub("_.*","",head(df[df$source=="gene",]$gene,1))),
+				"_",gsub("contig_.*","UN",gsub("01","1",gsub("chr","0",df[i,]$chr))),"g",pos_num,sep="")
+		} else if(nrow(head(df[df$chr == df[i,]$chr & df$source == "gene",],1)) == 0){
+			pos_num=as.numeric(gsub(".*g","",tail(df[df$source=="gene",],1)$gene))+new_count
+			pos_num=paste(paste(rep(0,5-nchar(pos_num)),collapse=""),pos_num,sep="")
+			df[i,]$up_pos <- gene_pos <- paste("Mg",gsub("Mg","",gsub("_.*","",head(df[df$source=="gene",]$gene,1))),
+				"_",gsub("contig_.*","UN",gsub("01","1",gsub("chr","0",df[i,]$chr))),"g",pos_num,sep="")
+			new_count=new_count+10
+		}
+	} else if(df[i,]$source == "pseudogene") {
+		df[i,]$up_pos <- gene_pos
 	}
 }
 #
 df$count <- NA
 for(i in 1:nrow(df)){
-	if(df[i,]$source == "Liftoff" ){
+	if(df[i,]$source == "pseudogene" ){
 		df[i,]$count <- nrow(subset(df, chr == df[i,]$chr & up_pos == df[i,]$up_pos))
 	}
 }
@@ -49,7 +49,7 @@ for(i in 1:nrow(df)){
 df$overlap_down_gene <- df$overlap_down <- df$overlap_up_gene <- df$overlap_up <- NA
 for(i in 1:nrow(df)){
 	if(i != 1){
-		if(df[i,]$start <= df[i-1,]$stop & df[i-1,]$source == "maker" & df[i,]$chr == df[i-1,]$chr){
+		if(df[i,]$start <= df[i-1,]$stop & df[i-1,]$source == "gene" & df[i,]$chr == df[i-1,]$chr){
 			df[i,]$overlap_up <- TRUE
 			df[i,]$overlap_up_gene <- df[i-1,]$gene
 		} else {
@@ -57,7 +57,7 @@ for(i in 1:nrow(df)){
 		}
 	}
 	if(i != nrow(df)){ 
-		if(df[i,]$stop <= df[i+1,]$start & df[i+1,]$source == "maker" & df[i,]$chr == df[i+1,]$chr){
+		if(df[i,]$stop <= df[i+1,]$start & df[i+1,]$source == "gene" & df[i,]$chr == df[i+1,]$chr){
 			df[i,]$overlap_down <- TRUE
 			df[i,]$overlap_down_gene <- df[i+1,]$gene
 		} else {
@@ -66,7 +66,7 @@ for(i in 1:nrow(df)){
 	}
 }
 #Rename genes
-df2 <- subset(df, source == "Liftoff")
+df2 <- subset(df, source == "pseudogene")
 df2$new_pos <- df2$center_gene <- df2$region_center <- NA
 df3 <- unique(df2[,c("chr","up_pos")])
 for(i in 1:nrow(df3)){
@@ -189,7 +189,7 @@ for(i in 1:nrow(df3)){
 	}
 }
 #
-write.table(df2[,c(5,14)],file="rename.map",sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE)
+write.table(df2[,c(5,14)],file="rename_pseudogene.map",sep="\t",quote=FALSE,row.names=FALSE,col.names=FALSE)
 
 
 
