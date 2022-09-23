@@ -11,8 +11,8 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-target_fa="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/L1/ref/L1-v1.fa" #target genome fasta to map gff files to, if left blank, look in current directory
-target_gff="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/L1/ref/annotations/L1-v1.gff" #gff file for target genome, only necessary if gffcompare=TRUE
+target_fa="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/IM62/ref/IM62-v2.fa" #target genome fasta to map gff files to, if left blank, look in current directory
+target_gff="/mnt/gs21/scratch/niederhu/mimulus-assembly/data/Mguttatus/IM62/ref/annotations/IM62-v2.gff" #gff file for target genome, only necessary if gffcompare=TRUE
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
