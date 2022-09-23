@@ -17,7 +17,7 @@ dependencies:
   - boost-cpp=1.74.0=h6cacc03_7
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.18.1=h7f98852_0
-  - ca-certificates=2021.10.8=ha878542_0
+  - ca-certificates=2022.9.14=ha878542_0
   - cached-property=1.5.2=hd8ed1ab_1
   - cached_property=1.5.2=pyha770c72_1
   - cdbtools=0.99=hd03093a_7
@@ -87,7 +87,7 @@ dependencies:
   - perl-acme-damn=0.08=pl5321h9f5acd7_5
   - perl-algorithm-diff=1.1903=pl5321hdfd78af_3
   - perl-apache-test=1.43=pl5321hdfd78af_0
-  - perl-app-cpanminus=1.7045=pl5321hd8ed1ab_0
+  - perl-app-cpanminus=1.7046=pl5321hd8ed1ab_0
   - perl-archive-tar=2.40=pl5321hdfd78af_0
   - perl-attribute-handlers=0.96=pl5321hdfd78af_3
   - perl-base=2.23=pl5321hdfd78af_2
@@ -207,6 +207,8 @@ dependencies:
   - perl-role-tiny=2.002004=pl5321hdfd78af_0
   - perl-scalar-list-utils=1.61=pl5321hec16e2b_1
   - perl-socket=2.027=pl5321hec16e2b_3
+  - perl-sort-key=1.33=pl5321hec16e2b_3
+  - perl-sort-naturally=1.03=pl5321hdfd78af_3
   - perl-storable=3.15=pl5321hec16e2b_3
   - perl-sub-exporter=0.988=pl5321hdfd78af_0
   - perl-sub-exporter-progressive=0.001013=pl5321hdfd78af_1
