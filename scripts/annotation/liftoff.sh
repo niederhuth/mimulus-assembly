@@ -83,7 +83,8 @@ do
 	mkdir ${i}
 	cd ${i}
 	fa_ver=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
-	gff_ver=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/annotations/${i/*_/}-v*.gff | head -1 | sed s/.*\-v// | sed s/\.gff//)
+	gff_ver=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/annotations/${i/*_/}-v*.gff | \
+		head -1 | sed s/.*\-v// | sed s/\.gff//)
 	ref_fa=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v${fa_ver}.fa)
 	ref_gff=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/annotations/${i/*_/}-v${gff_ver}.gff)
 	chroms="${path1}/annotation/${i}_${species}_${genotype}_chr_mapping.csv"
