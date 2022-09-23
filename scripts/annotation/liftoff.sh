@@ -82,9 +82,10 @@ for i in ${genomes}
 do
 	mkdir ${i}
 	cd ${i}
-	version=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
-	ref_fa=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v${version}.fa)
-	ref_gff=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/annotations/${i/*_/}-v${version}.gff)
+	fa_ver=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
+	gff_ver=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/annotations/${i/*_/}-v*.gff | \sed s/.*\-v// | sed s/\.fa//)
+	ref_fa=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/${i/*_/}-v${fa_ver}.fa)
+	ref_gff=$(ls ${path2}/${i/_*/}/${i/*_/}/ref/annotations/${i/*_/}-v${gff_ver}.gff)
 	chroms="${path1}/annotation/${i}_${species}_${genotype}_chr_mapping.csv"
 	ignore_transcripts="${path1}/annotation/${i}_ignore_transcripts.txt"
 
