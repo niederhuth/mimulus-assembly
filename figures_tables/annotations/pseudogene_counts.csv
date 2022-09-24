@@ -1,4 +1,4 @@
-Genome,Total,Total_No_TE,L1,S1
-L1,3026,2975,,1355
-S1,3110,3052,1448,
-IM62,3108,2755,,
+Genome,Total,Total_No_TE,L1,S1,S1_unique,S1_L1_IM62_Shared,S1_L1_unique,S1_L1_unique,IM62_unique,IM62_L1_S1_shared,IM62_L1_unique,IM62_S1_unique
+L1,3026,2975,0,1355,,,,,1671,1067,604,0
+S1,3110,3052,1448,0,,,,,1662,1067,0,595
+IM62,3108,2755,,,1027,,,,0,0,0,0
