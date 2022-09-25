@@ -54,7 +54,7 @@ genomes=$(awk -v FS="," \
 if [ ${start_from} = "f" ]
 then
 	echo "Copying sequence files"
-	if [[ ! -d seqs ]]
+	if [[ -d ${datatype} ]]
 	then
 		mkdir ${datatype}
 	fi
