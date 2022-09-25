@@ -12,14 +12,17 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=100 #sequence search threads
-threads2=10 #analysis threads
+threads2=20 #analysis threads
 inflation=1.3 #Inflation parameter, default 1.5
 seq_search_program=diamond #blast/diamond/diamond_ultra_sens/blast_gz/mmseqs/blast_nucl sequence search program 
 msa=TRUE #TRUE/FALSE use multiple sequence alignment
 msa_program=mafft #mafft/muscle
 tree_program=fasttree #fasttree/raxml/raxml-ng/iqtree only applies if msa=TRUE
 tree= #path to a user provided tree, if left blank, orthofinder will generate its own
+split_HOGs=TRUE #TRUE/FALSE Split paralogous orthogroups: -y argument in orthofinder
 is_DNA=FALSE #TRUE/FALSE, sequences are DNA
+start_from=f #f/b/fg/ft : f=full pipeline, b=from previous blast, fg=from previous orthogroup, ft=from previous gene tree  
+previous_results=
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -48,20 +51,23 @@ genomes=$(awk -v FS="," \
 	${path1}/samples.csv)
 
 #Copy over input sequences
-echo "Copying sequence files"
-if [[ ! -d seqs ]]
+if [ ${start_from} = "f" ]
 then
-	mkdir ${datatype}
+	echo "Copying sequence files"
+	if [[ ! -d seqs ]]
+	then
+		mkdir ${datatype}
+	fi
+	for i in ${genomes}
+	do
+		#Find input sequences
+		species2=$(echo ${i} | sed s/_.*//)
+		genotype2=$(echo ${i} | sed s/${species2}_//)
+		path4="${path2}/${species2}/${genotype2}/ref/annotations"
+		version=$(ls ${path4}/${genotype2}-v*-${datatype}.fa | sed s/.*\-v// | sed s/\-${datatype}.fa//)
+		cp ${path4}/${genotype2}-v${version}-${datatype}.fa ${datatype}/${species2}_${genotype2}.fa
+	done
 fi
-for i in ${genomes}
-do
-	#Find input sequences
-	species2=$(echo ${i} | sed s/_.*//)
-	genotype2=$(echo ${i} | sed s/${species2}_//)
-	path4="${path2}/${species2}/${genotype2}/ref/annotations"
-	version=$(ls ${path4}/${genotype2}-v*-${datatype}.fa | sed s/.*\-v// | sed s/\-${datatype}.fa//)
-	cp ${path4}/${genotype2}-v${version}-${datatype}.fa ${datatype}/${species2}_${genotype2}.fa
-done
 
 #Set msa options
 if [ ${msa} = TRUE ]
@@ -79,10 +85,29 @@ then
 	echo "User provided rooted tree supplied"
 	settings="${settings} -s ${tree}"
 fi
+#Split HOGs
+if [ ${split_HOGs} = TRUE ]
+then
+	settings="${settings} -y"
+fi
 #Are sequences DNA?
 if [ ${is_DNA} = TRUE ]
 then
 	settings="${settings} -d"
+fi
+#Set starting point
+if [ ${start_from} = "f" ]
+then
+	settings="${settings} -f ${datatype} -o ${path3}"
+elif [ ${start_from} = "b" ]
+then
+	settings="${settings} -b ${previous_results}"	
+elif [ ${start_from} = "fg" ]
+then
+	settings="${settings} -fg ${previous_results}"
+elif [ ${start_from} = "ft" ]
+then
+	settings="${settings} -ft ${previous_results}"
 fi
 
 #Run Orthofinder
@@ -90,12 +115,9 @@ echo "Running OrthoFinder"
 orthofinder \
 	-t ${threads} \
 	-a ${threads2} \
-	${settings} \
 	-S ${seq_search_program} \
 	-I ${inflation}\
-	-y \
-	-o ${path3} \
-	-f ${datatype}/
+	${settings} 	
 
 echo "Done"
 
