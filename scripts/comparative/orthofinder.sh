@@ -55,7 +55,7 @@ echo "Genomes: ${genomes}"
 if [ ${start_from} = "f" ]
 then
 	echo "Copying sequence files"
-	if [[ -d ${datatype} ]]
+	if [[ ! -d ${datatype} ]]
 	then
 		mkdir ${datatype}
 	fi
