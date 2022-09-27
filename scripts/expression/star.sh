@@ -22,8 +22,8 @@ export LD_LIBRARY_PATH="${conda}/envs/expression/lib:${LD_LIBRARY_PATH}"
 #Other variables, these should not have to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
-genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
+genotype=$(pwd | sed s/.*data\\/${species}\\/// | sed s/\\/.*//)
+sample=$(pwd | sed s/.*data\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition=""
 datatype="rna"
 
