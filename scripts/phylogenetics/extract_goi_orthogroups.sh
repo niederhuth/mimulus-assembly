@@ -87,11 +87,11 @@ do
 		#Get species name
 		a=$(echo ${line} | cut -d ' ' -f2 | sed s/\.fa//)
 		#Get the genes for that species
-		genes=$(cut -f ${column} tmp | sed 's/\ //g' | tr ',' '\n')
+		genes=$(cut -f ${column} tmp | sed 's/\ //g')
 		proteins=${genes}
 		if [ ${trim_p} = TRUE ]
 		then
-			genes=$(echo ${genes} | tr ',' '\n' | sed s/\.p$// | tr '\n' ',')
+			genes=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | sed s/\.p$// | tr '\n' ',')
 		fi
 		#Count the genes for that species
 		count=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | wc -l)
