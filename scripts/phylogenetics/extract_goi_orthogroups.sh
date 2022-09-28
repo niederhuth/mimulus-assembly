@@ -91,7 +91,7 @@ do
 		proteins=${genes}
 		if [ ${trim_p} = TRUE ]
 		then
-			genes=$(echo ${genes} | tr ' ' '\n' | sed s/\.p$//)
+			genes=$(echo ${genes} | tr ',' '\n' | sed s/\.p$// | tr '\n' ',')
 		fi
 		#Count the genes for that species
 		count=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | wc -l)
