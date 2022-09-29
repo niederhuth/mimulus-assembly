@@ -26,7 +26,7 @@ if [ -z ${orthofinder_dir} ]
 then
 	orthofinder_dir="orthofinder/$(ls orthofinder)"
 	echo "Previous orthofinder results found: ${orthofinder_dir}"
-	cd ${orthogroup_dir}
+	cd ${orthofinder_dir}
 else
 	cd ${orthofinder_dir}
 	echo "Previous orthofinder results found: ${orthofinder_dir}"
