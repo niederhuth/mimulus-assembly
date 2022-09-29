@@ -65,6 +65,8 @@ query_seqs="${path2}/${species}/${genotype}/ref/annotations/${genotype}-v${versi
 #Run diamond
 for i in ${genomes}
 do
+	mkdir ${i}
+	cd ${i}
 	#Find target sequences
 	path4="${path2}/${i/_*/}/${i/*_/}"
 	version2=$(ls ${path4}/ref/annotations/${i/*_/}-v*-${datatype}.fa | \
@@ -115,5 +117,6 @@ do
 				echo ${line} | tr ' ' '\t' >> ${query}-${i}_orthogroup_filtered.m8
 			fi
 	fi
+	cd ../
 done
 
