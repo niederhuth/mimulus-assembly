@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
-protein_fasta="../../final/contigs/annotations/*-proteins.fa"
+protein_fasta="../../final/pseudomolecule/annotations/v1.2/*-v1.2-proteins.fa"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
