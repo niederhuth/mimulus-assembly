@@ -45,17 +45,19 @@ head -1 ${orthogroups}/N0.tsv | cut -f1,4- > ${orthogroups}/HOG_counts.tsv
 sed '1d' ${orthogroups}/N0.tsv | while read line 
 do
 	og=$(echo ${line} | cut -d ' ' -f1)
+	grep ${og} ${orthogroups}/N0.tsv > tmp
 	column=4
 	#Loop over each species
 	until [[ ${column} -gt ${col_num} ]]
 	do
 		#Count the genes for that species
-		count=$(echo ${line} | sed s/\,\ //g | cut -d ' ' -f ${column} | tr ',' '\n' | sed '/^$/d' | wc -l)
+		count=$(cut  -f ${column} tmp | tr ',' '\n' | sed '/^$/d' | wc -l)
 		og="${og} ${count}" 
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
 	done
 	echo ${og} | tr ' ' '\t' >> ${orthogroups}/HOG_counts.tsv
+	rm tmp
 done	
 
 echo "Done"
