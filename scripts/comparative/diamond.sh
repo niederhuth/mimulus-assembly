@@ -112,7 +112,7 @@ do
 		do
 			a=$(echo ${line} | cut -d ' ' -f1)
 			b=$(echo ${line} | cut -d ' ' -f2)
-			if [ $(grep ${a} {orthogroups} | cut -f2) = $(grep ${b} {orthogroups} | cut -f2) ]
+			if [ $(grep ${a} ${orthogroups} | cut -f2) = $(grep ${b} ${orthogroups} | cut -f2) ]
 			then
 				echo ${line} | tr ' ' '\t' >> ${query}-${i}_orthogroup_filtered.m8
 			fi
