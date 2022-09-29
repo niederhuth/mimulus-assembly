@@ -105,7 +105,7 @@ do
 			--evalue ${evalue} \
 			--max-target-seqs ${max_target_seqs}
 	fi
-	if [ -z ${orthogroups} ]
+	if [[ ! -z ${orthogroups} ]]
 	then
 		echo "Filtering results for othogroups"
 		cat ${query}-${i}.m8 | while read line
