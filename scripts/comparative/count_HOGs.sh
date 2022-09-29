@@ -50,7 +50,7 @@ do
 	until [[ ${column} -gt ${col_num} ]]
 	do
 		#Count the genes for that species
-		count=$(cut -f ${column} tmp | sed 's/\ //g' | sed '/^$/d' | wc -l)
+		count=$(echo ${line} | cut -d ' ' -f ${column} | sed 's/\ //g' | sed '/^$/d' | wc -l)
 		og="${og} ${count}" 
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
