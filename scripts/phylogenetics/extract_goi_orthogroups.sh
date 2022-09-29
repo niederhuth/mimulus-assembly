@@ -82,10 +82,10 @@ do
 	#First species starts on column 4
 	column=4
 	#Loop over each species
-	cat ${speciesIDs} | while read line
+	cat ${speciesIDs} | while read line2
 	do
 		#Get species name
-		a=$(echo ${line} | cut -d ' ' -f2 | sed s/\.fa//)
+		a=$(echo ${line2} | cut -d ' ' -f2 | sed s/\.fa//)
 		#Get the genes for that species
 		genes=$(cut -f ${column} tmp | sed 's/\ //g' | sed s/\,$//)
 		proteins=${genes}
