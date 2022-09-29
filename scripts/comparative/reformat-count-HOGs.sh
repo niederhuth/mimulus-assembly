@@ -51,6 +51,7 @@ cut -f1,4- ${orthogroups} | sed s/\,\ /\;/g | tr '\t' ',' | tr ';' ' ' > orthogr
 sed '1d' ${orthogroups} | while read line 
 do
 	og=$(echo ${line} | cut -d ' ' -f1)
+	og_counts=${og}
 	grep ${og} ${orthogroups} > tmp
 	column=4
 	#Loop over each species
@@ -70,7 +71,7 @@ do
 		done
 		#Count the genes for that species
 		count=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | wc -l)
-		og="${og} ${count}" 
+		og_counts="${og_counts} ${count}" 
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
 	done
