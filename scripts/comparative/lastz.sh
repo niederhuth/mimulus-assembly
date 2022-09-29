@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=400GB
-#SBATCH --job-name nucmer
+#SBATCH --job-name lastz
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -29,7 +29,7 @@ sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="genome_alignment"
 datatype="genome"
 path2=$(pwd | sed s/data.*/data/)
-path3="laastz"
+path3="lastz"
 
 #Check and look for ref genome
 if [ -z ${ref} ]
@@ -118,7 +118,7 @@ do
 			--strand=both \
 			--inner=1000 \
 			--format=maf \
-			--output=${query}}_${ref}_lastz
+			--output=${query}_${ref}_lastz
 	else
 		echo "by_seq must be TRUE or FALSE"
 	fi
