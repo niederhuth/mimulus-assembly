@@ -62,7 +62,7 @@ do
 		#Trim off the ".p" found at end of some protein sequences
 		if [ ${trim_p} = TRUE ]
 		then
-			genes=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | sed s/\.p$// | tr '\n' ' ')
+			genes=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | sed s/\.p$// | tr '\n' ',')
 		fi
 		#Output each gene and its orthogroup
 		for i in $(echo ${genes} | tr ',' '\n' | sed '/^$/d')
