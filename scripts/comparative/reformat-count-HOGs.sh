@@ -76,7 +76,7 @@ do
 		column=$(expr ${column} + 1)
 	done
 	#Output gene counts in each species for each orthogroup
-	echo ${og} | tr ' ' '\t' >> orthogroup_counts.tsv
+	echo ${og_counts} | tr ' ' '\t' >> orthogroup_counts.tsv
 	rm tmp
 done	
 
