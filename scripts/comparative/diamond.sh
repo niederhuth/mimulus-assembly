@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-datatype="proteins-primary" #Query seqs: protein (all), protein-primary (primary transcript)
+datatype="proteins-primary" #Query seqs: proteins (all), proteins-primary (primary transcript)
 genomes= #List targets as SPECIES_GENOTYPE, e.g. Mguttatus_S1; if left blank, will search in samples.csv
 threads=50 #Number of threads to use
 evalue=0.00001 #e-value cutoff
