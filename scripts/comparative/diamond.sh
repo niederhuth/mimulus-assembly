@@ -116,6 +116,7 @@ do
 			then
 				echo ${line} | tr ' ' '\t' >> ${query}-${i}_orthogroup_filtered.m8
 			fi
+		done
 	fi
 	cd ../
 done
