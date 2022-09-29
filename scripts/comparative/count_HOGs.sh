@@ -24,7 +24,7 @@ export LD_LIBRARY_PATH="${conda}/envs/phylo/lib:$LD_LIBRARY_PATH"
 #Find orthofinder_dir and cd to it
 if [ -z ${orthofinder_dir} ]
 then
-	orthofinder_dir=$(ls orthofinder/Results_*)
+	orthofinder_dir=$(ls orthofinder)
 	echo "Previous orthofinder results found: ${orthofinder_dir}"
 	cd ${orthogroup_dir}
 else
@@ -33,19 +33,16 @@ else
 fi
 
 #Set path to the SpeciesID.txt file
-if [ -z ${speciesIDs} ]
-then
-	speciesIDs=$(ls WorkingDirectory/SpeciesIDs.txt)
-	col_num=$(cat ${speciesIDs} | wc -l)
-fi
-#Set path to N0.tsv orthofinder output
-if [ -z ${orthogroups} ]
-then
-	orthogroups=$(ls Phylogenetic_Hierarchical_Orthogroups/N0.tsv)
-fi
+speciesIDs="WorkingDirectory/SpeciesIDs.txt"
+#Count number of species
+col_num=$(cat ${speciesIDs} | wc -l)
+#Set path to Phylogenetic_Hierarchical_Orthogroups
+orthogroups="Phylogenetic_Hierarchical_Orthogroups"
+#Create the output file with header line
+head -1 ${orthogroups}/N0.tsv | cut -f1,4- >> ${orthogroups}/HOG_counts.tsv
 
 #Loop over each HOG and get the relevant data
-while read line 
+sed '1d' ${orthogroups}/N0.tsv | while read line 
 do
 	og=$(echo ${line} | cut -d ' ' -f1)
 	column=4
@@ -58,7 +55,7 @@ do
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
 	done
-	echo ${og} | tr ' ' '\t' >> HOG_counts.tsv
+	echo ${og} | tr ' ' '\t' >> ${orthogroups}/HOG_counts.tsv
 done	
 
 echo "Done"
