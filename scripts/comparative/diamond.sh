@@ -16,7 +16,8 @@ genomes= #List targets as SPECIES_GENOTYPE, e.g. Mguttatus_S1; if left blank, wi
 threads=50 #Number of threads to use
 evalue=0.00001 #e-value cutoff
 max_target_seqs=5 #max number of hits to retain
-options="--unal 0 --iterate" #additional diamond options
+options="--unal 0 --more-sensitive" #additional diamond options
+orthogroup_filter= #Path to transcript_orthogroup.tsv file, if blank will not run this step
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -101,6 +102,10 @@ do
 			--un ${query}-${i}-un.fa \
 			--evalue ${evalue} \
 			--max-target-seqs ${max_target_seqs}
+	fi
+	if [ -z ${orthogroup_filter} ]
+	then
+		echo "Filtering results for othogroups"
 	fi
 done
 
