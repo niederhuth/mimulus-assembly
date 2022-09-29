@@ -54,14 +54,14 @@ do
 	grep ${og} ${orthogroups}/N0.tsv > tmp
 	column=4
 	#Loop over each species
-	until [[ ${column} -gt ${col_num} ]]
+	until [[ ${column} -gt $(expr ${col_num} + 4) ]]
 	do
 		#Get the genes for that species
 		genes=$(cut -f ${column} tmp | sed 's/\ //g' | sed s/\,$//)
 		#Trim off the ".p" found at end of some protein sequences
 		if [ ${trim_p} = TRUE ]
 		then
-			genes=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | sed s/\.p$//)
+			genes=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | sed s/\.p$// | tr '\n' ' ')
 		fi
 		#Output each gene and its orthogroup
 		for i in $(echo ${genes} | tr ',' '\n' | sed '/^$/d')
