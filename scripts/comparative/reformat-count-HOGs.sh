@@ -51,7 +51,7 @@ cut -f1,4- ${orthogroups} | sed s/\,\ /\;/g | tr '\t' ',' | tr ';' ' ' > orthogr
 sed '1d' ${orthogroups} | while read line 
 do
 	og=$(echo ${line} | cut -d ' ' -f1)
-	grep ${og} ${orthogroups}/N0.tsv > tmp
+	grep ${og} ${orthogroups} > tmp
 	column=4
 	#Loop over each species
 	until [[ ${column} -gt $(expr ${col_num} + 4) ]]
