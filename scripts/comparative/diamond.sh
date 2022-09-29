@@ -1,5 +1,5 @@
 #!/bin/bash --login
-#SBATCH --time=96:00:00
+#SBATCH --time=128:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=50
@@ -17,7 +17,7 @@ threads=50 #Number of threads to use
 evalue=0.00001 #e-value cutoff
 max_target_seqs=5 #max number of hits to retain
 options="--unal 0 --more-sensitive" #additional diamond options
-orthogroup_filter= #Path to transcript_orthogroup.tsv file, if blank will not run this step
+orthogroups="$(pwd | sed s/data.*/data/)/comparative/orthofinder/transcript_orthogroup.tsv" #Path to transcript_orthogroup.tsv file, if blank will not run this step
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -103,9 +103,17 @@ do
 			--evalue ${evalue} \
 			--max-target-seqs ${max_target_seqs}
 	fi
-	if [ -z ${orthogroup_filter} ]
+	if [ -z ${orthogroups} ]
 	then
 		echo "Filtering results for othogroups"
+		cat ${query}-${i}.m8 | while read line
+		do
+			a=$(echo ${line} | cut -d ' ' -f1)
+			b=$(echo ${line} | cut -d ' ' -f2)
+			if [ $(grep ${a} {orthogroups} | cut -f2) = $(grep ${b} {orthogroups} | cut -f2) ]
+			then
+				echo ${line} | tr ' ' '\t' >> ${query}-${i}_orthogroup_filtered.m8
+			fi
 	fi
 done
 
