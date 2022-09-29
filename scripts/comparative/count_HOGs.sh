@@ -39,7 +39,7 @@ col_num=$(cat ${speciesIDs} | wc -l)
 #Set path to Phylogenetic_Hierarchical_Orthogroups
 orthogroups="Phylogenetic_Hierarchical_Orthogroups"
 #Create the output file with header line
-head -1 ${orthogroups}/N0.tsv | cut -f1,4- >> ${orthogroups}/HOG_counts.tsv
+head -1 ${orthogroups}/N0.tsv | cut -f1,4- > ${orthogroups}/HOG_counts.tsv
 
 #Loop over each HOG and get the relevant data
 sed '1d' ${orthogroups}/N0.tsv | while read line 
