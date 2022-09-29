@@ -89,6 +89,7 @@ do
 		#Get the genes for that species
 		genes=$(cut -f ${column} tmp | sed 's/\ //g' | sed s/\,$//)
 		proteins=${genes}
+		#Trim off the ".p" found at end of some protein sequences
 		if [ ${trim_p} = TRUE ]
 		then
 			genes=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | sed s/\.p$// | tr '\n' ',' | sed s/\,$//)
