@@ -57,7 +57,7 @@ fi
 
 #Get query sequences
 query="${species}_${genotype}"
-version=$(ls ${path2}/${species}/${genotype}/ref/${genotype}-v*-${datatype}.fa | \
+version=$(ls ${path2}/${species}/${genotype}/ref/annotations/${genotype}-v*-${datatype}.fa | \
 	sed s/.*\-v// | sed s/\-${datatype}.fa//)
 query_seqs="${path2}/${species}/${genotype}/ref/annotations/${genotype}-v${version}-${datatype}.fa"
 
