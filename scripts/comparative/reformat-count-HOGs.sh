@@ -38,7 +38,7 @@ speciesIDs=$(ls */WorkingDirectory/SpeciesIDs.txt)
 #Count number of species
 col_num=$(cat ${speciesIDs} | wc -l)
 #Set path to Phylogenetic_Hierarchical_Orthogroups
-orthogroups=$(ls */WorkingDirectory/Phylogenetic_Hierarchical_Orthogroups/N0.tsv)
+orthogroups=$(ls */Phylogenetic_Hierarchical_Orthogroups/N0.tsv)
 #Create the output files with header line
 head -1 ${orthogroups} | cut -f1,4- > orthogroup_counts.tsv
 echo "Transcript Orthogroup" | tr ' ' '\t' > transcript_orthogroup.tsv
