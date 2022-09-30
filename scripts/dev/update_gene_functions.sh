@@ -14,8 +14,8 @@ conda="${HOME}/miniconda3"
 threads=50
 old_version="1"
 new_version="1.2"
-old_proteins="../../final/pseudomolecule/annotations/${old_version}/*protiens.fa"
-new_proteins="../../final/pseudomolecule/annotations/${new_version}/*protiens.fa"
+old_proteins="../../final/pseudomolecule/annotations/${old_version}/*proteins.fa"
+new_proteins="../../final/pseudomolecule/annotations/${new_version}/*proteins.fa"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -36,8 +36,6 @@ genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
 output="${genotype}-v${new_version}"
 path3="update_gene_functions"
-
-
 
 #Make & cd to directory
 if [ -d ${path3} ]
