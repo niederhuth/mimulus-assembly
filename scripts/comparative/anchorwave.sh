@@ -129,19 +129,19 @@ do
 	#Set genoAli settings
 	if [[ ${inversions} = TRUE && ${vcf} = FALSE ]]
 	then
-		echo "Running genoAli with -IV (invrsion calling) option"
-		settings="-t ${threads} -IV"
+		echo "Running genoAli with -IV (inversion calling) option"
+		genoAli_settings="-t ${threads} -IV"
 	elif [[ ${inversions} = FALSE && ${vcf} = TRUE ]]
 	then
 		echo "Running genoAli with -v (vcf) option"
-		settings="-t ${threads} -v ${i}.vcf"
+		genoAli_settings="-t ${threads} -v ${i}.vcf"
 	elif [[ ${inversions} = TRUE && ${vcf} = TRUE ]]
 	then
 		echo "Error, inversions & vcf cannot both be set to true"
 		echo "Running genoAli without either option"
-		settings="-t ${threads}"
+		genoAli_settings="-t ${threads}"
 	else
-		settings="-t ${threads}"
+		genoAli_settings="-t ${threads}"
 	fi
 	#Run Genome Alignment
 	if [[ ${mode} = "genoAli" || ${mode} = "both" ]]
@@ -150,7 +150,7 @@ do
 		#Run genoAli
 		echo "Aligning ${i} to ${species}_${genotype} with genoAli"
 		anchorwave genoAli \
-			${settings} \
+			${genoAli_settings} \
 			-i ${ref_gff} \
 			-r ${ref_fasta} \
 			-as cds.fa \
