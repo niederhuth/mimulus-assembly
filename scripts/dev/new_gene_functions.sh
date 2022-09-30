@@ -49,7 +49,7 @@ cp ../../final/pseudomolecule/annotations/v1/${genotype}-v1-proteins.fa ./
 cp ../../final/pseudomolecule/annotations/v1.2/${genotype}-v1.2-proteins.fa ./
 
 #map new ids onto the v1 roteins
-map_fasta_ids ../liftoff/rename.map ${genotype}-v1-proteins.fa
+${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map ${genotype}-v1-proteins.fa
 
 #
 grep \> ${genotype}-v1-proteins.fa | sed s/\>// > old_proteins
@@ -80,6 +80,10 @@ echo "Downloading Arabidopsis GO terms"
 wget -q https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/gene_association.tair.gz
 gunzip gene_association.tair.gz
 
+#Create header for output file
+echo "Transcript Locus Arabidopsis_blast_hit Arabidopsis_GO_terms PFAM_hits PFAM_GO_terms Short_functional_description" | \
+tr ' ' '\t' > ${output}-functional-annotations.tsv
+#Loop over each gene and format data
 cat new_proteins | while read line
 do
 	#Handle the Arabidopsis BLAST
@@ -87,9 +91,11 @@ do
 	if [[ ! -z ${AtID} ]]
 	then
 		#Get the Arabidopsis Description
-		AtDesc="Arabidopsis BLAST: $(grep ${AtID} TAIR10_short_functional_descriptions.txt)"
+		AtDesc=$(echo "Arabidopsis BLAST: $(grep ${AtID} TAIR10_short_functional_descriptions.txt)" | \
+			tr ' ' ';')
 		#Get Arabidopsis GO terms
-		AtGO=$(grep ${AtID} gene_association.tair | cut -f5 | tr '|' '\n' | sort | uniq | tr '\n' '|' | sed s/\|$//)
+		AtGO=$(grep ${AtID} gene_association.tair | cut -f5 | tr '|' '\n' | sort | uniq | tr '\n' '|' | \
+			sed s/\|$//)
 	else
 		AtID=NA
 		AtDesc=NA
@@ -103,7 +109,7 @@ do
 		#List the PfamIDs
 		PfamID=$(cut -f5 tmp | sort | uniq | tr '\n' '|' | sed s/\|$//)
 		#Get the Pfam Descriptions
-		PfamDesc="PFAM: $(cut -f6 | tr '\n' ',')"
+		PfamDesc=$("PFAM: $(cut -f6 | tr '\n' ',')" | tr ' ' ';')
 		if [ -z ${PfamDesc} ]
 		then
 			PfamDesc=NA
@@ -136,7 +142,7 @@ do
 	fi
 	#Output the results
 	echo "${line} ${line/\.*/} ${AtID} ${AtGO} ${PfamID} ${PfamGO} ${FuncDesc}" | \
-	tr ' ' '\t' | tr ';' ' ' >> functional-annotations.tsv
+	tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
 	#Remove tmp file
 	rm tmp
 done
