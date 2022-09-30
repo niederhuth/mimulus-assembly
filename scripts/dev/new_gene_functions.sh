@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-theads=50
+threads=50
 genotype="S1"
 output="S1-v1.2"
 blast="../../../comparative/diamond_blastp/Athaliana_Athaliana/Mguttatus_S1-Athaliana_Athaliana_orthogroup_filtered.m8"
@@ -58,7 +58,7 @@ grep \> ${genotype}-v1.2-proteins.fa | sed s/\>// > new_proteins
 #Run interproscan
 echo "Running interproscan"
 ${path2}/annotation/interproscan/interproscan.sh \
-	-cpu ${threads} \
+	--cpu ${threads} \
 	-appl pfam \
 	-goterms \
 	-pa \
@@ -66,7 +66,7 @@ ${path2}/annotation/interproscan/interproscan.sh \
 	-iprlookup \
 	-t p \
 	-f TSV \
-	-i new.fa \
+	-i ${genotype}-proteins.fa \
 	-o ${output}.iprscan
 
 #Download and format Arabidopsis TAIR10 functional descriptions
