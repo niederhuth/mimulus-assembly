@@ -12,8 +12,8 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
-old_version="v1"
-new_version="v1.2"
+old_version="1"
+new_version="1.2"
 old_proteins="../../final/pseudomolecule/annotations/${old_version}/*protiens.fa"
 new_proteins="../../final/pseudomolecule/annotations/${new_version}/*protiens.fa"
 
@@ -34,7 +34,10 @@ path2=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
+output="${genotype}-v${new_version}"
 path3="update_gene_functions"
+
+
 
 #Make & cd to directory
 if [ -d ${path3} ]
@@ -53,11 +56,11 @@ cp ${old_proteins} ./
 cp ${new_proteins} ./
 
 #map new ids onto the v1 roteins
-${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map ${genotype}-${old_version}-proteins.fa
+${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map ${genotype}-v${old_version}-proteins.fa
 
 #Get gene names for old and new proteins
-grep \> ${genotype}-${old_version}-proteins.fa | sed s/\>// > old_proteins
-grep \> ${genotype}-${new_version}-proteins.fa | sed s/\>// > new_proteins 
+grep \> ${genotype}-v${old_version}-proteins.fa | sed s/\>// > old_proteins
+grep \> ${genotype}-v${new_version}-proteins.fa | sed s/\>// > new_proteins 
 
 #Run interproscan
 echo "Running interproscan"
