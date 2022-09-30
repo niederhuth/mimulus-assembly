@@ -18,6 +18,8 @@ threads=10
 ref_coverage=1 #For proali use only, set max coverage for reference genome
 query_coverage=1 #For proali use only, set max coverage for query genome
 seqs="chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14"
+inversions=TRUE #TRUE/FALSE, genoAli use only, call inversions, conflicts with vcf output
+vcf=FALSE #TRUE/FALSE, genoAli use only, output vcf file, conflicts with inversion calling
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -124,6 +126,23 @@ do
 		-p 0.4 \
 		-N 20 \
 		${query_fasta} cds.fa > ${i}.sam
+	#Set genoAli settings
+	if [[ ${inversions} = TRUE && ${vcf} = FALSE ]]
+	then
+		echo "Running genoAli with -IV (invrsion calling) option"
+		settings="-t ${threads} -IV"
+	elif [[ ${inversions} = FALSE && ${vcf} = TRUE ]]
+	then
+		echo "Running genoAli with -v (vcf) option"
+		settings="-t ${threads} -v ${i}.vcf"
+	elif [[ ${inversions} = TRUE && ${vcf} = TRUE ]]
+	then
+		echo "Error, inversions & vcf cannot both be set to true"
+		echo "Running genoAli without either option"
+		settings="-t ${threads}"
+	else
+		settings="-t ${threads}"
+	fi
 	#Run Genome Alignment
 	if [[ ${mode} = "genoAli" || ${mode} = "both" ]]
 	then
@@ -131,8 +150,7 @@ do
 		#Run genoAli
 		echo "Aligning ${i} to ${species}_${genotype} with genoAli"
 		anchorwave genoAli \
-			-t ${threads} \
-			-IV \
+			${settings} \
 			-i ${ref_gff} \
 			-r ${ref_fasta} \
 			-as cds.fa \
