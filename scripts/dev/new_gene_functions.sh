@@ -49,7 +49,7 @@ cp ../../final/pseudomolecule/annotations/v1/${genotype}-v1-proteins.fa ./
 cp ../../final/pseudomolecule/annotations/v1.2/${genotype}-v1.2-proteins.fa ./
 
 #map new ids onto the v1 roteins
-map_fasta_ids ../../liftoff/rename.map ${genotype}-v1-proteins.fa
+map_fasta_ids ../liftoff/rename.map ${genotype}-v1-proteins.fa
 
 #
 grep \> ${genotype}-v1-proteins.fa | sed s/\>// > old_proteins
@@ -93,8 +93,6 @@ TAIR10_functional_descriptions > TAIR10_short_functional_descriptions.txt
 echo "Downloading Arabidopsis GO terms"
 wget -q https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_Ontology_Annotations/gene_association.tair.gz
 gunzip gene_association.tair.gz
-
-blast="../../../../comparative/diamond_blastp/Athaliana_Athaliana/Mguttatus_S1-Athaliana_Athaliana_orthogroup_filtered.m8"
 
 cat new_proteins | while read line
 do
