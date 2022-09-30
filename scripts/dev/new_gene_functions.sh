@@ -12,6 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
+genotype="S1"
 output="S1-v1.2"
 blast="../../../comparative/diamond_blastp/Athaliana_Athaliana/Mguttatus_S1-Athaliana_Athaliana_orthogroup_filtered.m8"
 
@@ -80,7 +81,7 @@ wget -q https://www.arabidopsis.org/download_files/GO_and_PO_Annotations/Gene_On
 gunzip gene_association.tair.gz
 
 #Create header for output file
-echo "Transcript Locus Arabidopsis_blast_hit Arabidopsis_GO_terms PFAM_hits PFAM_GO_terms Short_functional_description" | \
+echo "Transcript Locus Arabidopsis_blast_hit Arabidopsis_GO_terms PFAM_hits PFAM_GO_terms Combined_Arabidopsis_PFAM_GO_terms Short_functional_description" | \
 tr ' ' '\t' > ${output}-functional-annotations.tsv
 #Loop over each gene and format data
 cat new_proteins | while read line
@@ -91,7 +92,7 @@ do
 	then
 		#Get the Arabidopsis Description
 		AtDesc=$(echo "Arabidopsis BLAST: $(grep ${AtID} TAIR10_short_functional_descriptions.txt)" | \
-			tr ' ' ';')
+			cut -f2 | tr ' ' ';')
 		#Get Arabidopsis GO terms
 		AtGO=$(grep ${AtID} gene_association.tair | cut -f5 | tr '|' '\n' | sort | uniq | tr '\n' '|' | \
 			sed s/\|$//)
@@ -120,8 +121,9 @@ do
 			PfamGO=NA
 		fi
 	else
-		PfamGO=NA
 		PfamID=NA
+		PfamDesc=NA
+		PfamGO=NA
 	fi
 	if [[ ${AtDesc} != "NA" ]]
 	then
@@ -139,8 +141,10 @@ do
 			fi
 		fi
 	fi
+	#Combine the GO term sets
+	combinedGO=$(echo "${AtGO}|${PfamGO}" | tr '|' '\n' | sort | uniq | tr '\n' '|')
 	#Output the results
-	echo "${line} ${line/\.*/} ${AtID} ${AtGO} ${PfamID} ${PfamGO} ${FuncDesc}" | \
+	echo "${line} ${line/\.*/} ${AtID} ${AtGO} ${PfamID} ${PfamGO} ${combinedGO} ${FuncDesc}" | \
 	tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
 	#Remove tmp file
 	rm tmp
