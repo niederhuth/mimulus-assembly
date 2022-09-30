@@ -4,8 +4,8 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=50
 #SBATCH --mem=50GB
-#SBATCH --job-name=../job_reports/new_gene_functions
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --job-name=new_gene_functions
+#SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -54,20 +54,6 @@ map_fasta_ids ../liftoff/rename.map ${genotype}-v1-proteins.fa
 #
 grep \> ${genotype}-v1-proteins.fa | sed s/\>// > old_proteins
 grep \> ${genotype}-v1.2-proteins.fa | sed s/\>// > new_proteins 
-
-cp ${genotype}-v1.2-proteins.fa new.fa
-cat new_proteins | while read line
-do
-	new=$(grep ${line} old_proteins)
-	if [[ ! -z ${new} ]]
-	then
-		sed -i s/"${line}"/"${new}"/ new.fa 
-	else
-		new="${line} AED:0.93 eAED:1.00 QI:200|-1|0|1|-1|1|1|0|97"
-		sed -i s/"${line}"/"${new}"/ new.fa 
-	fi
-done
-
 
 #Run interproscan
 echo "Running interproscan"
