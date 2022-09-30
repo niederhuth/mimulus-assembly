@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=50
 #SBATCH --mem=50GB
-#SBATCH --job-name=new_gene_functions
+#SBATCH --job-name=update-gene-functions
 #SBATCH --output=../job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -12,9 +12,10 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
-genotype="S1"
-output="S1-v1.2"
-blast="../../../comparative/diamond_blastp/Athaliana_Athaliana/Mguttatus_S1-Athaliana_Athaliana_orthogroup_filtered.m8"
+old_version="v1"
+new_version="v1.2"
+old_proteins="../../final/pseudomolecule/annotations/${old_version}/*protiens.fa"
+new_proteins="../../final/pseudomolecule/annotations/${new_version}/*protiens.fa"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -33,7 +34,7 @@ path2=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
-path3="new_gene_functions"
+path3="update_gene_functions"
 
 #Make & cd to directory
 if [ -d ${path3} ]
@@ -44,16 +45,19 @@ else
 	cd ${path3}
 fi
 
+#Find the blast results
+blast="$(pwd | sed s/data.*/data/)/${species}/${genotype}/comparative/diamond_blastp/Athaliana_Athaliana/${species}_${genotype}-Athaliana_Athaliana_orthogroup_filtered.m8"
+
 #Copy over the proteins
-cp ../../final/pseudomolecule/annotations/v1/${genotype}-v1-proteins.fa ./
-cp ../../final/pseudomolecule/annotations/v1.2/${genotype}-v1.2-proteins.fa ./
+cp ${old_proteins} ./
+cp ${new_proteins} ./
 
 #map new ids onto the v1 roteins
-${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map ${genotype}-v1-proteins.fa
+${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map ${genotype}-${old_version}-proteins.fa
 
-#
-grep \> ${genotype}-v1-proteins.fa | sed s/\>// > old_proteins
-grep \> ${genotype}-v1.2-proteins.fa | sed s/\>// > new_proteins 
+#Get gene names for old and new proteins
+grep \> ${genotype}-${old_version}-proteins.fa | sed s/\>// > old_proteins
+grep \> ${genotype}-${new_version}-proteins.fa | sed s/\>// > new_proteins 
 
 #Run interproscan
 echo "Running interproscan"
@@ -86,16 +90,26 @@ tr ' ' '\t' > ${output}-functional-annotations.tsv
 #Loop over each gene and format data
 cat new_proteins | while read line
 do
+	echo ${line}
 	#Handle the Arabidopsis BLAST
 	AtID=$(grep ${line} ${blast} | sort -r -k12 | head -1 | cut -f2)
 	if [[ ! -z ${AtID} ]]
 	then
 		#Get the Arabidopsis Description
-		AtDesc=$(echo "Arabidopsis BLAST: $(grep ${AtID} TAIR10_short_functional_descriptions.txt)" | \
-			cut -f2 | tr ' ' ';')
+		AtDesc=$(grep ${AtID} TAIR10_short_functional_descriptions.txt | cut -f2)
+		if [[ ! -z ${AtDesc} ]]
+		then
+			AtDesc=$(echo "Arabidopsis BLAST: ${AtDesc}" | cut -f2 | tr ' ' ';')
+		else
+			AtDesc=NA
+		fi
 		#Get Arabidopsis GO terms
 		AtGO=$(grep ${AtID} gene_association.tair | cut -f5 | tr '|' '\n' | sort | uniq | tr '\n' '|' | \
 			sed s/\|$//)
+		if [ -z ${AtGO} ]
+		then
+			AtGO=NA
+		fi
 	else
 		AtID=NA
 		AtDesc=NA
@@ -109,7 +123,7 @@ do
 		#List the PfamIDs
 		PfamID=$(cut -f5 tmp | sort | uniq | tr '\n' '|' | sed s/\|$//)
 		#Get the Pfam Descriptions
-		PfamDesc=$("PFAM: $(cut -f6 | tr '\n' ',')" | tr ' ' ';')
+		PfamDesc=$(echo "PFAM: $(cut -f6 tmp | tr '\n' ',')" | tr ' ' ';' | sed s/\,$//)
 		if [ -z ${PfamDesc} ]
 		then
 			PfamDesc=NA
@@ -131,18 +145,18 @@ do
 	else
 		if [[ ${PfamDesc} != "NA" ]]
 		then
-			FuncDesc=${AtDesc}
+			FuncDesc=${PfamDesc}
 		else
-			if [[ $(grep ${line} old_proteins | cut -d ' ' -f5 | tr '|' '\t' | cut -f3) -gt 0 ]]
+			if [[ ! -z $(grep ${line} old_proteins | cut -d ' ' -f5 | awk -v FS="|" '$3 > 0') ]]
 			then
-				FuncDesc="Expressed gene of unknown function"
+				FuncDesc="Expressed;gene;of;unknown;function"
 			else
-				FuncDesc="Hypothetical gene of unknown function"
+				FuncDesc="Hypothetical;gene;of;unknown;function"
 			fi
 		fi
 	fi
 	#Combine the GO term sets
-	combinedGO=$(echo "${AtGO}|${PfamGO}" | tr '|' '\n' | sort | uniq | tr '\n' '|')
+	combinedGO=$(echo "${AtGO}|${PfamGO}" | tr '|' '\n' | grep -v NA | sort | uniq | tr '\n' '|' | sed s/\|$//)
 	#Output the results
 	echo "${line} ${line/\.*/} ${AtID} ${AtGO} ${PfamID} ${PfamGO} ${combinedGO} ${FuncDesc}" | \
 	tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
