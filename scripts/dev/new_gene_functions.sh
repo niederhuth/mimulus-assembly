@@ -1,14 +1,52 @@
+#!/bin/bash --login
+#SBATCH --time=168:00:00
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=50
+#SBATCH --mem=50GB
+#SBATCH --job-name=../job_reports/new_gene_functions
+#SBATCH --output=%x-%j.SLURMout
+
+#Set this variable to the path to wherever you have conda installed
+conda="${HOME}/miniconda3"
+
+#Set variables
+theads=50
 genotype="S1"
 output="S1-v1.2"
+blast="../../../comparative/diamond_blastp/Athaliana_Athaliana/Mguttatus_S1-Athaliana_Athaliana_orthogroup_filtered.m8"
 
-mkdir v1
-mv * v1
-mkdir v1.2
-cd v1.2
+#Change to current directory
+cd ${PBS_O_WORKDIR}
+#Export paths to conda
+export PATH="${conda}/envs/gene-function/bin:${PATH}"
+export LD_LIBRARY_PATH="${conda}/envs/gene-function/lib:${LD_LIBRARY_PATH}"
+
+#Set temporary directories for large memory operations
+export TMPDIR=$(pwd)
+export TMP=$(pwd)
+export TEMP=$(pwd)
+
+#The following shouldn't need to be changed, but should set automatically
+path1=$(pwd | sed s/data.*/misc/)
+path2=$(pwd | sed s/data.*/scripts/)
+species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
+genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
+sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
+path3="new_gene_functions"
+
+#Make & cd to directory
+if [ -d ${path3} ]
+then
+	cd ${path3}
+else
+	mkdir ${path3}
+	cd ${path3}
+fi
 
 #Copy over the proteins
-cp ../../../final/pseudomolecule/annotations/v1/${genotype}-v1-proteins.fa ./
-cp ../../../final/pseudomolecule/annotations/v1.2/${genotype}-v1.2-proteins.fa ./
+cp ../../final/pseudomolecule/annotations/v1/${genotype}-v1-proteins.fa ./
+cp ../../final/pseudomolecule/annotations/v1.2/${genotype}-v1.2-proteins.fa ./
 
 #map new ids onto the v1 roteins
 map_fasta_ids ../../liftoff/rename.map ${genotype}-v1-proteins.fa
@@ -74,7 +112,7 @@ do
 		AtGO=NA
 	fi
 	#Get the Pfam domains
-	grep ${line} ../v1/*.iprscan > tmp
+	grep ${line} ${output}.iprscan > tmp
 	#If tmp is not empty
 	if [ -s tmp ]
 	then
