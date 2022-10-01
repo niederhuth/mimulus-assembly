@@ -17,7 +17,7 @@ threads=50 #Number of threads to use
 evalue=0.00001 #e-value cutoff
 max_target_seqs=5 #max number of hits to retain
 options="--unal 0 --more-sensitive" #additional diamond options
-orthogroups="$(pwd | sed s/data.*/data/)/comparative/orthofinder/transcript_orthogroup.tsv" #Path to transcript_orthogroup.tsv file, if blank will not run this step
+orthogroups="$(pwd | sed s/data.*/data/)/comparative/orthofinder/Results_Sep27/Phylogenetic_Hierarchical_Orthogroups/N0.tsv" #Path to N0.tsv file, if blank will not run this step
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -112,7 +112,7 @@ do
 		do
 			a=$(echo ${line} | cut -d ' ' -f1)
 			b=$(echo ${line} | cut -d ' ' -f2)
-			if [[ $(grep ${a} ${orthogroups} | cut -f2) = $(grep ${b} ${orthogroups} | cut -f2) ]]
+			if [[ $(grep ${a} ${orthogroups} | cut -f1) = $(grep ${b} ${orthogroups} | cut -f1) ]]
 			then
 				echo ${line} | tr ' ' '\t' >> ${query}-${i}_orthogroup_filtered.m8
 			fi
