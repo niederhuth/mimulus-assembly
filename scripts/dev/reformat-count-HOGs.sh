@@ -39,44 +39,36 @@ speciesIDs=$(ls */WorkingDirectory/SpeciesIDs.txt)
 col_num=$(cat ${speciesIDs} | wc -l)
 #Set path to Phylogenetic_Hierarchical_Orthogroups
 orthogroups=$(ls */Phylogenetic_Hierarchical_Orthogroups/N0.tsv)
-#Create the output files with header line
-head -1 ${orthogroups} | cut -f1,4- > orthogroup_counts.tsv
-echo "Transcript Orthogroup" | tr ' ' '\t' > transcript_orthogroup.tsv
 
 #Reformat the N0.tsv
 echo "Reformatting HOG N0.tsv"
-cut -f1,4- ${orthogroups} | sed s/\,\ /\;/g | tr '\t' ',' | tr ';' ' ' > orthogroups.csv
+if [ ${trim_p} = TRUE ]
+then
+	cut -f1,4- ${orthogroups} | sed s/\,\ /\;/g | tr '\t' ',' | sed s/\.p\,/\,/g | sed s/\.p\;/\;/g | tr ';' ' ' > orthogroups.csv
+else
+	cut -f1,4- ${orthogroups} | sed s/\,\ /\;/g | tr '\t' ',' | tr ';' ' ' > orthogroups.csv
+fi
 
-#Loop over each HOG and get the relevant data
+#Create the output count file with header line
+head -1 ${orthogroups} | cut -f1,4- > orthogroup_counts.tsv
+
+#Loop over each HOG and count
 sed '1d' ${orthogroups} | while read line 
 do
 	og=$(echo ${line} | cut -d ' ' -f1)
-	og_counts=${og}
 	grep ${og} ${orthogroups} > tmp
 	column=4
 	#Loop over each species
 	until [[ ${column} -gt $(expr ${col_num} + 4) ]]
 	do
-		#Get the genes for that species
-		genes=$(cut -f ${column} tmp | sed 's/\ //g' | sed s/\,$//)
-		#Trim off the ".p" found at end of some protein sequences
-		if [ ${trim_p} = TRUE ]
-		then
-			genes=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | sed s/\.p$// | tr '\n' ',')
-		fi
-		#Output each gene and its orthogroup
-		for i in $(echo ${genes} | tr ',' '\n' | sed '/^$/d')
-		do
-			echo "${i} ${og}" | tr ' ' '\t' >> transcript_orthogroup.tsv
-		done
 		#Count the genes for that species
-		count=$(echo ${genes} | tr ',' '\n' | sed '/^$/d' | wc -l)
-		og_counts="${og_counts} ${count}" 
+		count=$(cut -f ${column} tmp | tr ',' '\n' | sed '/^$/d' | wc -l)
+		og="${og} ${count}" 
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)
 	done
 	#Output gene counts in each species for each orthogroup
-	echo ${og_counts} | tr ' ' '\t' >> orthogroup_counts.tsv
+	echo ${og} | tr ' ' '\t' >> orthogroup_counts.tsv
 	rm tmp
 done	
 
