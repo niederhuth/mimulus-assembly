@@ -14,8 +14,8 @@ conda="${HOME}/miniconda3"
 threads=50
 old_version="1"
 new_version="1.2"
-old_proteins="../../final/pseudomolecule/annotations/${old_version}/*proteins.fa"
-new_proteins="../../final/pseudomolecule/annotations/${new_version}/*proteins.fa"
+old_proteins="../../final/pseudomolecule/annotations/v${old_version}/*proteins.fa"
+new_proteins="../../final/pseudomolecule/annotations/v${new_version}/*proteins.fa"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
