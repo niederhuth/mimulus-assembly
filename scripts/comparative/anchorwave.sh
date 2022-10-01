@@ -2,7 +2,7 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=5
 #SBATCH --mem=400GB
 #SBATCH --job-name anchorwave
 #SBATCH --output=job_reports/%x-%j.SLURMout
@@ -14,7 +14,7 @@ conda="${HOME}/miniconda3"
 mode="both" #genoAli or proali or both (both will run both genoAli & proAli)
 ref_fasta= #reference genome, if left blank, will look for in the ref directory for that genotype
 ref_gff= #reference gff, if left blank, will look for in the ref directory for that genotype
-threads=10
+threads=5
 ref_coverage=1 #For proali use only, set max coverage for reference genome
 query_coverage=1 #For proali use only, set max coverage for query genome
 seqs="chr1 chr2 chr3 chr4 chr5 chr6 chr7 chr8 chr9 chr10 chr11 chr12 chr13 chr14"
