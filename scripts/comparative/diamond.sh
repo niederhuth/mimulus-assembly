@@ -17,7 +17,7 @@ threads=50 #Number of threads to use
 evalue=0.00001 #e-value cutoff
 max_target_seqs=5 #max number of hits to retain
 options="--unal 0 --more-sensitive" #additional diamond options
-orthogroups="$(pwd | sed s/data.*/data/)/comparative/orthofinder/Results_Sep27/Phylogenetic_Hierarchical_Orthogroups/N0.tsv" #Path to N0.tsv file, if blank will not run this step
+orthogroups="$(pwd | sed s/data.*/data/)/comparative/orthofinder/Results_Sep27/Phylogenetic_Hierarchical_Orthogroups/N0.tsv" #N0.tsv file, if blank will not run this step
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
