@@ -1,5 +1,5 @@
 #Set some variables
-tandem_cutoff=10 #Must be within this number of genes of a gene with same arrayID to be classified as "tandem"
+tandem_cutoff=5 #If within this number of genes of a gene with same arrayID, classify as "tandem"
 
 #Load libraries
 library(GENESPACE)
@@ -131,52 +131,4 @@ rm(x,x2,x3,x4,gene,gene2,i,columns)
 write.table(subset(tandem,genome=="L1" & isTandem),file="results/L1_tandem_arrays.tsv",sep="\t",quote=FALSE,row.names=FALSE)
 write.table(subset(tandem,genome=="S1" & isTandem),file="results/S1_tandem_arrays.tsv",sep="\t",quote=FALSE,row.names=FALSE)
 
-#
 
-
-
-
-
-
-
-
-#Subset out genes that are nonsyntenic orthologs to those in the syntenic pairs
-L1_NSog <- subset(nonsynt, id.y %in% synt$id.y)
-S1_NSog <- subset(nonsynt, id.x %in% synt$id.x)
-
-#
-NS <- setdiff(setdiff(nonsynt,L1_NSog),S1_NSog)
-
-
-
-
-pc <- pgdb
-#pgff <- fread("results/gffWithOgs.txt.gz",na.strings = c("", "NA"))
-
-#Count occurrence of a gene in pc
-count <- as.data.frame(table(pc$id))
-pc$genecount <- count$Freq[match(pc$id, count$Var1)]
-#Count occurances of pgID in pc
-count <- as.data.frame(table(pc$pgID))
-pc$pgIDcount <- count$Freq[match(pc$pgID, count$Var1)]
-#Count occurrence of an pgID for L1 in pc
-count <- as.data.frame(table(pc[pc$genome=="L1",]$pgID))
-pc$L1pgIDcount <- count$Freq[match(pc$pgID, count$Var1)]
-pc$L1pgIDcount <- ifelse(is.na(pc$L1pgIDcount),0,pc$L1pgIDcount)
-#Count occurrence of an pgID for S1 in pc
-count <- as.data.frame(table(pc[pc$genome=="S1",]$pgID))
-pc$S1pgIDcount <- count$Freq[match(pc$pgID, count$Var1)]
-pc$S1pgIDcount <- ifelse(is.na(pc$S1pgIDcount),0,pc$S1pgIDcount)
-#Count occurrence of an orthogroup in pc
-count <- as.data.frame(table(pc$og))
-pc$ogcount <- count$Freq[match(pc$og, count$Var1)]
-#Count occurrence of an orthogroup for L1 in pc
-count <- as.data.frame(table(pc[pc$genome=="L1",]$og))
-pc$L1ogcount <- count$Freq[match(pc$og, count$Var1)]
-pc$L1ogcount <- ifelse(is.na(pc$L1ogcount),0,pc$L1ogcount)
-#Count occurrence of an orthogroup for S1 in pc
-count <- as.data.frame(table(pc[pc$genome=="S1",]$og))
-pc$S1ogcount <- count$Freq[match(pc$og, count$Var1)]
-pc$S1ogcount <- ifelse(is.na(pc$S1ogcount),0,pc$S1ogcount)
-#cleanup a bit
-rm(count)
