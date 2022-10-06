@@ -1,10 +1,15 @@
+#Get list of genomes & ploidy
+genomes <- read.csv("genomes.csv",header=TRUE)
+
 #Set variables
-gids <- sids <- vids <- c("L1","S1")
-ploidy <- c(1,1)
+sids <- genomes$Species
+gids <- genomes$Genotype
+vids <- genomes$Version
+ploidy <- genomes$Ploidy
 outgroup <- NULL
 runwd <- getwd()
 nCores <- 4
-path2mcscanx <- "MCScanX"
+path2mcscanx <- "../../../scripts/comparative/"
 
 #Check for BiocManager & install
 if (!require("BiocManager", quietly = TRUE))
