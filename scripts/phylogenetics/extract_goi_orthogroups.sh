@@ -62,7 +62,7 @@ else
 fi
 
 #Loop over each goi and get the relevant data
-sed '1d' ${goi} | while read line 
+sed '1d' ${goi} | grep -v \# | while read line 
 do
 	name=$(echo ${line} | cut -d ',' -f1)
 	echo "Extracting sequences for ${name}"
