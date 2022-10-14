@@ -38,7 +38,7 @@ speciesIDs=$(ls */WorkingDirectory/SpeciesIDs.txt)
 #Count number of species
 col_num=$(cat ${speciesIDs} | wc -l)
 #Set path to Phylogenetic_Hierarchical_Orthogroups
-orthogroups=$(ls */Phylogenetic_Hierarchical_Orthogroups/N0.tsv)
+orthogroups=$(ls Results*/Phylogenetic_Hierarchical_Orthogroups/N0.tsv)
 
 #Reformat the N0.tsv
 echo "Reformatting HOG N0.tsv"
