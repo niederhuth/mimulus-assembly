@@ -70,12 +70,11 @@ do
 	start2=
 	stop2=
 	sign2=
-	zcat  ${genespace} | awk -v a=${genotype} -v b=${ref/*_/} -v c=${chr} '$1==a && $2==b && $3==c && $4==c' | \
-	cut -f4,6,7,20 | sort -k3n | while read line
+	zcat ${genespace} | awk -v a=${genotype} -v b=${ref/*_/} -v c=${chr} '$1==a && $2==b && $3==c && $4==c' | cut -f4,6,7,20 | sort -k3n | while read line
 	do
-		start=$(echo ${line} | cut -d ' ' -f3)
-		stop=$(echo ${line} | cut -d ' ' -f4)
-		sign=$(echo ${line} | cut -d ' ' -f5)
+		start=$(echo ${line} | cut -d ' ' -f2)
+		stop=$(echo ${line} | cut -d ' ' -f3)
+		sign=$(echo ${line} | cut -d ' ' -f4)
 		if [ -z ${start2} ]
 		then
 			start2=${start}
