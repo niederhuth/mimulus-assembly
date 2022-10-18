@@ -89,9 +89,9 @@ do
 			else
 				if [[ ${stop2} -gt ${start} ]]
 				then
-					echo "${chr} ${start} ${stop2} invalid_inversion" | tr ' ' '\t' >> breakpoints.bed
+					echo "${chr} ${start2} ${start}" | tr ' ' '\t' >> complex_rearrangments.bed
 				else
-					echo "${chr} ${stop2} ${start} valid_inversion" | tr ' ' '\t' >> breakpoints.bed
+					echo "${chr} ${stop2} ${start}" | tr ' ' '\t' >> breakpoints.bed
 				fi
 				start2=${start}
 				stop2=${stop}
