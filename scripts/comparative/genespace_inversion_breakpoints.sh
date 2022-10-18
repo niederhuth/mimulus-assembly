@@ -63,14 +63,15 @@ then
 		${path1}/samples.csv)
 fi
 
-#Make the breakpoints bed file
+#Make the breakpoints bed file for the genotype
 zcat ${genespace} | awk -v a=${genotype} -v b=${ref/*_/} '$1==a && $2==b' | cut -f4 | sort | uniq | while read seq
 do
 	chr=$(echo ${seq} | cut -d ' ' -f4)
 	start2=
 	stop2=
 	sign2=
-	zcat ${genespace} | awk -v a=${genotype} -v b=${ref/*_/} -v c=${chr} '$1==a && $2==b && $3==c && $4==c' | cut -f3,6,7,20 | sort -k2n | while read line
+	zcat ${genespace} | awk -v a=${genotype} -v b=${ref/*_/} -v c=${chr} '$1==a && $2==b && $3==c && $4==c' | \
+	cut -f3,6,7,20 | sort -k2n | while read line
 	do
 		start=$(echo ${line} | cut -d ' ' -f2)
 		stop=$(echo ${line} | cut -d ' ' -f3)
@@ -93,9 +94,11 @@ do
 			else
 				if [[ ${stop2} -gt ${start} ]]
 				then
-					echo "${chr} ${start2} ${start}" | tr ' ' '\t' >> complex_rearrangments.bed
+					echo "${chr} ${start2} ${start}" | \
+					tr ' ' '\t' >> ${species}_${genotype}_complex_rearrangments.bed
 				else
-					echo "${chr} ${stop2} ${start}" | tr ' ' '\t' >> breakpoints.bed
+					echo "${chr} ${stop2} ${start}" | \
+					tr ' ' '\t' >> ${species}_${genotype}_breakpoints.bed
 				fi
 				start2=${start}
 				stop2=${stop}
@@ -104,6 +107,46 @@ do
 		fi
 	done
 done
+
+#Make the breakpoints bed file for the reference 
+zcat ${genespace} | awk -v a=${ref/*_/} -v b=${genotype} '$1==a && $2==b' | cut -f4 | sort | uniq | while read seq
+do
+	chr=$(echo ${seq} | cut -d ' ' -f4)
+	start2=
+	stop2=
+	sign2=
+	zcat ${genespace} | awk -v a=${ref/*_/} -v b=${genotype} -v c=${chr} '$1==a && $2==b && $3==c && $4==c' | \
+	cut -f3,6,7,20 | sort -k2n | while read line
+	do
+		start=$(echo ${line} | cut -d ' ' -f2)
+		stop=$(echo ${line} | cut -d ' ' -f3)
+		sign=$(echo ${line} | cut -d ' ' -f4)
+		if [ -z ${start2} ]
+		then
+			start2=${start}
+			stop2=${stop}
+			sign2=${sign}
+		else
+			if [ ${sign} == ${sign2} ]
+			then
+				start2=${start}
+				stop2=${stop}
+				sign2=${sign}
+			else
+				if [[ ${stop2} -gt ${start} ]]
+				then
+					echo "${chr} ${start2} ${start}" | tr ' ' '\t' >> ${ref}_complex_rearrangments.bed
+				else
+					echo "${chr} ${stop2} ${start}" | tr ' ' '\t' >> ${ref}_breakpoints.bed
+				fi
+				start2=${start}
+				stop2=${stop}
+				sign2=${sign}
+			fi
+		fi
+	done
+done
+
 
 #Set the input files
 version=$(ls ${path2}/${species}/${genotype}/ref/${genotype}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
@@ -115,10 +158,15 @@ then
 fi
 ref_version=$(ls ${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
 ref_fa="${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v${ref_version}.fa"
+ref_fai="${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v${ref_version}.fafai"
+if [[ ! -f ${ref_fai} ]]
+then
+	samtools index ${ref_fasta}
+fi
 
 #Make & align simulated reads from breakpoints to ref genome
 #Loop over each region in the breakpoints.bed
-cat breakpoints.bed | while read line
+cat ${ref}_breakpoints.bed | while read line
 do
 	#get the region to analyze
 	region=$(echo ${line} | tr ' ' '_')
@@ -127,7 +175,7 @@ do
 	if [ ! -d indexes/${region/_*/} ]
 	then
 		mkdir indexes/${region/_*/}
-		samtools faidx ${ref_fa} ${region/_*/} > indexes/${region/_*/}/${region/_*/}.fa
+		samtools faidx ${fasta} ${region/_*/} > indexes/${region/_*/}/${region/_*/}.fa
 		bwa index -p indexes/${region/_*/}/${region/_*/} indexes/${region/_*/}/${region/_*/}.fa
 	fi
 	#Create a directory for that region
@@ -139,11 +187,11 @@ do
 	bedtools slop \
 		-b ${extend} \
 		-i ${dir}/${region}.bed \
-		-g ${fai} > ${dir}/${region}_ext.bed
+		-g ${ref_fai} > ${dir}/${region}_ext.bed
 	#Extract the fasta sequence
 	bedtools getfasta \
 		-bed ${dir}/${region}_ext.bed \
-		-fi ${fasta} \
+		-fi ${ref_fasta} \
 		-fo ${dir}/${region}_ext.fa
 	#Make simulated reads using wgsim
 	wgsim \
