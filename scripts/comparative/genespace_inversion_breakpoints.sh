@@ -20,8 +20,8 @@ genespace= #path to genespace syntenicBlocks.txt.gz, if left to blank look in da
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/wga/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/wga/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/variant-calling/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/variant-calling/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
