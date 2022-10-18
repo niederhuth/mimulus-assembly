@@ -75,6 +75,9 @@ do
 		start=$(echo ${line} | cut -d ' ' -f2)
 		stop=$(echo ${line} | cut -d ' ' -f3)
 		sign=$(echo ${line} | cut -d ' ' -f4)
+		if [ ${sign} == "-" ]
+		then
+			echo "${chr} ${start} ${stop} ${$sign}" >> inversions.bed
 		if [ -z ${start2} ]
 		then
 			start2=${start}
