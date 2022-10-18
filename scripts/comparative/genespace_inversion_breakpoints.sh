@@ -70,7 +70,7 @@ do
 	start2=
 	stop2=
 	sign2=
-	zcat ${genespace} | awk -v a=${ref/*_/} -v b=${genotype} -v c=${chr} '$1==a && $2==b && $3==c && $4==c' | cut -f3,6,7,20 | sort -k3n | while read line
+	zcat ${genespace} | awk -v a=${ref/*_/} -v b=${genotype} -v c=${chr} '$1==a && $2==b && $3==c && $4==c' | cut -f3,6,7,20 | sort -k2n | while read line
 	do
 		start=$(echo ${line} | cut -d ' ' -f2)
 		stop=$(echo ${line} | cut -d ' ' -f3)
@@ -87,7 +87,12 @@ do
 				stop2=${stop}
 				sign2=${sign}
 			else
-				echo "${chr} ${stop2} ${start}" | tr ' ' '\t' >> breakpoints.bed
+				if [ ${stop2} > ${start} ]
+				then
+					echo "${chr} ${start} ${stop2} invalid_inversion" | tr ' ' '\t' >> breakpoints.bed
+				else
+					echo "${chr} ${stop2} ${start} valid_inversion" | tr ' ' '\t' >> breakpoints.bed
+				fi
 				start2=${start}
 				stop2=${stop}
 				sign2=${sign}
