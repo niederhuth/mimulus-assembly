@@ -78,6 +78,7 @@ do
 		if [ ${sign} == "-" ]
 		then
 			echo "${chr} ${start} ${stop} ${$sign}" >> inversions.bed
+		fi
 		if [ -z ${start2} ]
 		then
 			start2=${start}
