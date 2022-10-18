@@ -29,7 +29,7 @@ path2=$(pwd | sed s/data.*/data/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
-condition="genespace"
+condition="breakpoints"
 datatype="genome"
 path3="breakpoints"
 
@@ -47,7 +47,7 @@ fi
 #Set path to genespace
 if [ -z ${genespace} ]
 then
-	genspace="${path2}/comparative/genespace/results/syntenicBlocks.txt.gz"
+	genespace="${path2}/comparative/genespace/results/syntenicBlocks.txt.gz"
 fi
 
 #Get list of genomes
