@@ -158,7 +158,7 @@ then
 fi
 ref_version=$(ls ${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
 ref_fa="${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v${ref_version}.fa"
-ref_fai="${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v${ref_version}.fafai"
+ref_fai="${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v${ref_version}.fa.fai"
 if [[ ! -f ${ref_fai} ]]
 then
 	samtools index ${ref_fasta}
