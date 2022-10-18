@@ -87,7 +87,7 @@ do
 				stop2=${stop}
 				sign2=${sign}
 			else
-				if [ ${stop2} > ${start} ]
+				if [[ ${stop2} -gt ${start} ]]
 				then
 					echo "${chr} ${start} ${stop2} invalid_inversion" | tr ' ' '\t' >> breakpoints.bed
 				else
