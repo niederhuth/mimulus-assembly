@@ -191,7 +191,7 @@ do
 	#Extract the fasta sequence
 	bedtools getfasta \
 		-bed ${dir}/${region}_ext.bed \
-		-fi ${ref_fasta} \
+		-fi ${ref_fa} \
 		-fo ${dir}/${region}_ext.fa
 	#Make simulated reads using wgsim
 	wgsim \
