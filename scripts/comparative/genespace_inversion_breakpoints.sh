@@ -158,9 +158,9 @@ do
 		samtools sort -@ ${threads2} > ${dir}/${region}.bam
 done
 #Merge the mapped reads for all the regions
-samtools merge combined.bam regions/*/*bam
+samtools merge ${species}_${genotype}_breakpoints.bam regions/*/*bam
 #Index the reads
-samtools index combined.bam
+samtools index ${species}_${genotype}_breakpoints.bam
 
 echo "Done"
 
