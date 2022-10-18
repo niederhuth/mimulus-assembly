@@ -77,7 +77,7 @@ do
 		sign=$(echo ${line} | cut -d ' ' -f4)
 		if [ ${sign} == "-" ]
 		then
-			echo "${chr} ${start} ${stop} ${$sign}" >> inversions.bed
+			echo "${chr} ${start} ${stop} ${sign}" | tr ' ' '\t' >> inversions.bed
 		fi
 		if [ -z ${start2} ]
 		then
