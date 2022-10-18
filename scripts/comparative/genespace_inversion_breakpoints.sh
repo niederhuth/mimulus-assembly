@@ -2,7 +2,7 @@
 #SBATCH --time=128:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=14
+#SBATCH --cpus-per-task=24
 #SBATCH --mem=100GB
 #SBATCH --job-name genespace-inversion-breakpoints
 #SBATCH --output=job_reports/%x-%j.SLURMout
@@ -11,9 +11,9 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=10
+threads=20
 threads2=4
-extend=50000
+extend=100000
 ref= #reference species_genotype to map to, e.g. Mguttatus_S1, if left blank, get from misc/samples.csv
 genespace= #path to genespace syntenicBlocks.txt.gz, if left to blank look in data/comparative
 
