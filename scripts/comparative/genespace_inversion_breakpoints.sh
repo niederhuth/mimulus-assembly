@@ -157,15 +157,11 @@ then
 fi
 ref_version=$(ls ${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
 ref_fa="${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v${ref_version}.fa"
-<<<<<<< HEAD
-ref_fai="${path2}/${species}/${genotype}/ref/${genotype}-v${version}.fa.fai"
-=======
 ref_fai="${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v${ref_version}.fa.fai"
 if [[ ! -f ${ref_fai} ]]
 then
 	samtools index ${ref_fasta}
 fi
->>>>>>> 8b58413c50a5cfb19aa0f8321a88e3fc6a01a013
 
 #Make & align simulated reads from breakpoints to ref genome
 #Loop over each region in the breakpoints.bed
