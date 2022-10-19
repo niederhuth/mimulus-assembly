@@ -2,7 +2,7 @@
 #SBATCH --time=128:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=14
+#SBATCH --cpus-per-task=24
 #SBATCH --mem=100GB
 #SBATCH --job-name genespace-inversion-breakpoints
 #SBATCH --output=job_reports/%x-%j.SLURMout
@@ -11,9 +11,9 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=10
+threads=20
 threads2=4
-extend=50000
+extend=100000
 ref= #reference species_genotype to map to, e.g. Mguttatus_S1, if left blank, get from misc/samples.csv
 genespace= #path to genespace syntenicBlocks.txt.gz, if left to blank look in data/comparative
 
@@ -63,14 +63,60 @@ then
 		${path1}/samples.csv)
 fi
 
-#Make the breakpoints bed file
+#Make the breakpoints bed file for the genotype
 zcat ${genespace} | awk -v a=${genotype} -v b=${ref/*_/} '$1==a && $2==b' | cut -f4 | sort | uniq | while read seq
 do
 	chr=$(echo ${seq} | cut -d ' ' -f4)
 	start2=
 	stop2=
 	sign2=
-	zcat ${genespace} | awk -v a=${genotype} -v b=${ref/*_/} -v c=${chr} '$1==a && $2==b && $3==c && $4==c' | cut -f4,6,7,20 | sort -k3n | while read line
+	zcat ${genespace} | awk -v a=${genotype} -v b=${ref/*_/} -v c=${chr} '$1==a && $2==b && $3==c && $4==c' | \
+	cut -f3,6,7,20 | sort -k2n | while read line
+	do
+		start=$(echo ${line} | cut -d ' ' -f2)
+		stop=$(echo ${line} | cut -d ' ' -f3)
+		sign=$(echo ${line} | cut -d ' ' -f4)
+		if [ ${sign} == "-" ]
+		then
+			echo "${chr} ${start} ${stop} ${sign}" | tr ' ' '\t' >> inversions.bed
+		fi
+		if [ -z ${start2} ]
+		then
+			start2=${start}
+			stop2=${stop}
+			sign2=${sign}
+		else
+			if [ ${sign} == ${sign2} ]
+			then
+				start2=${start}
+				stop2=${stop}
+				sign2=${sign}
+			else
+				if [[ ${stop2} -gt ${start} ]]
+				then
+					echo "${chr} ${start2} ${start}" | \
+					tr ' ' '\t' >> ${species}_${genotype}_complex_rearrangments.bed
+				else
+					echo "${chr} ${stop2} ${start}" | \
+					tr ' ' '\t' >> ${species}_${genotype}_breakpoints.bed
+				fi
+				start2=${start}
+				stop2=${stop}
+				sign2=${sign}
+			fi
+		fi
+	done
+done
+
+#Make the breakpoints bed file for the reference 
+zcat ${genespace} | awk -v a=${ref/*_/} -v b=${genotype} '$1==a && $2==b' | cut -f4 | sort | uniq | while read seq
+do
+	chr=$(echo ${seq} | cut -d ' ' -f4)
+	start2=
+	stop2=
+	sign2=
+	zcat ${genespace} | awk -v a=${ref/*_/} -v b=${genotype} -v c=${chr} '$1==a && $2==b && $3==c && $4==c' | \
+	cut -f3,6,7,20 | sort -k2n | while read line
 	do
 		start=$(echo ${line} | cut -d ' ' -f2)
 		stop=$(echo ${line} | cut -d ' ' -f3)
@@ -87,7 +133,12 @@ do
 				stop2=${stop}
 				sign2=${sign}
 			else
-				echo "${chr} ${stop2} ${start}" | tr ' ' '\t' >> breakpoints.bed
+				if [[ ${stop2} -gt ${start} ]]
+				then
+					echo "${chr} ${start2} ${start}" | tr ' ' '\t' >> ${ref}_complex_rearrangments.bed
+				else
+					echo "${chr} ${stop2} ${start}" | tr ' ' '\t' >> ${ref}_breakpoints.bed
+				fi
 				start2=${start}
 				stop2=${stop}
 				sign2=${sign}
@@ -95,6 +146,7 @@ do
 		fi
 	done
 done
+
 
 #Set the input files
 version=$(ls ${path2}/${species}/${genotype}/ref/${genotype}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
@@ -105,11 +157,19 @@ then
 fi
 ref_version=$(ls ${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
 ref_fa="${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v${ref_version}.fa"
+<<<<<<< HEAD
 ref_fai="${path2}/${species}/${genotype}/ref/${genotype}-v${version}.fa.fai"
+=======
+ref_fai="${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v${ref_version}.fa.fai"
+if [[ ! -f ${ref_fai} ]]
+then
+	samtools index ${ref_fasta}
+fi
+>>>>>>> 8b58413c50a5cfb19aa0f8321a88e3fc6a01a013
 
 #Make & align simulated reads from breakpoints to ref genome
 #Loop over each region in the breakpoints.bed
-cat breakpoints.bed | while read line
+cat ${ref}_breakpoints.bed | while read line
 do
 	#get the region to analyze
 	region=$(echo ${line} | tr ' ' '_')
@@ -134,7 +194,11 @@ do
 	#Extract the fasta sequence
 	bedtools getfasta \
 		-bed ${dir}/${region}_ext.bed \
+<<<<<<< HEAD
 		-fi ${ref_fasta} \
+=======
+		-fi ${ref_fa} \
+>>>>>>> 8b58413c50a5cfb19aa0f8321a88e3fc6a01a013
 		-fo ${dir}/${region}_ext.fa
 	#Make simulated reads using wgsim
 	wgsim \
