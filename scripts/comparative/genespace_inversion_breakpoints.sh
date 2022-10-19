@@ -151,6 +151,7 @@ done
 #Set the input files
 version=$(ls ${path2}/${species}/${genotype}/ref/${genotype}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
 fasta="${path2}/${species}/${genotype}/ref/${genotype}-v${version}.fa"
+fai="${path2}/${species}/${genotype}/ref/${genotype}-v${version}.fa.fai"
 if [[ ! -f ${fai} ]]
 then
 	samtools index ${fasta}
@@ -190,11 +191,7 @@ do
 	#Extract the fasta sequence
 	bedtools getfasta \
 		-bed ${dir}/${region}_ext.bed \
-<<<<<<< HEAD
-		-fi ${ref_fasta} \
-=======
 		-fi ${ref_fa} \
->>>>>>> 8b58413c50a5cfb19aa0f8321a88e3fc6a01a013
 		-fo ${dir}/${region}_ext.fa
 	#Make simulated reads using wgsim
 	wgsim \
