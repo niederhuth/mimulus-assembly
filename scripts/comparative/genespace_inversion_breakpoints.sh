@@ -99,13 +99,13 @@ done
 #Set the input files
 version=$(ls ${path2}/${species}/${genotype}/ref/${genotype}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
 fasta="${path2}/${species}/${genotype}/ref/${genotype}-v${version}.fa"
-fai="${path2}/${species}/${genotype}/ref/${genotype}-v${version}.fa.fai"
 if [[ ! -f ${fai} ]]
 then
 	samtools index ${fasta}
 fi
 ref_version=$(ls ${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v*.fa | sed s/.*\-v// | sed s/\.fa//)
 ref_fa="${path2}/${ref/_*/}/${ref/*_/}/ref/${ref/*_/}-v${ref_version}.fa"
+ref_fai="${path2}/${species}/${genotype}/ref/${genotype}-v${version}.fa.fai"
 
 #Make & align simulated reads from breakpoints to ref genome
 #Loop over each region in the breakpoints.bed
@@ -118,7 +118,7 @@ do
 	if [ ! -d indexes/${region/_*/} ]
 	then
 		mkdir indexes/${region/_*/}
-		samtools faidx ${ref_fa} ${region/_*/} > indexes/${region/_*/}/${region/_*/}.fa
+		samtools faidx ${fasta} ${region/_*/} > indexes/${region/_*/}/${region/_*/}.fa
 		bwa index -p indexes/${region/_*/}/${region/_*/} indexes/${region/_*/}/${region/_*/}.fa
 	fi
 	#Create a directory for that region
@@ -130,11 +130,11 @@ do
 	bedtools slop \
 		-b ${extend} \
 		-i ${dir}/${region}.bed \
-		-g ${fai} > ${dir}/${region}_ext.bed
+		-g ${ref_fai} > ${dir}/${region}_ext.bed
 	#Extract the fasta sequence
 	bedtools getfasta \
 		-bed ${dir}/${region}_ext.bed \
-		-fi ${fasta} \
+		-fi ${ref_fasta} \
 		-fo ${dir}/${region}_ext.fa
 	#Make simulated reads using wgsim
 	wgsim \
