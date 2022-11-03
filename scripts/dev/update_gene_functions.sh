@@ -50,8 +50,8 @@ fi
 blast="$(pwd | sed s/data.*/data/)/${species}/${genotype}/comparative/diamond_blastp/Athaliana_Athaliana/${species}_${genotype}-Athaliana_Athaliana_orthogroup_filtered.m8"
 
 #Copy over the proteins
-cp ${old_proteins} ./
-cp ${new_proteins} ./
+cp ${old_proteins} ${genotype}-v${old_version}-proteins.fa
+cp ${new_proteins} ${genotype}-v${new_version}-proteins.fa
 
 #map new ids onto the v1 roteins
 ${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map ${genotype}-v${old_version}-proteins.fa
