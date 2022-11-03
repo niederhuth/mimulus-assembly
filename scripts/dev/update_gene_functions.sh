@@ -12,8 +12,6 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
-old_version="1"
-new_version="1.2"
 old_proteins="../../final/pseudomolecule/annotations/v${old_version}/*proteins.fa"
 new_proteins="../../final/pseudomolecule/annotations/v${new_version}/*proteins.fa"
 
@@ -50,15 +48,15 @@ fi
 blast="$(pwd | sed s/data.*/data/)/${species}/${genotype}/comparative/diamond_blastp/Athaliana_Athaliana/${species}_${genotype}-Athaliana_Athaliana_orthogroup_filtered.m8"
 
 #Copy over the proteins
-cp ${old_proteins} ${genotype}-v${old_version}-proteins.fa
-cp ${new_proteins} ${genotype}-v${new_version}-proteins.fa
+cp ${old_proteins} old_proteins.fa
+cp ${new_proteins} new_proteins.fa
 
-#map new ids onto the v1 roteins
-${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map ${genotype}-v${old_version}-proteins.fa
+#map new ids onto the v1 proteins
+${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map old_proteins.fa
 
 #Get gene names for old and new proteins
-grep \> ${genotype}-v${old_version}-proteins.fa | sed s/\>// > old_proteins
-grep \> ${genotype}-v${new_version}-proteins.fa | sed s/\>// > new_proteins 
+grep \> old_proteins.fa | sed s/\>// > old_proteins
+grep \> new_proteins.fa | sed s/\>// > new_proteins 
 
 #Run interproscan
 echo "Running interproscan"
@@ -71,7 +69,7 @@ ${path2}/annotation/interproscan/interproscan.sh \
 	-iprlookup \
 	-t p \
 	-f TSV \
-	-i ${output}-proteins.fa \
+	-i new_proteins.fa \
 	-o ${output}.iprscan
 
 #Download and format Arabidopsis TAIR10 functional descriptions
