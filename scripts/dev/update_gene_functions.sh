@@ -45,18 +45,23 @@ else
 fi
 
 #Find the blast results
-blast="$(pwd | sed s/data.*/data/)/${species}/${genotype}/comparative/diamond_blastp/Athaliana_Athaliana/${species}_${genotype}-Athaliana_Athaliana_orthogroup_filtered.m8"
+path_to_blast="$(pwd | sed s/data.*/data/)/${species}/${genotype}/comparative/diamond_blastp/"
+blast="${path_to_blast}/Athaliana_Athaliana/${species}_${genotype}-Athaliana_Athaliana_orthogroup_filtered.m8"
 
-#Copy over the proteins
-cp ${old_proteins} old_proteins.fa
+#Copy over the new proteins
 cp ${new_proteins} new_proteins.fa
+#Get gene names for new proteins
+grep \> new_proteins.fa | sed s/\>// > new_proteins_list 
 
 #map new ids onto the v1 proteins
-${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map old_proteins.fa
-
-#Get gene names for old and new proteins
-grep \> old_proteins.fa | sed s/\>// > old_proteins
-grep \> new_proteins.fa | sed s/\>// > new_proteins 
+if [ -f ${old_proteins} ]
+then
+	#Copy over the old proteins
+	cp ${old_proteins} old_proteins.fa
+	${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map old_proteins.fa
+	#Get gene names for old and new proteins
+	grep \> old_proteins.fa | sed s/\>// > old_proteins_list
+fi
 
 #Run interproscan
 echo "Running interproscan"
@@ -87,7 +92,7 @@ gunzip gene_association.tair.gz
 echo "Transcript Locus Arabidopsis_blast_hit Arabidopsis_GO_terms PFAM_hits PFAM_GO_terms Combined_Arabidopsis_PFAM_GO_terms Short_functional_description" | \
 tr ' ' '\t' > ${output}-functional-annotations.tsv
 #Loop over each gene and format data
-cat new_proteins | while read line
+cat new_proteins_list | while read line
 do
 	echo ${line}
 	#Handle the Arabidopsis BLAST
@@ -146,9 +151,14 @@ do
 		then
 			FuncDesc=${PfamDesc}
 		else
-			if [[ ! -z $(grep ${line} old_proteins | cut -d ' ' -f5 | awk -v FS="|" '$3 > 0') ]]
+			if [ -f old_proteins_list ]
 			then
-				FuncDesc="Expressed;gene;of;unknown;function"
+				if [[ ! -z $(grep ${line} old_proteins_list | cut -d ' ' -f5 | awk -v FS="|" '$3 > 0') ]]
+				then
+					FuncDesc="Expressed;gene;of;unknown;function"
+				else
+					FuncDesc="Hypothetical;gene;of;unknown;function"
+				fi
 			else
 				FuncDesc="Hypothetical;gene;of;unknown;function"
 			fi
