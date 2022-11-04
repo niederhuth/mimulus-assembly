@@ -12,8 +12,10 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
-old_proteins="../../final/pseudomolecule/annotations/v${old_version}/*proteins.fa"
-new_proteins="../../final/pseudomolecule/annotations/v${new_version}/*proteins.fa"
+#old_proteins="../../final/pseudomolecule/annotations/v${old_version}/*proteins.fa"
+old_proteins="../../../ref/annotations/v2/IM62-v2-proteins-primary.fa"
+#new_proteins="../../final/pseudomolecule/annotations/v${new_version}/*proteins.fa"
+new_proteins="../../../ref/annotations/IM62-v2.1-proteins-primary.fa"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
