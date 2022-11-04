@@ -11,11 +11,14 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=50
-#old_proteins="../../final/pseudomolecule/annotations/v${old_version}/*proteins.fa"
-old_proteins="../../../ref/annotations/v2/IM62-v2-proteins-primary.fa"
-#new_proteins="../../final/pseudomolecule/annotations/v${new_version}/*proteins.fa"
-new_proteins="../../../ref/annotations/IM62-v2.1-proteins-primary.fa"
+threads=50 #Threads for interproscan
+id_map_file="../liftoff/rename.map" #Path to map id file
+#old_proteins="../../final/pseudomolecule/annotations/v1/*proteins.fa"
+old_proteins="../../../ref/annotations/v2/IM62-v2-proteins-primary.fa" #fasta of old proteins
+#new_proteins="../../final/pseudomolecule/annotations/v1.2/*proteins.fa"
+new_proteins="../../../ref/annotations/IM62-v2.1-proteins-primary.fa" #fasta of new proteins
+#new_gff="../../final/pseudomolecule/annotations/v1.2/*v2.1.gff"
+new_gff="../../../ref/annotations/IM62-v2.1.gff" #GFF for new proteins
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -60,7 +63,8 @@ if [ -f ${old_proteins} ]
 then
 	#Copy over the old proteins
 	cp ${old_proteins} old_proteins.fa
-	${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map old_proteins.fa
+	#Map the new ids onto the old proteins
+	${conda}/envs/maker/bin/map_fasta_ids ${id_map_file} old_proteins.fa
 	#Get gene names for old and new proteins
 	grep \> old_proteins.fa | sed s/\>// > old_proteins_list
 fi
@@ -168,8 +172,10 @@ do
 	fi
 	#Combine the GO term sets
 	combinedGO=$(echo "${AtGO}|${PfamGO}" | tr '|' '\n' | grep -v NA | sort | uniq | tr '\n' '|' | sed s/\|$//)
+	#Get the gene name
+	gene=$(grep ${line} ${new_gff} | awk '$3=="mRNA"' | cut -f9 | sed s/.*Parent\=// | sed s/\;.*//)
 	#Output the results
-	echo "${line} ${line/\.*/} ${AtID} ${AtGO} ${PfamID} ${PfamGO} ${combinedGO} ${FuncDesc}" | \
+	echo "${line} ${gene} ${AtID} ${AtGO} ${PfamID} ${PfamGO} ${combinedGO} ${FuncDesc}" | \
 	tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
 	#Remove tmp file
 	rm tmp
