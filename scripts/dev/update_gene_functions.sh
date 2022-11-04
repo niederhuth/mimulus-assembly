@@ -37,7 +37,6 @@ path2=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
-output="${genotype}-v${new_version}"
 path3="update_gene_functions"
 
 #Make & cd to directory
@@ -57,6 +56,10 @@ blast="${path_to_blast}/Athaliana_Athaliana/${species}_${genotype}-Athaliana_Ath
 cp ${new_proteins} new_proteins.fa
 #Get gene names for new proteins
 grep \> new_proteins.fa | sed s/\>// > new_proteins_list 
+#Set the version
+version=$(echo ${new_proteins} | sed s/.*\-v// | sed s/\-proteins.*.fa//)
+output="${genotype}-v${version}"
+
 
 #map new ids onto the v1 proteins
 if [ -f ${old_proteins} ]
