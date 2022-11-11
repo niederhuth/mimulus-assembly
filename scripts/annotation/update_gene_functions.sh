@@ -60,7 +60,6 @@ grep \> new_proteins.fa | sed s/\>// > new_proteins_list
 version=$(echo ${new_proteins} | sed s/.*\-v// | sed s/\-proteins.*.fa//)
 output="${genotype}-v${version}"
 
-
 #map new ids onto the v1 proteins
 if [ -f ${old_proteins} ]
 then
@@ -182,4 +181,6 @@ do
 	tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
 	#Remove tmp file
 	rm tmp
+	#Remove interposcan temp directory
+	rmdir temp
 done
