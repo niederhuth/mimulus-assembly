@@ -12,7 +12,9 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=50
-protein_fasta="../../final/contigs/annotations/*-proteins.fa"
+protein_fasta="../../final/contigs/annotations/*-proteins.fa" #input proteins fasta file
+gff=../../final/contigs/annotations/*.gff #input gff file
+arabidopsis_blast= #path to BLAST results, e.g. orthogroup filtered blast, if left blank, will run blast
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -66,26 +68,31 @@ ${path2}/annotation/interproscan/interproscan.sh \
 	-i ${proteins} \
 	-o ${output}.iprscan
 
-#Download Arabidopsis genes and create diamond DB
-echo "Downloading Arabidopsis TAIR10 proteins"
-wget -q https://www.arabidopsis.org/download_files/Proteins/TAIR10_protein_lists/TAIR10_pep_20110103_representative_gene_model
-echo "Making diamond blast DB for "
-diamond makedb \
-	--threads ${threads} \
-	--in TAIR10_pep_20110103_representative_gene_model \
-	--db TAIR10.dmnd
+#Check if BLAST results provided, if not, then run BLAST
+if [ -z ${arabidopsis_blast} ]
+then
+	#Download Arabidopsis genes and create diamond DB
+	echo "Downloading Arabidopsis TAIR10 proteins"
+	wget -q https://www.arabidopsis.org/download_files/Proteins/TAIR10_protein_lists/TAIR10_pep_20110103_representative_gene_model
+	echo "Making diamond blast DB for "
+	diamond makedb \
+		--threads ${threads} \
+		--in TAIR10_pep_20110103_representative_gene_model \
+		--db TAIR10.dmnd
 
-#Run diamond blastp against Arabidopsis 
-echo "Running diamond blastp on "
-diamond blastp \
-	--threads ${threads} \
-	--db TAIR10.dmnd \
-	--query ${proteins} \
-	--out ${output}_TAIR10_blast.out \
-	--evalue 1e-6 \
-	--max-hsps 1 \
-	--max-target-seqs 5 \
-	--outfmt 0
+	#Run diamond blastp against Arabidopsis 
+	echo "Running diamond blastp on "
+	diamond blastp \
+		--threads ${threads} \
+		--db TAIR10.dmnd \
+		--query ${proteins} \
+		--out ${output}_TAIR10_blast.out \
+		--evalue 1e-6 \
+		--max-hsps 1 \
+		--max-target-seqs 5 \
+		--outfmt 0
+	arabidopsis_blast="${output}_TAIR10_blast.out"
+fi
 
 #Download and format Arabidopsis TAIR10 functional descriptions
 echo "Downloading and formatting Arabidopsis TAIR10 functional descriptions"
@@ -98,7 +105,7 @@ echo "Creating short functional descriptions file"
 perl ${path2}/annotation/pl/create_functional_annotation_file.pl \
 	--protein_fasta ${proteins} \
 	--model_annot TAIR10_short_functional_descriptions.txt \
-	--model_blast ${output}_TAIR10_blast.out \
+	--model_blast ${arabidopsis_blast} \
 	--pfam_results_file ${output}.iprscan \
 	--max_hits 1 \
 	--output ${output}-description.tsv
@@ -137,7 +144,8 @@ do
 	else
 		AT_GO=NA
 	fi
-	echo "${line} ${line/\.*/} ${AT_ID} ${AT_GO} ${PFAM_ID} ${PFAM_GO} ${func_desc}" | tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
+	gene=$(grep ${line} ${gff} | awk '$3=="mRNA"' | cut -f9 | sed s/.*Parent\=// | sed s/\;.*//)
+	echo "${line} ${gene} ${AT_ID} ${AT_GO} ${PFAM_ID} ${PFAM_GO} ${func_desc}" | tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
 	rm tmp
 done
 

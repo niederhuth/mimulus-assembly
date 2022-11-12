@@ -11,11 +11,14 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=50
-old_version="1"
-new_version="1.2"
-old_proteins="../../final/pseudomolecule/annotations/v${old_version}/*proteins.fa"
-new_proteins="../../final/pseudomolecule/annotations/v${new_version}/*proteins.fa"
+threads=50 #Threads for interproscan
+id_map_file="../liftoff/rename.map" #Path to map id file
+#old_proteins="../../final/pseudomolecule/annotations/v1/*proteins.fa"
+old_proteins="../../../ref/annotations/v2/IM62-v2-proteins-primary.fa" #fasta of old proteins
+#new_proteins="../../final/pseudomolecule/annotations/v1.2/*proteins.fa"
+new_proteins="../../../ref/annotations/IM62-v2.1-proteins-primary.fa" #fasta of new proteins
+#new_gff="../../final/pseudomolecule/annotations/v1.2/*v2.1.gff"
+new_gff="../../../ref/annotations/IM62-v2.1.gff" #GFF for new proteins
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -34,7 +37,6 @@ path2=$(pwd | sed s/data.*/scripts/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*${species}\\/${genotype}\\/// | sed s/\\/.*//)
-output="${genotype}-v${new_version}"
 path3="update_gene_functions"
 
 #Make & cd to directory
@@ -47,18 +49,27 @@ else
 fi
 
 #Find the blast results
-blast="$(pwd | sed s/data.*/data/)/${species}/${genotype}/comparative/diamond_blastp/Athaliana_Athaliana/${species}_${genotype}-Athaliana_Athaliana_orthogroup_filtered.m8"
+path_to_blast="$(pwd | sed s/data.*/data/)/${species}/${genotype}/comparative/diamond_blastp/"
+blast="${path_to_blast}/Athaliana_Athaliana/${species}_${genotype}-Athaliana_Athaliana_orthogroup_filtered.m8"
 
-#Copy over the proteins
-cp ${old_proteins} ./
-cp ${new_proteins} ./
+#Copy over the new proteins
+cp ${new_proteins} new_proteins.fa
+#Get gene names for new proteins
+grep \> new_proteins.fa | sed s/\>// > new_proteins_list 
+#Set the version
+version=$(echo ${new_proteins} | sed s/.*\-v// | sed s/\-proteins.*.fa//)
+output="${genotype}-v${version}"
 
-#map new ids onto the v1 roteins
-${conda}/envs/maker/bin/map_fasta_ids ../liftoff/rename.map ${genotype}-v${old_version}-proteins.fa
-
-#Get gene names for old and new proteins
-grep \> ${genotype}-v${old_version}-proteins.fa | sed s/\>// > old_proteins
-grep \> ${genotype}-v${new_version}-proteins.fa | sed s/\>// > new_proteins 
+#map new ids onto the v1 proteins
+if [ -f ${old_proteins} ]
+then
+	#Copy over the old proteins
+	cp ${old_proteins} old_proteins.fa
+	#Map the new ids onto the old proteins
+	${conda}/envs/maker/bin/map_fasta_ids ${id_map_file} old_proteins.fa
+	#Get gene names for old and new proteins
+	grep \> old_proteins.fa | sed s/\>// > old_proteins_list
+fi
 
 #Run interproscan
 echo "Running interproscan"
@@ -71,7 +82,7 @@ ${path2}/annotation/interproscan/interproscan.sh \
 	-iprlookup \
 	-t p \
 	-f TSV \
-	-i ${output}-proteins.fa \
+	-i new_proteins.fa \
 	-o ${output}.iprscan
 
 #Download and format Arabidopsis TAIR10 functional descriptions
@@ -89,7 +100,7 @@ gunzip gene_association.tair.gz
 echo "Transcript Locus Arabidopsis_blast_hit Arabidopsis_GO_terms PFAM_hits PFAM_GO_terms Combined_Arabidopsis_PFAM_GO_terms Short_functional_description" | \
 tr ' ' '\t' > ${output}-functional-annotations.tsv
 #Loop over each gene and format data
-cat new_proteins | while read line
+cat new_proteins_list | while read line
 do
 	echo ${line}
 	#Handle the Arabidopsis BLAST
@@ -148,9 +159,14 @@ do
 		then
 			FuncDesc=${PfamDesc}
 		else
-			if [[ ! -z $(grep ${line} old_proteins | cut -d ' ' -f5 | awk -v FS="|" '$3 > 0') ]]
+			if [ -f old_proteins_list ]
 			then
-				FuncDesc="Expressed;gene;of;unknown;function"
+				if [[ ! -z $(grep ${line} old_proteins_list | cut -d ' ' -f5 | awk -v FS="|" '$3 > 0') ]]
+				then
+					FuncDesc="Expressed;gene;of;unknown;function"
+				else
+					FuncDesc="Hypothetical;gene;of;unknown;function"
+				fi
 			else
 				FuncDesc="Hypothetical;gene;of;unknown;function"
 			fi
@@ -158,9 +174,13 @@ do
 	fi
 	#Combine the GO term sets
 	combinedGO=$(echo "${AtGO}|${PfamGO}" | tr '|' '\n' | grep -v NA | sort | uniq | tr '\n' '|' | sed s/\|$//)
+	#Get the gene name
+	gene=$(grep ${line} ${new_gff} | awk '$3=="mRNA"' | cut -f9 | sed s/.*Parent\=// | sed s/\;.*//)
 	#Output the results
-	echo "${line} ${line/\.*/} ${AtID} ${AtGO} ${PfamID} ${PfamGO} ${combinedGO} ${FuncDesc}" | \
+	echo "${line} ${gene} ${AtID} ${AtGO} ${PfamID} ${PfamGO} ${combinedGO} ${FuncDesc}" | \
 	tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
 	#Remove tmp file
 	rm tmp
+	#Remove interposcan temp directory
+	rmdir temp
 done

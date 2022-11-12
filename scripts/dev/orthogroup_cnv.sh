@@ -19,3 +19,14 @@ mv tmp S1_cnv_orthologs.txt
 #
 awk '$2=="Mguttatus_L1"' Results_Sep27/Gene_Duplication_Events/Duplications.tsv | cut -f6,7 | tr '\t' '\n' | sed s/\ //g | tr ',' '\n' | sort | uniq | sed s/Mguttatus_L1_// | sed /^$/d > L1_gene_duplications.txt
 awk '$2=="Mguttatus_S1"' Results_Sep27/Gene_Duplication_Events/Duplications.tsv | cut -f6,7 | tr '\t' '\n' | sed s/\ //g | tr ',' '\n' | sort | uniq | sed s/Mguttatus_S1_// | sed /^$/d > S1_gene_duplications.txt
+
+
+
+#
+grep \> ../proteins-primary/Mguttatus_S1.fa | sed s/\>// | fgrep -v -f ../genespace/results/S1_1x1_syntelogs.txt > S1_genes
+fgrep -f S1_genes ../Results_Sep27/Gene_Duplication_Events/Duplications.tsv > S1_duplications
+
+
+
+#Variable syntelogs
+fgrep -v -f ../genespace/results/S1_1x1_syntelogs.txt ../genespace/results/S1_syntelogs.txt > cnv_synt.txt
