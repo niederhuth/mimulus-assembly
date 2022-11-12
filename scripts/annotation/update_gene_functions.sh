@@ -181,6 +181,9 @@ do
 	tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
 	#Remove tmp file
 	rm tmp
-	#Remove interposcan temp directory
-	rmdir temp
 done
+
+#Remove interposcan temp directory
+rmdir temp
+
+echo "Done"
