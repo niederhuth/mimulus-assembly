@@ -135,7 +135,7 @@ do
 		#List the PfamIDs
 		PfamID=$(cut -f5 tmp | sort | uniq | tr '\n' '|' | sed s/\|$//)
 		#Get the Pfam Descriptions
-		PfamDesc=$(echo "PFAM: $(cut -f6 tmp | tr '\n' ',')" | tr ' ' ';' | sed s/\,$//)
+		PfamDesc=$(echo "PFAM: $(cut -f6 tmp | sort | uniq | tr '\n' ',')" | tr ' ' ';' | sed s/\,$//)
 		if [ -z ${PfamDesc} ]
 		then
 			PfamDesc=NA
