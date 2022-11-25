@@ -59,6 +59,7 @@ then
 	gunzip -c ${fastq} > combined.fastq
 	fastq="$(pwd)/combined.fastq"
 elif [[ ${fastq} =~ \.fastq$ ]]
+then
 	echo "File is uncompressed"
 fi
 
