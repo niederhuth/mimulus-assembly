@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20
 fast5_dir="fast5_pass/"
-fastq="pass.fastq.gz"
+fastq="pass.fastq"
 sequencing_summary="sequencing_summary_PAG35136_e70c34ec.txt"
 
 #Change to current directory

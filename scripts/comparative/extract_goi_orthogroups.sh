@@ -88,7 +88,7 @@ do
 		a=$(echo ${line2} | cut -d ' ' -f2 | sed s/\.fa//)
 		#Get the genes for that species
 		genes=$(cut -f ${column} tmp | sed 's/\ //g' | sed s/\,$//)
-		proteins=${genes}
+		proteins=$(echo ${genes} | tr ',' '\n')
 		#Trim off the ".p" found at end of some protein sequences
 		if [ ${trim_p} = TRUE ]
 		then
@@ -105,7 +105,7 @@ do
 		if [ ${CDS} = TRUE ]
 		then
 			cds=$(ls ${path4}/${a/_*/}/${a/*_/}/ref/annotations/${a/*_/}*-${datatype/proteins/cds}.fa)
-			samtools faidx ${cds} $(echo ${genes} | tr ' ' '\n') >> ${outseqs}-${datatype/proteins/cds}.fa
+			samtools faidx ${cds} $(echo ${genes} | tr ',' '\n') >> ${outseqs}-${datatype/proteins/cds}.fa
 		fi
 		#Increase the column number by 1
 		column=$(expr ${column} + 1)

@@ -13,12 +13,15 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=50 #Threads for interproscan
 id_map_file="../liftoff/rename.map" #Path to map id file
-#old_proteins="../../final/pseudomolecule/annotations/v1/*proteins.fa"
-old_proteins="../../../ref/annotations/v2/IM62-v2-proteins-primary.fa" #fasta of old proteins
-#new_proteins="../../final/pseudomolecule/annotations/v1.2/*proteins.fa"
-new_proteins="../../../ref/annotations/IM62-v2.1-proteins-primary.fa" #fasta of new proteins
-#new_gff="../../final/pseudomolecule/annotations/v1.2/*v2.1.gff"
-new_gff="../../../ref/annotations/IM62-v2.1.gff" #GFF for new proteins
+#old_proteins="../../final/pseudomolecule/annotations/v1/S1-v1-proteins.fa"
+old_proteins="../../final/pseudomolecule/annotations/v1/L1-v1-proteins.fa"
+#old_proteins="../../../ref/annotations/v2/IM62-v2-proteins-primary.fa" #fasta of old proteins
+#new_proteins="../../final/pseudomolecule/annotations/v1.2/S1-v1.2-proteins.fa"
+new_proteins="../../final/pseudomolecule/annotations/v1.2/L1-v1.2-proteins.fa"
+#new_proteins="../../../ref/annotations/IM62-v2.1-proteins-primary.fa" #fasta of new proteins
+#new_gff="../../final/pseudomolecule/annotations/v1.2/S1-v1.2.gff"
+new_gff="../../final/pseudomolecule/annotations/v1.2/L1-v1.2.gff"
+#new_gff="../../../ref/annotations/IM62-v2.1.gff" #GFF for new proteins
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
