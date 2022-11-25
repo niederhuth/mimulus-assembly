@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20
 fast5_dir="$(pwd)/fastq/ont/fast5_pass/"
-fastq="$(pwd)/fastq/ont/pass.fastq"
+fastq="$(pwd)/fastq/ont/combined.fastq.gz"
 sequencing_summary="$(pwd)/fastq/ont/sequencing_summary_PAG35136_e70c34ec.txt"
 convert_to_single=TRUE #TRUE or FALSE, fast5 is multi-fast5 and should be converted to single-fast5
 
