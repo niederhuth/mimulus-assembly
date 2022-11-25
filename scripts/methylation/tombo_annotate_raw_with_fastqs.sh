@@ -44,20 +44,33 @@ fi
 #If data is in multi-fast5 format convert to single-fast5 format
 if [ ${convert_to_single} = TRUE ]
 then
-	echo "Converting multi-fast5 to single-fast5"
-	multi_to_single_fast5 \
-		-t ${threads} \
-		-i ${fast5_dir} \
-		-s fast5
-	fast5_dir="$(pwd)/fast5"
+	if [ -d fast5 ]
+	then
+		echo "fast5 directory found in current directory"
+		echo "Assuming single-copy fast5 files are in this directory."
+		echo "Skipping conversion, if this is in error, please check, delete directory fast5, and restart."
+		fast5_dir="$(pwd)/fast5"
+	else
+		echo "Converting multi-fast5 to single-fast5"
+		multi_to_single_fast5 \
+			-t ${threads} \
+			-i ${fast5_dir} \
+			-s fast5
+		fast5_dir="$(pwd)/fast5"
+	fi
 fi
 
 #Unzip the fastq data if it is compressed
 if [[ $(pwd)/${fastq} =~ \.gz$ ]]
 then
-	echo "File is gzip file, uncompressing fastq"
-	gunzip -c ${fastq} > combined.fastq
-	fastq="$(pwd)/combined.fastq"
+	if [ -f combined.fastq ]
+	then
+		echo "Uncompressed fastq file found"
+	else
+		echo "File is gzip file, uncompressing fastq"
+		gunzip -c ${fastq} > combined.fastq
+		fastq="$(pwd)/combined.fastq"
+	fi
 elif [[ ${fastq} =~ \.fastq$ ]]
 then
 	echo "File is uncompressed"
