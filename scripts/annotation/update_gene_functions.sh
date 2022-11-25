@@ -135,7 +135,7 @@ do
 		#List the PfamIDs
 		PfamID=$(cut -f5 tmp | sort | uniq | tr '\n' '|' | sed s/\|$//)
 		#Get the Pfam Descriptions
-		PfamDesc=$(echo "PFAM: $(cut -f6 tmp | tr '\n' ',')" | tr ' ' ';' | sed s/\,$//)
+		PfamDesc=$(echo "PFAM: $(cut -f6 tmp | sort | uniq | tr '\n' ',')" | tr ' ' ';' | sed s/\,$//)
 		if [ -z ${PfamDesc} ]
 		then
 			PfamDesc=NA
@@ -181,6 +181,9 @@ do
 	tr ' ' '\t' | tr ';' ' ' >> ${output}-functional-annotations.tsv
 	#Remove tmp file
 	rm tmp
-	#Remove interposcan temp directory
-	rmdir temp
 done
+
+#Remove interposcan temp directory
+rmdir temp
+
+echo "Done"
