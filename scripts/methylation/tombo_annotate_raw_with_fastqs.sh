@@ -12,9 +12,16 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=20
+<<<<<<< HEAD
 fast5_dir="fast5_pass/"
 fastq="pass.fastq"
 sequencing_summary="sequencing_summary_PAG35136_e70c34ec.txt"
+=======
+fast5_dir="$(pwd)/fastq/ont/fast5_pass/"
+fastq="$(pwd)/fastq/ont/pass.fastq"
+sequencing_summary="$(pwd)/fastq/ont/sequencing_summary_PAG35136_e70c34ec.txt"
+convert_to_single=TRUE #TRUE or FALSE, fast5 is multi-fast5 and should be converted to single-fast5
+>>>>>>> 8076f4e0c8871817d53db7ff1fa40d1281d46f62
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -29,13 +36,40 @@ genotype=$(pwd | sed s/.*\\/data\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/data\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 datatype="ont"
-path2=
+path2="methylC_ont"
 
-#Change to fastq file
-cd fastq/ont
+#Check for and make/cd working directory
+if [ -d ${path2} ]
+then
+	cd ${path2}
+else
+	mkdir ${path2}
+	cd ${path2}
+fi
+
+#If data is in multi-fast5 format convert to single-fast5 format
+if [ ${convert_to_single} = TRUE ]
+then
+	echo "Converting multi-fast5 to single-fast5"
+	multi_to_single_fast5 \
+		-t ${threads} \
+		-i ${path2}/${fast5_dir} \
+		-s fast5/
+	fast5_dir="$(pwd)/fast5"
+fi
+
+#Unzip the fastq data if it is compressed
+if [[ $(pwd)/${fastq} =~ \.gz$ ]]
+then
+	echo "File is gzip file, uncompressing fastq"
+	gunzip -c ${fastq} > combined.fastq
+	fastq="$(pwd)/combined.fastq"
+elif [[ ${fastq} =~ \.fastq$ ]]
+	echo "File is uncompressed"
+fi
 
 #Run tombo annotate_raw_with_fastqs
-echo ""
+echo "Running tombo preprocess annotate_raw_with_fastqs"
 tombo preprocess annotate_raw_with_fastqs \
 	--processes ${threads} \
 	--fast5-basedir ${fast5_dir} \
