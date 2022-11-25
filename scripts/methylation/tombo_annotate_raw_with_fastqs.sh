@@ -47,8 +47,8 @@ then
 	echo "Converting multi-fast5 to single-fast5"
 	multi_to_single_fast5 \
 		-t ${threads} \
-		-i ${path2}/${fast5_dir} \
-		-s fast5/
+		-i ${fast5_dir} \
+		-s fast5
 	fast5_dir="$(pwd)/fast5"
 fi
 
