@@ -37,8 +37,8 @@ export TEMP=$(pwd | sed s/data.*/data/)
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
-genotype=$(pwd | sed s/.*\\/${species}\\/// | sed s/\\/.*//)
-sample=$(pwd | sed s/.*\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
+genotype=$(pwd | sed s/.*\\/data\\/${species}\\/// | sed s/\\/.*//)
+sample=$(pwd | sed s/.*\\/data\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 path2="flye"
 reads="fastq/${datatype}/clean.fastq.gz"
