@@ -2,8 +2,8 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=800GB
+#SBATCH --cpus-per-task=40
+#SBATCH --mem=40GB
 #SBATCH --job-name format-ont-for-tombo-mods
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
+threads=40
 fast5_dir="$(pwd)/fastq/ont/fast5_pass/"
 fastq="$(pwd)/fastq/ont/combined.fastq.gz"
 
