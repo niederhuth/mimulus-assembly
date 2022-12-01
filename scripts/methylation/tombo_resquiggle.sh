@@ -3,8 +3,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=40
-#SBATCH --mem=100GB
-#SBATCH --job-name tombo-annotate-raw-with-fastqs
+#SBATCH --mem=200GB
+#SBATCH --job-name tombo-resquiggle
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -13,8 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=40
 fast5_dir="fast5"
-fastq="combined.fastq"
-sequencing_summary="$(pwd)/fastq/ont/sequencing_summary_PAG35136_e70c34ec.txt"
+ref_fasta= #reference genome, if left blank, will look for in the ref directory for that genotype
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -24,34 +23,41 @@ export LD_LIBRARY_PATH="${conda}/envs/deepsignal/lib:$LD_LIBRARY_PATH"
 
 #The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
+path2=$(pwd | sed s/data.*/data/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/data\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/data\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 condition="assembly"
 datatype="ont"
-path2="methylC_ont"
+path3="methylC_ont"
 
 #Check for and make/cd working directory
-if [ -d ${path2} ]
+if [ -d ${path3} ]
 then
-	cd ${path2}
+	cd ${path3}
 else
-	mkdir ${path2}
-	cd ${path2}
+	mkdir ${path3}
+	cd ${path3}
 fi
 
-#Remove reads that did not pass filtering from the sequencing summary
-awk '$10 != "FALSE"' ${sequencing_summary} > passed_filter_sequencing_summary.txt
+#find the reference fasta if not provided
+if [ -z ${ref_fasta} ]
+then
+	#Get version number for genome fasta
+	genome_ver=$(ls ${path2}/${species}/${genotype}/ref/${genotype}-v*.fa | head -1 | \
+		sed s/.*\-v// | sed s/\.fa//)
+	#Set the ref_fasta path
+	ref_fasta="${path2}/${species}/${genotype}/ref/${genotype}-v${genome_ver}.fa"
+fi 
 
 #Run tombo annotate_raw_with_fastqs
-echo "Running tombo preprocess annotate_raw_with_fastqs"
-tombo preprocess annotate_raw_with_fastqs \
+echo "Running tombo resquiggle"
+tombo resquiggle \
+	${fast5_dir}/ \
+	${ref_fasta} \
 	--processes ${threads} \
-	--fast5-basedir ${fast5_dir} \
-	--fastq-filename ${fastq} \
-	--sequencing-summary-filenames passed_filter_sequencing_summary.txt \
+	--corrected-group RawGenomeCorrected_000 \
 	--basecall-group Basecall_1D_000 \
-	--basecall-subgroup BaseCalled_template \
 	--overwrite
 
 echo "Done"
