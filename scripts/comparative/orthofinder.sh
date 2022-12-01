@@ -13,7 +13,8 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=100 #sequence search threads
 threads2=20 #analysis threads
-input_seqs= #Directory of input sequences, if left blank will copy over from list of genomes in misc/samples.csv
+datatype="proteins" #proteins, proteins-primary, etc
+input_seqs=proteins #Directory of input sequences, if left blank will copy over from list of genomes in misc/samples.csv
 inflation=1.3 #Inflation parameter, default 1.5
 seq_search_program=diamond #blast/diamond/diamond_ultra_sens/blast_gz/mmseqs/blast_nucl sequence search program 
 msa=TRUE #TRUE/FALSE use multiple sequence alignment
@@ -37,7 +38,6 @@ species="comparative"
 genotype="orthofinder"
 sample="orthofinder"
 condition="orthofinder"
-datatype="proteins-primary"
 path2=$(pwd | sed s/data.*/data/)
 path3="orthofinder"
 
@@ -109,7 +109,12 @@ fi
 #Set starting point
 if [ ${start_from} = "f" ]
 then
-	settings="${settings} -f ${datatype} -o ${path3}"
+	if [ -z ${input_seqs} ]
+	then
+		settings="${settings} -f ${datatype} -o ${path3}"
+	else
+		settings="${settings} -f ${input_seqs} -o ${path3}"
+	fi
 elif [ ${start_from} = "b" ]
 then
 	settings="${settings} -b ${previous_results}"	
