@@ -13,6 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=100 #sequence search threads
 threads2=20 #analysis threads
+input_seqs= #Directory of input sequences, if left blank will copy over from list of genomes in misc/samples.csv
 inflation=1.3 #Inflation parameter, default 1.5
 seq_search_program=diamond #blast/diamond/diamond_ultra_sens/blast_gz/mmseqs/blast_nucl sequence search program 
 msa=TRUE #TRUE/FALSE use multiple sequence alignment
@@ -22,7 +23,7 @@ tree= #path to a user provided tree, if left blank, orthofinder will generate it
 split_HOGs=TRUE #TRUE/FALSE Split paralogous orthogroups: -y argument in orthofinder
 is_DNA=FALSE #TRUE/FALSE, sequences are DNA
 start_from=f #f/b/fg/ft : f=full pipeline, b=from previous blast, fg=from previous orthogroup, ft=from previous gene tree  
-previous_results=
+previous_results= #directory of previous results for restarting orthofinder at later stages
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -41,33 +42,42 @@ path2=$(pwd | sed s/data.*/data/)
 path3="orthofinder"
 
 #Get list of genomes
-genomes=$(awk -v FS="," \
-	-v a=${species} \
-	-v b=${genotype} \
-	-v c=${sample} \
-	-v d=${condition} \
-	-v e=${datatype} \
-	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $7}' \
-	${path1}/samples.csv)
-echo "Genomes: ${genomes}"
+if [ -z ${input_seqs} ]
+then
+	genomes=$(awk -v FS="," \
+		-v a=${species} \
+		-v b=${genotype} \
+		-v c=${sample} \
+		-v d=${condition} \
+		-v e=${datatype} \
+		'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $7}' \
+		${path1}/samples.csv)
+	echo "Genomes: ${genomes}"
+
+fi
 
 #Copy over input sequences
-if [ ${start_from} = "f" ]
+if [ -z ${input_seqs} ]
 then
-	echo "Copying sequence files"
-	if [[ ! -d ${datatype} ]]
+	if [ ${start_from} = "f" ]
 	then
-		mkdir ${datatype}
+		echo "Copying sequence files"
+		if [[ ! -d ${datatype} ]]
+		then
+			mkdir ${datatype}
+		fi
+		for i in ${genomes}
+		do
+			#Find input sequences
+			species2=$(echo ${i} | sed s/_.*//)
+			genotype2=$(echo ${i} | sed s/${species2}_//)
+			path4="${path2}/${species2}/${genotype2}/ref/annotations"
+			version=$(ls ${path4}/${genotype2}-v*-${datatype}.fa | sed s/.*\-v// | sed s/\-${datatype}.fa//)
+			cp ${path4}/${genotype2}-v${version}-${datatype}.fa ${datatype}/${species2}_${genotype2}.fa
+		done
 	fi
-	for i in ${genomes}
-	do
-		#Find input sequences
-		species2=$(echo ${i} | sed s/_.*//)
-		genotype2=$(echo ${i} | sed s/${species2}_//)
-		path4="${path2}/${species2}/${genotype2}/ref/annotations"
-		version=$(ls ${path4}/${genotype2}-v*-${datatype}.fa | sed s/.*\-v// | sed s/\-${datatype}.fa//)
-		cp ${path4}/${genotype2}-v${version}-${datatype}.fa ${datatype}/${species2}_${genotype2}.fa
-	done
+else
+	echo 'Input sequences already provided in: ${input_seqs}'
 fi
 
 #Set msa options
