@@ -67,7 +67,7 @@ fi
 if [[ ! -f passed_filter_sequencing_summary.txt ]]
 then
 	awk -v OFS="\t" '{if ($1 == "filename_fastq") print $0; 
-		else if ($10 != "FALSE") print $1,$3".fast5",$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22}' \
+		else if ($10 != "FALSE") print "combined.fastq",$3".fast5",$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22}' \
 		${sequencing_summary} > passed_filter_sequencing_summary.txt
 fi
 
