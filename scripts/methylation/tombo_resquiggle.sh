@@ -2,7 +2,7 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=40
+#SBATCH --cpus-per-task=50
 #SBATCH --mem=200GB
 #SBATCH --job-name tombo-resquiggle
 #SBATCH --output=job_reports/%x-%j.SLURMout
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=40
+threads=50
 fast5_dir="fast5"
 ref_fasta= #reference genome, if left blank, will look for in the ref directory for that genotype
 

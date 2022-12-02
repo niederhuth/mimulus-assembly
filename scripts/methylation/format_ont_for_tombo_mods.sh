@@ -14,6 +14,7 @@ conda="${HOME}/miniconda3"
 threads=40
 fast5_dir="$(pwd)/fastq/ont/fast5_pass/"
 fastq="$(pwd)/fastq/ont/combined.fastq.gz"
+sequencing_summary="$(pwd)/fastq/ont/sequencing_summary_PAG35136_e70c34ec.txt"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -60,6 +61,14 @@ elif [[ ${fastq} =~ \.fastq$ ]]
 then
 	echo "File is uncompressed, copying over"
 	cp ${fastq} combined.fastq
+fi
+
+#Remove reads that did not pass filtering from the sequencing summary
+if [[ ! -f passed_filter_sequencing_summary.txt ]]
+then
+	awk -v OFS="\t" '{if ($1 == "filename_fastq") print $0; 
+		else if ($10 != "FALSE") print $1,$3".fast5",$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22}' \
+		${sequencing_summary} > passed_filter_sequencing_summary.txt
 fi
 
 echo "Done"
