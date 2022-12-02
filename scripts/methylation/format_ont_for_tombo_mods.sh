@@ -27,7 +27,7 @@ path1=$(pwd | sed s/data.*/misc/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/data\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/data\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
-condition="assembly"
+condition="methylation"
 datatype="ont"
 path2="ont_mods"
 

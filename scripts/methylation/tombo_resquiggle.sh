@@ -27,9 +27,9 @@ path2=$(pwd | sed s/data.*/data/)
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 genotype=$(pwd | sed s/.*\\/data\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*\\/data\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
-condition="assembly"
+condition="methylation"
 datatype="ont"
-path3="methylC_ont"
+path3="ont_mods"
 
 #Check for and make/cd working directory
 if [ -d ${path3} ]
