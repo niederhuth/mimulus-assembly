@@ -44,7 +44,7 @@ fi
 echo "Running tombo preprocess annotate_raw_with_fastqs"
 tombo preprocess annotate_raw_with_fastqs \
 	--processes ${threads} \
-	--fast5-basedir ${fast5_dir} \
+	--fast5-basedir ${fast5_dir}/ \
 	--fastq-filename ${fastq} \
 	--sequencing-summary-filenames ${sequencing_summary} \
 	--basecall-group Basecall_1D_000 \
