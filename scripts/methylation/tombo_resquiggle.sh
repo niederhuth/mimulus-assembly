@@ -2,8 +2,8 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=50
-#SBATCH --mem=200GB
+#SBATCH --cpus-per-task=120
+#SBATCH --mem=500GB
 #SBATCH --job-name tombo-resquiggle
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=50
+threads=120
 fast5_dir="fast5"
 ref_fasta= #reference genome, if left blank, will look for in the ref directory for that genotype
 
@@ -58,6 +58,7 @@ tombo resquiggle \
 	--processes ${threads} \
 	--corrected-group RawGenomeCorrected_000 \
 	--basecall-group Basecall_1D_000 \
+	--ignore-read-locks \
 	--overwrite
 
 echo "Done"
