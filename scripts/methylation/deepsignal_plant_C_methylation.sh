@@ -46,7 +46,7 @@ echo "Calling methylation with deepsignal-plant"
 CUDA_VISIBLE_DEVICES=-1 deepsignal_plant call_mods \
 	--gzip \
 	--input_path ${fast5_dir}/ \
-	--model_path ${model_path} \
+	--model_path ${model} \
 	--result_file ${sample}_ont_C_methylation.tsv.gz \
 	--corrected_group RawGenomeCorrected_000 \
 	--motifs C \
