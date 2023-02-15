@@ -99,10 +99,10 @@ do
 		echo "Converting protein alignments to CDS alignments"
 		if [ ${prefilter} = "prequal" ]
 		then
-			pal2nal.pl \
+			   \
 				${alns}${filtered}.fas \
 				${seqs/proteins/cds}.fa \
-				-output fasta > ${alns/proteins/cds}${filtered}.fas.fas
+				-output fasta > ${alns/proteins/cds}${filtered}.fas
 
 		fi
 		if [[ ! -z ${prefilter} || ${align_unfiltered} = TRUE ]]
