@@ -119,7 +119,7 @@ do
 	then
 		echo "Trimming the alignment with Gblocks"
 		Gblocks ${alns/proteins/cds}.fas \
-			-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gblocks
+			-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
 		#sed -i s/\ //g cds.fas.gb
 	fi
 	#Trim with trimAL
