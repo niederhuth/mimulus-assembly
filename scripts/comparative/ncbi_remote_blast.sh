@@ -41,18 +41,24 @@ fi
 grep \> ${fasta} | sed s/\>// > blast_list
 cat blast_list | while read seq
 do
-	echo "Running ${blast_type} on ${seq}"
-	mkdir ${seq}
-	cd ${seq}
-	samtools faidx ${fasta} ${seq} > ${seq}.fa
-	python ${path2}/comparative/py/NCBI_BLAST.py \
-		--bp ${blast_type} \
-		--evalue ${evalue} \
-		--rn ${result_number} \
-		--email ${email} \
-		--output-prefix ${seq}-blastp \
-		--input ${seq}.fa
-	cd ..
+	if [ -d ${seq} ]
+	then
+		echo "Previous blast results for ${seq} found. Skipping."
+		echo "To rerun this blast, delete the directory and resubmit."
+	else
+		echo "Running ${blast_type} on ${seq}"
+		mkdir ${seq}
+		cd ${seq}
+		samtools faidx ${fasta} ${seq} > ${seq}.fa
+		python ${path2}/comparative/py/NCBI_BLAST.py \
+			--bp ${blast_type} \
+			--evalue ${evalue} \
+			--rn ${result_number} \
+			--email ${email} \
+			--output-prefix ${seq}-blastp \
+			--input ${seq}.fa
+		cd ..
+	fi
 done
 
 echo "Done"
