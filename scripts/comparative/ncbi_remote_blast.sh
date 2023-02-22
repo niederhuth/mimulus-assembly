@@ -45,7 +45,7 @@ do
 	mkdir ${seq}
 	cd ${seq}
 	samtools faidx ${fasta} ${seq} > ${seq}.fa
-	python ${path2}comparative/py/NCBI_BLAST.py \
+	python ${path2}/comparative/py/NCBI_BLAST.py \
 		--bp ${blast_type} \
 		--evalue ${evalue} \
 		--rn ${result_number} \
