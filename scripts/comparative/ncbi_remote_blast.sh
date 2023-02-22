@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=5GB
 #SBATCH --job-name ncbi_remote_blast
-#SBATCH --output=../job_reports/%x-%j.SLURMout
+#SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
