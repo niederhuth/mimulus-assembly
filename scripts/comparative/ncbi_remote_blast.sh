@@ -34,6 +34,7 @@ then
 	cd ${path3}
 else
 	mkdir ${path3}
+	cd ${path3}
 fi
 
 #Loop over the fasta file and run blast for each sequence
