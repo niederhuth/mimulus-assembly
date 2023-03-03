@@ -20,3 +20,15 @@ export LD_LIBRARY_PATH="${conda}/envs/pangenomes/lib:$LD_LIBRARY_PATH"
 
 #
 wfmash Mguttatus.fa.gz -p 90 -n 6 -t 4 -m > Mguttatus.mapping.paf
+#
+paf2net.py -p Mguttatus.mapping.paf
+#
+net2communities.py \
+	-e Mguttatus.mapping.paf.edges.list.txt \
+	-w Mguttatus.mapping.paf.edges.weights.txt \
+	-n Mguttatus.mapping.paf.vertices.id2name.txt
+#
+seq 0 14 | while read i; do
+    chromosomes=$(cat scerevisiae7.mapping.paf.edges.weights.txt.community.$i.txt | cut -f 3 -d '#' | sort | uniq | tr '\n' ' ');
+    echo "community $i --> $chromosomes";
+done
