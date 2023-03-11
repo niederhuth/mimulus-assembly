@@ -27,12 +27,16 @@ cnv <- dcast(subset(pgdb, !is.na(pgChr)), pgChr + pgOrd + pgID ~ genome, value.v
 #If isDirectSyn & isArrayRep is TRUE for both paired genes in both genomes, it is a syntenic pair
 #Subset syntenic genes and write out lists of these genes
 synt <- subset(LS, isArrayRep.x & isDirectSyn.x & isArrayRep.y & isDirectSyn.y)
+write.table(data.frame(L1=synt$id.x,S1=synt$id.y),file="results/syntelogs.tsv",
+	sep="\t",quote=FALSE,col.names=TRUE,row.names=FALSE)
 write.table(unique(synt$id.x),file="results/L1_syntelogs.txt",
 	quote=FALSE,col.names=FALSE,row.names=FALSE)
 write.table(unique(synt$id.y),file="results/S1_syntelogs.txt",
 	quote=FALSE,col.names=FALSE,row.names=FALSE)
 #Get High-confidence 1x1 syntelogs and write out lists of these genes
 synt1x1 <- subset(synt, pgID %in% subset(cnv, L1==1 & S1==1)$pgID)
+write.table(data.frame(L1=synt1x1$id.x,S1=synt1x1$id.y),file="results/syntelogs1x1.tsv",
+	sep="\t",quote=FALSE,col.names=TRUE,row.names=FALSE)
 write.table(synt1x1$id.x,file="results/L1_1x1_syntelogs.txt",
 	quote=FALSE,col.names=FALSE,row.names=FALSE)
 write.table(synt1x1$id.y,file="results/S1_1x1_syntelogs.txt",
