@@ -18,3 +18,4 @@ cd ${PBS_O_WORKDIR}
 export PATH="${conda}/envs/pangenomes/bin:$PATH"
 export LD_LIBRARY_PATH="${conda}/envs/pangenomes/lib:$LD_LIBRARY_PATH"
 
+#
