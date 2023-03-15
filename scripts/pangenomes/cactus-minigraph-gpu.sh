@@ -40,7 +40,7 @@ fi
 
 #Copy over the seqFile
 if [[ ! -f ${path2}/seqFile.txt ]]
-	cp ${seqFile} ${path2}/seqFile.txt
+	cp ${path1}/${seqFile} ${path2}/seqFile.txt
 fi
 
 #Get the reference genome
@@ -48,7 +48,7 @@ if [[ ! -f ${path2}/reference.txt ]]
 then
 	if [ -z ${reference} ]
 	then
-		echo $(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1) > ${path2}/reference.txt
+		echo $(grep -A 1 Haploid ${path2}/seqFile.txt | tail -n 1 | cut -f1) > ${path2}/reference.txt
 	else
 		echo ${reference} > ${path2}/reference.txt
 	fi
