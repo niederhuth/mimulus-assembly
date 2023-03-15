@@ -62,13 +62,13 @@ fi
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/minigraph_cactus ]]
 then
-	udocker create --name=cactus_pg_gpu quay.io/comparative-genomics-toolkit/cactus:v2.4.3-gpu
+	udocker create --name=cactus_pg_gpu quay.io/comparative-genomics-toolkit/cactus:v2.4.3
 fi
 #Run docker container
-udocker run --volume=$(PBS_O_WORKDIR):/data cactus_pg_gpu
+udocker run --volume=$(PBS_O_WORKDIR):/data cactus_pg
 
 #Set files & variables
-path2=cactus_pg_gpu
+path2=cactus_pg
 seqFile=${path2}/seqFile.txt
 reference=$(head -1 ${path2}/reference.txt)
 name=$(head -1 ${path2}/reference.txt)
