@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=200GB
-#SBATCH --job-name cactus-minigraph
+#SBATCH --job-name cactus-graphmap
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -60,9 +60,12 @@ fi
 
 #Run cactus-minigraph
 echo "Running cactus-minigraph"
-cactus-minigraph ${path2}/jobstore ${seqFile} ${outputGFA} \
+cactus-minigraph ${path2} ${seqFile} ${outputGFA} \
 	--reference ${reference} \
 	--logFile ${logFile} \
 	--mapCores ${threads}
+
+cactus-graphmap ${path2}/jobstore primates-pg/evolverPrimates.pg.txt primates-pg/primates.sv.gfa.gz primates-pg/primates.paf \
+--reference simChimp --outputFasta primates-pg/primates.sv.gfa.fa.gz	
 
 echo "Done"

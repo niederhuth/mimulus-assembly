@@ -65,7 +65,7 @@ fi
 
 #Run cactus-minigraph
 echo "Running cactus-minigraph"
-cactus-minigraph ${path2} ${seqFile} ${outputGFA} \
+cactus-minigraph ${path2}/jobstore ${seqFile} ${outputGFA} \
 	--reference ${reference} \
 	--logFile ${logFile} \
 	--mapCores ${threads}
