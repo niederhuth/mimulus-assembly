@@ -2,8 +2,8 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=200GB
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=100GB
 #SBATCH --job-name cactus-minigraph
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
+threads=10
 seqFile=/data/misc/Mguttatus-pangenome-seqs.txt
 reference=
 
