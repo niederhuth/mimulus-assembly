@@ -29,8 +29,6 @@ export UDOCKER_CONTAINERS=$(pwd)/containers
 #The following shouldn't need to be changed, but should set automatically
 #Set new path for within container
 path1=$(echo ${PBS_O_WORKDIR} | sed s/.*data/data/)
-#cd to that path
-cd ${path1}
 #Set rest of variables
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 path2=cactus_pg
