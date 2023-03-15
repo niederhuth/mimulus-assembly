@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 name=Mguttatus
-seqFile=/data/misc/Mguttatus-pangenome-seqs.txt
+seqFile=Mguttatus-pangenome-seqs.txt
 reference=
 maxLen=10000
 

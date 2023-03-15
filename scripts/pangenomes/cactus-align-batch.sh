@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20
 name=Mguttatus
-seqFile=/data/misc/Mguttatus-pangenome-seqs.txt
+seqFile=Mguttatus-pangenome-seqs.txt
 reference=
 
 #Change to current directory
