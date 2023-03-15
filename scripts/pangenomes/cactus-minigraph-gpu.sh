@@ -1,10 +1,9 @@
 #!/bin/bash --login
 #SBATCH --time=168:00:00
-#SBATCH --nodes=1
-#SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=200GB
-#SBATCH --job-name cactus-minigraph
+#SBATCH --ntasks=1
+#SBATCH --gres=gpu:v100:1
+#SBATCH --mem-per-cpu=10G
+#SBATCH --job-name cactus-minigraph-gpu
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed

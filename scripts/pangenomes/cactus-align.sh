@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=100GB
-#SBATCH --job-name cactus-graphmap
+#SBATCH --job-name cactus-align
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -49,9 +49,8 @@ then
 fi
 
 #Set output files
-inputGFA=${path2}/${species}-pg.gfa.gz
-outputPAF=${path2}/${species}-pg.paf
-logFile={path2}/${species}-pg-graphmap.log
+outputGFA=${path2}/${species}-pg.gfa.gz
+logFile={path2}/${species}-pg-minigraph.log
 
 #Get the reference genome
 if [ -z ${reference} ]
@@ -61,7 +60,7 @@ fi
 
 #Run cactus-minigraph
 echo "Running cactus-graphmap"
-cactus-graphmap ${path2}/jobstore ${seqFile} ${inputGFA} ${outputPAF} \
+cactus-graphmap ${path2}/jobstore ${seqFile} ${path2}/primates.sv.gfa.gz ${path2}/primates.paf \
 	--outputFasta ${path2}/primates.sv.gfa.fa.gz \
 	--reference ${reference} \
 	--logFile ${logFile} \
