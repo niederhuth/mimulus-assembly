@@ -2,24 +2,24 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=10
-#SBATCH --mem=100GB
-#SBATCH --job-name cactus-minigraph
+#SBATCH --cpus-per-task=20
+#SBATCH --mem=200GB
+#SBATCH --job-name cactus-align-batch
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=10
+threads=20
 seqFile=/data/misc/Mguttatus-pangenome-seqs.txt
 reference=
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/pangenome/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/pangenome/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/pangenomes/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/pangenomes/lib:$LD_LIBRARY_PATH"
 #Export path to UDOCKER_DIR. All images will be downloaded and installed here
 export UDOCKER_DIR=${conda}/envs/pangenome/udocker
 #Export path to UDOCKER_CONTAINERS. All containers will be saved there
@@ -59,8 +59,9 @@ then
 fi
 
 #Run cactus-minigraph
-echo "Running cactus-minigraph"
-cactus-minigraph ${path2}/jobstore ${seqFile} ${outputGFA} \
+echo "Running cactus-graphmap"
+cactus-graphmap ${path2}/jobstore ${seqFile} ${path2}/primates.sv.gfa.gz ${path2}/primates.paf \
+	--outputFasta ${path2}/primates.sv.gfa.fa.gz \
 	--reference ${reference} \
 	--logFile ${logFile} \
 	--mapCores ${threads}

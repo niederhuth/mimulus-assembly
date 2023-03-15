@@ -2,8 +2,8 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
-#SBATCH --mem=200GB
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=100GB
 #SBATCH --job-name cactus-graphmap
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
+threads=10
 seqFile=/data/misc/Mguttatus-pangenome-seqs.txt
 reference=
 
@@ -49,8 +49,9 @@ then
 fi
 
 #Set output files
-outputGFA=${path2}/${species}-pg.gfa.gz
-logFile={path2}/${species}-pg-minigraph.log
+inputGFA=${path2}/${species}-pg.gfa.gz
+outputPAF=${path2}/${species}-pg.paf
+logFile={path2}/${species}-pg-graphmap.log
 
 #Get the reference genome
 if [ -z ${reference} ]
@@ -59,13 +60,11 @@ then
 fi
 
 #Run cactus-minigraph
-echo "Running cactus-minigraph"
-cactus-minigraph ${path2} ${seqFile} ${outputGFA} \
+echo "Running cactus-graphmap"
+cactus-graphmap ${path2}/jobstore ${seqFile} ${inputGFA} ${outputPAF} \
+	--outputFasta ${path2}/primates.sv.gfa.fa.gz \
 	--reference ${reference} \
 	--logFile ${logFile} \
 	--mapCores ${threads}
-
-cactus-graphmap ${path2}/jobstore primates-pg/evolverPrimates.pg.txt primates-pg/primates.sv.gfa.gz primates-pg/primates.paf \
---reference simChimp --outputFasta primates-pg/primates.sv.gfa.fa.gz	
 
 echo "Done"
