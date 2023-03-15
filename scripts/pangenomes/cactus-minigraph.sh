@@ -11,6 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
+threads=20
 seqFile=/data/misc/Mguttatus-pangenome-seqs.txt
 reference=
 
@@ -35,9 +36,9 @@ species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
 path2=cactus
 
 #Create docker container
-udocker create --name=cactus_run quay.io/comparative-genomics-toolkit/cactus:v2.4.3
+udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.3
 #Run docker container
-udocker run --volume=$(pwd | sed s/data.*//) cactus_run
+udocker run --volume=$(pwd | sed s/data.*//) cactus_pg
 #Change directories within container
 cd /data/${path1}
 
@@ -61,6 +62,7 @@ fi
 echo "Running cactus-minigraph"
 cactus-minigraph ${path2} ${seqFile} ${outputGFA} \
 	--reference ${reference} \
-	--logFile ${logFile}
+	--logFile ${logFile} \
+	--mapCores ${threads}
 
 echo "Done"
