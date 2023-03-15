@@ -66,6 +66,12 @@ outDir=${path3}/split
 jobstore=${path3}/jobstore
 logFile=${path3}/${name}-pg-graphmap-split.log
 
+#Get the reference genome
+if [ -z ${reference} ]
+then
+	reference=$(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1)
+fi
+
 #Run cactus-minigraph
 echo "Running cactus-graphmap-split"
 cactus-graphmap-split ${jobstore} ${seqFile} ${inputGFA} ${inputPAF} \

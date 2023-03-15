@@ -66,6 +66,12 @@ outputFASTA=${path3}/${name}-pg.gfa.fa.gz
 jobstore=${path3}/jobstore
 logFile=${path3}/${name}-pg-graphmap.log
 
+#Get the reference genome
+if [ -z ${reference} ]
+then
+	reference=$(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1)
+fi
+
 #Run cactus-minigraph
 echo "Running cactus-graphmap"
 cactus-graphmap ${jobstore} ${seqFile} ${inputGFA} ${outputPAF} \
