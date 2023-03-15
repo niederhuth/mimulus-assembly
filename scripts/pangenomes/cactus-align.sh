@@ -46,8 +46,9 @@ udocker run \
 	--env="path3=${path3}" \
 	--env="name=${name}" \
 	--env="reference=${reference}" \
-	--env="seqFile=${path2}/${seqFile}" \
+	--env="seqFile=${seqFile}" \
 	--env="threads=${threads}" \
+	--env="maxLen=${maxLen}" \
 	--volume=$(pwd | sed s/data.*//):/data \
 	cactus_pg
 
@@ -60,11 +61,20 @@ then
 	mkdir ${path3}
 fi
 
+#Check for seqFile and copy over is not already
+if [[ ! -f ${path3}/${seqFile} ]]
+then
+	cp ${path2}/${seqFile} ${path3}/${seqFile}
+	seqFile=${path3}/${seqFile}
+else
+	seqFile=${path3}/${seqFile}
+fi
+
 #Set files & variables
-inputPAF=${path3}/${species}-pg.paf
-outputHal=${path3}/${species}-pg.hal
+inputPAF=${path3}/${name}-pg.paf
+outputHal=${path3}/${name}-pg.hal
 jobstore=${path3}/jobstore
-logFile=${path3}/${species}-pg-align.log
+logFile=${path3}/${name}-pg-align.log
 
 #Get the reference genome
 if [ -z ${reference} ]

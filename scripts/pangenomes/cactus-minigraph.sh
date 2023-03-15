@@ -45,7 +45,7 @@ udocker run \
 	--env="path3=${path3}" \
 	--env="name=${name}" \
 	--env="reference=${reference}" \
-	--env="seqFile=${path2}/${seqFile}" \
+	--env="seqFile=${seqFile}" \
 	--env="threads=${threads}" \
 	--volume=$(pwd | sed s/data.*//):/data \
 	cactus_pg
@@ -57,6 +57,15 @@ cd ${path1}
 if [[ ! -d ${path3} ]]
 then
 	mkdir ${path3}
+fi
+
+#Check for seqFile and copy over is not already
+if [[ ! -f ${path3}/${seqFile} ]]
+then
+	cp ${path2}/${seqFile} ${path3}/${seqFile}
+	seqFile=${path3}/${seqFile}
+else
+	seqFile=${path3}/${seqFile}
 fi
 
 #Set files & variables

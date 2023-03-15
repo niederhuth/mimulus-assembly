@@ -45,7 +45,7 @@ udocker run \
 	--env="path3=${path3}" \
 	--env="name=${name}" \
 	--env="reference=${reference}" \
-	--env="seqFile=${path2}/${seqFile}" \
+	--env="seqFile=${seqFile}" \
 	--env="threads=${threads}" \
 	--volume=$(pwd | sed s/data.*//):/data \
 	cactus_pg
@@ -59,18 +59,21 @@ then
 	mkdir ${path3}
 fi
 
+#Check for seqFile and copy over is not already
+if [[ ! -f ${path3}/${seqFile} ]]
+then
+	cp ${path2}/${seqFile} ${path3}/${seqFile}
+	seqFile=${path3}/${seqFile}
+else
+	seqFile=${path3}/${seqFile}
+fi
+
 #Set files & variables
 inputGFA=${path3}/${name}-pg.gfa.gz
 outputPAF=${path3}/${name}-pg.paf
 outputFASTA=${path3}/${name}-pg.gfa.fa.gz
 jobstore=${path3}/jobstore
 logFile=${path3}/${name}-pg-graphmap.log
-
-#Get the reference genome
-if [ -z ${reference} ]
-then
-	reference=$(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1)
-fi
 
 #Run cactus-minigraph
 echo "Running cactus-graphmap"
