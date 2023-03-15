@@ -12,6 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 threads=20
+name=Mguttatus
 seqFile=/data/misc/Mguttatus-pangenome-seqs.txt
 reference=
 
@@ -27,36 +28,54 @@ mkdir containers
 export UDOCKER_CONTAINERS=$(pwd)/containers
 
 #The following shouldn't need to be changed, but should set automatically
-#Set new path for within container
-path1=$(echo ${PBS_O_WORKDIR} | sed s/.*data/data/)
-#Set rest of variables
-species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
-path2=cactus_pg
-
-#Create docker container
-udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.3
-#Run docker container
-udocker run --volume=$(pwd | sed s/data.*//) cactus_pg
-#Change directories within container
-cd /data/${path1}
-
+path1=$(pwd | sed s/data.*/misc/)
+#Set output directory
+path2=cactus_pg_gpu
 #Create output directory
 if [[ ! -d ${path2} ]]
 then
 	mkdir ${path2}
 fi
 
-#Set output files
-inputVG=${path2}/${species}-pg.vg
-outName=${species}-pg
-jobstore=${path2}/jobstore
-logFile={path2}/${species}-pg-minigraph.log
+#Copy over the seqFile
+if [[ ! -f ${path2}/${seqFile} ]]
+	cp ${seqFile} ${path2}/seqFile.txt
+fi
 
 #Get the reference genome
-if [ -z ${reference} ]
+if [[ ! -f ${path2}/reference.txt ]]
 then
-	reference=$(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1)
+	if [ -z ${reference} ]
+	then
+		echo $(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1) > ${path2}/reference.txt
+	else
+		echo ${reference} > ${path2}/reference.txt
+	fi
 fi
+
+#Set the name
+if [[ ! -f ${path2}/name.txt ]]
+then
+	echo ${name} > ${path2}/name.txt
+fi
+
+#Check for docker container, if it doesnt exist, create it
+if [[ ! -d containers/minigraph_cactus ]]
+then
+	udocker create --name=cactus_pg_gpu quay.io/comparative-genomics-toolkit/cactus:v2.4.3-gpu
+fi
+#Run docker container
+udocker run --volume=$(PBS_O_WORKDIR):/data cactus_pg_gpu
+
+#Set files & variables
+path2=cactus_pg_gpu
+seqFile=${path2}/seqFile.txt
+rreference=$(head -1 ${path2}/reference.txt)
+name=$(head -1 ${path2}/reference.txt)
+inputVG=${path2}/${name}-pg.vg
+outName=${name}-pg
+jobstore=${path2}/jobstore
+logFile={path2}/${name}-pg-minigraph.log
 
 #Run cactus-minigraph
 echo "Running cactus-graphmap-join"

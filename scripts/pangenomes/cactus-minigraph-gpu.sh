@@ -10,7 +10,8 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-seqFile=/data/misc/Mguttatus-pangenome-seqs.txt
+name=Mguttatus
+seqFile=Mguttatus-pangenome-seqs.txt
 reference=
 
 #Change to current directory
@@ -28,11 +29,36 @@ fi
 export UDOCKER_CONTAINERS=$(pwd)/containers
 
 #The following shouldn't need to be changed, but should set automatically
-#Set new path for within container
-path1=$(echo ${PBS_O_WORKDIR} | sed s/.*data/data/)
-#Set rest of variables
-species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
+path1=$(pwd | sed s/data.*/misc/)
+#Set output directory
 path2=cactus_pg_gpu
+#Create output directory
+if [[ ! -d ${path2} ]]
+then
+	mkdir ${path2}
+fi
+
+#Copy over the seqFile
+if [[ ! -f ${path2}/${seqFile} ]]
+	cp ${seqFile} ${path2}/seqFile.txt
+fi
+
+#Get the reference genome
+if [[ ! -f ${path2}/reference.txt ]]
+then
+	if [ -z ${reference} ]
+	then
+		echo $(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1) > ${path2}/reference.txt
+	else
+		echo ${reference} > ${path2}/reference.txt
+	fi
+fi
+
+#Set the name
+if [[ ! -f ${path2}/name.txt ]]
+then
+	echo ${name} > ${path2}/name.txt
+fi
 
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/minigraph_cactus ]]
@@ -40,26 +66,16 @@ then
 	udocker create --name=cactus_pg_gpu quay.io/comparative-genomics-toolkit/cactus:v2.4.3-gpu
 fi
 #Run docker container
-udocker run --volume=$(pwd | sed s/data.*//) cactus_pg_gpu
-#Change directories within container
-cd /data/${path1}
+udocker run --volume=$(PBS_O_WORKDIR):/data cactus_pg_gpu
 
-#Create output directory
-if [[ ! -d ${path2} ]]
-then
-	mkdir ${path2}
-fi
-
-#Set output files
-outputGFA=${path2}/${species}-pg.gfa.gz
+#Set files & variables
+path2=cactus_pg_gpu
+seqFile=${path2}/seqFile.txt
+reference=$(head -1 ${path2}/reference.txt)
+name=$(head -1 ${path2}/reference.txt)
+outputGFA=${path2}/${name}-pg.gfa.gz
 jobstore=${path2}/jobstore
-logFile={path2}/${species}-pg-minigraph.log
-
-#Get the reference genome
-if [ -z ${reference} ]
-then
-	reference=$(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1)
-fi
+logFile={path2}/${name}-pg-minigraph.log
 
 #Run cactus-minigraph
 echo "Running cactus-minigraph"
