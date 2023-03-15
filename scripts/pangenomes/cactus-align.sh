@@ -11,6 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
+threads=10
 name=Mguttatus
 seqFile=Mguttatus-pangenome-seqs.txt
 reference=
@@ -28,55 +29,48 @@ mkdir containers
 export UDOCKER_CONTAINERS=$(pwd)/containers
 
 #The following shouldn't need to be changed, but should set automatically
-path1=$(pwd | sed s/data.*/misc/)
-#Set output directory
-path2=cactus_pg
-#Create output directory
-if [[ ! -d ${path2} ]]
-then
-	mkdir ${path2}
-fi
-
-#Copy over the seqFile
-if [[ ! -f ${path2}/seqFile.txt ]]
-then
-	cp ${path1}/${seqFile} ${path2}/seqFile.txt
-fi
-
-#Get the reference genome
-if [[ ! -f ${path2}/reference.txt ]]
-then
-	if [ -z ${reference} ]
-	then
-		echo $(grep -A 1 Haploid ${path2}/seqFile.txt | tail -n 1 | cut -f1) > ${path2}/reference.txt
-	else
-		echo ${reference} > ${path2}/reference.txt
-	fi
-fi
-
-#Set the name
-if [[ ! -f ${path2}/name.txt ]]
-then
-	echo ${name} > ${path2}/name.txt
-fi
+path1=/data/$(pwd | sed s/.*data/data/)
+path2=/data/misc
+path3=cactus_pg
 
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/cactus_pg ]]
 then
 	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.3
 fi
+
 #Run docker container
-udocker run --volume=$(pwd):/data cactus_pg
+udocker run \
+	--env="path1=${path1}" \
+	--env="path3=${path2}" \
+	--env="path3=${path3}" \
+	--env="name=${name}" \
+	--env="reference=${reference}" \
+	--env="seqFile=${path2}/${seqFile}" \
+	--env="threads=${threads}" \
+	--volume=$(pwd | sed s/data.*//):/data \
+	cactus_pg
+
+#Change to working directory
+cd ${path1}
+
+#Create output directory
+if [[ ! -d ${path3} ]]
+then
+	mkdir ${path3}
+fi
 
 #Set files & variables
-path2=cactus_pg
-seqFile=${path2}/seqFile.txt
-reference=$(head -1 ${path2}/reference.txt)
-name=$(head -1 ${path2}/name.txt)
-inputPAF=${path2}/${name}-pg.paf
-outputHal=${path2}/${name}-pg.hal
-jobstore=${path2}/jobstore
-logFile=${path2}/${name}-pg-align.log
+inputPAF=${path3}/${species}-pg.paf
+outputHal=${path3}/${species}-pg.hal
+jobstore=${path3}/jobstore
+logFile={path3}/${species}-pg-align.log
+
+#Get the reference genome
+if [ -z ${reference} ]
+then
+	reference=$(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1)
+fi
 
 #Run cactus-minigraph
 echo "Running cactus-align"

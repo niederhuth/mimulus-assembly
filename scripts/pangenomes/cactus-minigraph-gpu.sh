@@ -10,6 +10,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
+threads=10
 name=Mguttatus
 seqFile=Mguttatus-pangenome-seqs.txt
 reference=
@@ -22,61 +23,51 @@ export LD_LIBRARY_PATH="${conda}/envs/pangenome/lib:$LD_LIBRARY_PATH"
 #Export path to UDOCKER_DIR. All images will be downloaded and installed here
 export UDOCKER_DIR=${conda}/envs/pangenome/udocker
 #Export path to UDOCKER_CONTAINERS. All containers will be saved there
-if [[ ! -d containers ]]
-then
-	mkdir containers
-fi
+mkdir containers
 export UDOCKER_CONTAINERS=$(pwd)/containers
 
 #The following shouldn't need to be changed, but should set automatically
-path1=$(pwd | sed s/data.*/misc/)
-#Set output directory
-path2=cactus_pg_gpu
-#Create output directory
-if [[ ! -d ${path2} ]]
-then
-	mkdir ${path2}
-fi
-
-#Copy over the seqFile
-if [[ ! -f ${path2}/seqFile.txt ]]
-then
-	cp ${path1}/${seqFile} ${path2}/seqFile.txt
-fi
-
-#Get the reference genome
-if [[ ! -f ${path2}/reference.txt ]]
-then
-	if [ -z ${reference} ]
-	then
-		echo $(grep -A 1 Haploid ${path2}/seqFile.txt | tail -n 1 | cut -f1) > ${path2}/reference.txt
-	else
-		echo ${reference} > ${path2}/reference.txt
-	fi
-fi
-
-#Set the name
-if [[ ! -f ${path2}/name.txt ]]
-then
-	echo ${name} > ${path2}/name.txt
-fi
+path1=/data/$(pwd | sed s/.*data/data/)
+path2=/data/misc
+path3=cactus_pg_gpu
 
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/cactus_pg_gpu ]]
 then
 	udocker create --name=cactus_pg_gpu quay.io/comparative-genomics-toolkit/cactus:v2.4.3-gpu
 fi
+
 #Run docker container
-udocker run --volume=$(pwd):/data cactus_pg_gpu
+udocker run \
+	--env="path1=${path1}" \
+	--env="path3=${path2}" \
+	--env="path3=${path3}" \
+	--env="name=${name}" \
+	--env="reference=${reference}" \
+	--env="seqFile=${path2}/${seqFile}" \
+	--env="threads=${threads}" \
+	--volume=$(pwd | sed s/data.*//):/data \
+	cactus_pg_gpu
+
+#Change to working directory
+cd ${path1}
+
+#Create output directory
+if [[ ! -d ${path3} ]]
+then
+	mkdir ${path3}
+fi
 
 #Set files & variables
-path2=cactus_pg_gpu
-seqFile=${path2}/seqFile.txt
-reference=$(head -1 ${path2}/reference.txt)
-name=$(head -1 ${path2}/name.txt)
-outputGFA=${path2}/${name}-pg.gfa.gz
-jobstore=${path2}/jobstore
-logFile=${path2}/${name}-pg-minigraph.log
+outputGFA=${path3}/${name}-pg.gfa.gz
+jobstore=${path3}/jobstore
+logFile=${path3}/${name}-pg-minigraph.log
+
+#Get the reference genome
+if [ -z ${reference} ]
+then
+	reference=$(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1)
+fi
 
 #Run cactus-minigraph
 echo "Running cactus-minigraph"
