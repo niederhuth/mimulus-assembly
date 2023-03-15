@@ -49,7 +49,7 @@ then
 fi
 
 #Set output files
-VG=${path2}/${species}-pg.vg
+inputVG=${path2}/${species}-pg.vg
 outName=${species}-pg
 jobstore=${path2}/jobstore
 logFile={path2}/${species}-pg-minigraph.log
@@ -63,7 +63,7 @@ fi
 #Run cactus-minigraph
 echo "Running cactus-graphmap-join"
 cactus-graphmap-join ${jobstore} \
-	--vg ${VG} \
+	--vg ${inputVG} \
 	--outDir ${path2} \
 	--outName ${outName} \
 	--reference ${reference} \
