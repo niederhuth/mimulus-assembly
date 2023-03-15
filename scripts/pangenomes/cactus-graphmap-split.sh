@@ -66,7 +66,7 @@ then
 	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.3
 fi
 #Run docker container
-udocker run --volume=$(PBS_O_WORKDIR):/data cactus_pg
+udocker run --volume=$(pwd):/data cactus_pg
 
 #Set files & variables
 path2=cactus_pg

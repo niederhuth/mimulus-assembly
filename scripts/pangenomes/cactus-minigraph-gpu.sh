@@ -67,7 +67,7 @@ then
 	udocker create --name=cactus_pg_gpu quay.io/comparative-genomics-toolkit/cactus:v2.4.3-gpu
 fi
 #Run docker container
-udocker run --volume=$(PBS_O_WORKDIR):/data cactus_pg_gpu
+udocker run --volume=$(pwd):/data cactus_pg_gpu
 
 #Set files & variables
 path2=cactus_pg_gpu
