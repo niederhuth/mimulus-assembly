@@ -62,7 +62,7 @@ fi
 #Set files & variables
 chromfile=
 splitDir=${path3}/split
-logFile={path3}/${species}-pg-graphmap-split.log
+logFile=${path3}/${species}-pg-graphmap-split.log
 
 #Get the reference genome
 if [ -z ${reference} ]

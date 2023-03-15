@@ -64,7 +64,7 @@ fi
 inputPAF=${path3}/${species}-pg.paf
 outputHal=${path3}/${species}-pg.hal
 jobstore=${path3}/jobstore
-logFile={path3}/${species}-pg-align.log
+logFile=${path3}/${species}-pg-align.log
 
 #Get the reference genome
 if [ -z ${reference} ]

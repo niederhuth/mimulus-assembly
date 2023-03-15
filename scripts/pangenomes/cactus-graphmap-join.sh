@@ -62,7 +62,7 @@ fi
 inputVG=${path3}/${species}-pg.vg
 outName=${species}-pg
 jobstore=${path3}/jobstore
-logFile={path3}/${species}-pg-minigraph.log
+logFile=${path3}/${species}-pg-minigraph.log
 
 #Get the reference genome
 if [ -z ${reference} ]
