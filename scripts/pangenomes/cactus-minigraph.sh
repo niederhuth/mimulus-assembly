@@ -33,7 +33,7 @@ path1=$(echo ${PBS_O_WORKDIR} | sed s/.*data/data/)
 cd ${path1}
 #Set rest of variables
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
-path2=cactus
+path2=cactus_pg
 
 #Create docker container
 udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.3

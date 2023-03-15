@@ -35,7 +35,7 @@ path1=$(echo ${PBS_O_WORKDIR} | sed s/.*data/data/)
 cd ${path1}
 #Set rest of variables
 species=$(pwd | sed s/^.*\\/data\\/// | sed s/\\/.*//)
-path2=cactus
+path2=cactus_pg_gpu
 
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/minigraph_cactus ]]
