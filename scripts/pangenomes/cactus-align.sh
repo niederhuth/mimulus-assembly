@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
-#SBATCH --mem=100GB
+#SBATCH --mem=200GB
 #SBATCH --job-name cactus-align
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
@@ -25,7 +25,10 @@ export LD_LIBRARY_PATH="${conda}/envs/pangenome/lib:$LD_LIBRARY_PATH"
 #Export path to UDOCKER_DIR. All images will be downloaded and installed here
 export UDOCKER_DIR=${conda}/envs/pangenome/udocker
 #Export path to UDOCKER_CONTAINERS. All containers will be saved there
-mkdir containers
+if [[ ! -d containers ]]
+then
+	mkdir containers
+fi
 export UDOCKER_CONTAINERS=$(pwd)/containers
 
 #The following shouldn't need to be changed, but should set automatically
