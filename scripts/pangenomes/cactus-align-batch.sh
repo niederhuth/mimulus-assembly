@@ -75,7 +75,7 @@ reference=$(head -1 ${path2}/reference.txt)
 name=$(head -1 ${path2}/name.txt)
 chromfile=
 splitDir=${path2}/split
-logFile={path2}/${name}-pg-graphmap-split.log
+logFile=${path2}/${name}-pg-graphmap-split.log
 
 #Run cactus-minigraph
 echo "Running cactus-graphmap"

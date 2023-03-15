@@ -76,7 +76,7 @@ name=$(head -1 ${path2}/name.txt)
 inputPAF=${path2}/${name}-pg.paf
 outputHal=${path2}/${name}-pg.hal
 jobstore=${path2}/jobstore
-logFile={path2}/${name}-pg-align.log
+logFile=${path2}/${name}-pg-align.log
 
 #Run cactus-minigraph
 echo "Running cactus-align"

@@ -77,7 +77,7 @@ inputGFA=${path2}/${name}-pg.gfa.gz
 outputPAF=${path2}/${name}-pg.paf
 outputFASTA=${path2}/${name}-pg.gfa.fa.gz
 jobstore=${path2}/jobstore
-logFile={path2}/${name}-pg-graphmap.log
+logFile=${path2}/${name}-pg-graphmap.log
 
 #Run cactus-minigraph
 echo "Running cactus-graphmap"

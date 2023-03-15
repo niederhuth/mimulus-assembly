@@ -76,7 +76,7 @@ name=$(head -1 ${path2}/name.txt)
 inputVG=${path2}/${name}-pg.vg
 outName=${name}-pg
 jobstore=${path2}/jobstore
-logFile={path2}/${name}-pg-minigraph.log
+logFile=${path2}/${name}-pg-minigraph.log
 
 #Run cactus-minigraph
 echo "Running cactus-graphmap-join"

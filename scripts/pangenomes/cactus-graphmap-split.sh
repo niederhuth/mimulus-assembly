@@ -72,12 +72,12 @@ udocker run --volume=$(pwd):/data cactus_pg
 path2=cactus_pg
 seqFile=${path2}/seqFile.txt
 reference=$(head -1 ${path2}/reference.txt)
-name=$(head -1 ${path2}/name.txt)
+name=$(head -1 ${path2}/reference.txt)
 inputGFA=${path2}/${name}-pg.gfa.gz
 inputPAF=${path2}/${name}-pg.paf
 outDir=${path2}/split
 jobstore=${path2}/jobstore
-logFile={path2}/${name}-pg-graphmap-split.log
+logFile=${path2}/${name}-pg-graphmap-split.log
 
 #Run cactus-minigraph
 echo "Running cactus-graphmap-split"
