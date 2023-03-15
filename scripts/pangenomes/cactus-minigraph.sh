@@ -39,6 +39,7 @@ fi
 
 #Copy over the seqFile
 if [[ ! -f ${path2}/seqFile.txt ]]
+then
 	cp ${path1}/${seqFile} ${path2}/seqFile.txt
 fi
 
