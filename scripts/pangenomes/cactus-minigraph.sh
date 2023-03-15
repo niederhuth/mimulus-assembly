@@ -50,6 +50,7 @@ fi
 
 #Set output files
 outputGFA=${path2}/${species}-pg.gfa.gz
+jobstore=${path2}/jobstore
 logFile={path2}/${species}-pg-minigraph.log
 
 #Get the reference genome
@@ -60,7 +61,7 @@ fi
 
 #Run cactus-minigraph
 echo "Running cactus-minigraph"
-cactus-minigraph ${path2}/jobstore ${seqFile} ${outputGFA} \
+cactus-minigraph ${jobstore} ${seqFile} ${outputGFA} \
 	--reference ${reference} \
 	--logFile ${logFile} \
 	--mapCores ${threads}

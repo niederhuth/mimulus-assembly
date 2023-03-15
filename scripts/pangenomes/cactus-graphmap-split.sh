@@ -18,8 +18,8 @@ reference=
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/pangenomes/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/pangenomes/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/pangenome/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/pangenome/lib:$LD_LIBRARY_PATH"
 #Export path to UDOCKER_DIR. All images will be downloaded and installed here
 export UDOCKER_DIR=${conda}/envs/pangenome/udocker
 #Export path to UDOCKER_CONTAINERS. All containers will be saved there
@@ -52,6 +52,7 @@ fi
 inputGFA=${path2}/${species}-pg.gfa.gz
 inputPAF=${path2}/${species}-pg.paf
 outDir=${path2}/split
+jobstore=${path2}/jobstore
 logFile={path2}/${species}-pg-graphmap-split.log
 
 #Get the reference genome
@@ -62,9 +63,8 @@ fi
 
 #Run cactus-minigraph
 echo "Running cactus-graphmap-split"
-cactus-graphmap-split ${path2}/jobstore ${seqFile} ${inputGFA} ${inputPAF} \
+cactus-graphmap-split ${jobstore} ${seqFile} ${inputGFA} ${inputPAF} \
 	--reference ${reference} \
-	--outDir ${outDir} \
-	--mapCores ${threads} 
+	--outDir ${outDir}
 
 echo "Done"

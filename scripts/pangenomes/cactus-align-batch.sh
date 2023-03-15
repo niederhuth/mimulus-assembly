@@ -18,8 +18,8 @@ reference=
 #Change to current directory
 cd ${PBS_O_WORKDIR}
 #Export paths to conda
-export PATH="${conda}/envs/pangenomes/bin:$PATH"
-export LD_LIBRARY_PATH="${conda}/envs/pangenomes/lib:$LD_LIBRARY_PATH"
+export PATH="${conda}/envs/pangenome/bin:$PATH"
+export LD_LIBRARY_PATH="${conda}/envs/pangenome/lib:$LD_LIBRARY_PATH"
 #Export path to UDOCKER_DIR. All images will be downloaded and installed here
 export UDOCKER_DIR=${conda}/envs/pangenome/udocker
 #Export path to UDOCKER_CONTAINERS. All containers will be saved there
@@ -49,8 +49,9 @@ then
 fi
 
 #Set output files
-outputGFA=${path2}/${species}-pg.gfa.gz
-logFile={path2}/${species}-pg-minigraph.log
+chromfile=
+splitDir=${path2}/split
+logFile={path2}/${species}-pg-graphmap-split.log
 
 #Get the reference genome
 if [ -z ${reference} ]
@@ -60,10 +61,9 @@ fi
 
 #Run cactus-minigraph
 echo "Running cactus-graphmap"
-cactus-graphmap ${path2}/jobstore ${seqFile} ${path2}/primates.sv.gfa.gz ${path2}/primates.paf \
-	--outputFasta ${path2}/primates.sv.gfa.fa.gz \
-	--reference ${reference} \
-	--logFile ${logFile} \
-	--mapCores ${threads}
+cactus-align-batch ${path2}/jobstore ${chromfile} ${splitDir}
+
+
+ --alignCores 16 --realTimeLogging --alignOptions "--pangenome --maxLen 10000 --reference Glycine_max_v4_0 --outVG" --logFile soybean-pg-${VERSION}-align.log --batchSystem mesos --provisioner aws --defaultPreemptable --nodeType r5.8xlarge:1.5 --nodeStorage 1000 --maxNodes 20 --betaInertia 0 --targetTime 1
 
 echo "Done"
