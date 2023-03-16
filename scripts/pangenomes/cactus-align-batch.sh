@@ -31,9 +31,8 @@ fi
 export UDOCKER_CONTAINERS=$(pwd)/containers
 
 #The following shouldn't need to be changed, but should set automatically
-path1=/data/$(pwd | sed s/.*data/data/)
-path2=/data/misc
-path3=cactus_pg
+path1=$(pwd | sed s/data.*/misc/)
+path2=cactus_pg
 
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/cactus_pg ]]
@@ -41,50 +40,38 @@ then
 	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.3
 fi
 
-#Run docker container
-udocker run \
-	--env="path1=${path1}" \
-	--env="path3=${path2}" \
-	--env="path3=${path3}" \
-	--env="name=${name}" \
-	--env="reference=${reference}" \
-	--env="seqFile=${seqFile}" \
-	--env="threads=${threads}" \
-	--volume=$(pwd | sed s/data.*//):/data \
-	cactus_pg
-
-#Change to working directory
-cd ${path1}
-
 #Create output directory
-if [[ ! -d ${path3} ]]
+if [[ ! -d ${path2} ]]
 then
-	mkdir ${path3}
+        mkdir ${path2}
 fi
 
 #Check for seqFile and copy over is not already
-if [[ ! -f ${path3}/${seqFile} ]]
+if [[ ! -f ${path2}/${seqFile} ]]
 then
-	cp ${path2}/${seqFile} ${path3}/${seqFile}
-	seqFile=${path3}/${seqFile}
+        cp ${path1}/${seqFile} ${path2}/${seqFile}
+        seqFile=${path2}/${seqFile}
 else
-	seqFile=${path3}/${seqFile}
+        seqFile=${path2}/${seqFile}
 fi
-
-#Set files & variables
-chromfile=
-splitDir=${path3}/split
-logFile=${path3}/${species}-pg-graphmap-split.log
 
 #Get the reference genome
 if [ -z ${reference} ]
 then
-	reference=$(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1)
+        reference=$(grep -A 1 Haploid ${seqFile} | tail -n 1 | cut -f1)
 fi
+
+#Set files & variables
+chromfile=
+splitDir=${path2}/split
+logFile=${path2}/${species}-pg-graphmap-split.log
 
 #Run cactus-minigraph
 echo "Running cactus-graphmap"
-cactus-align-batch ${path3}/jobstore ${chromfile} ${splitDir}
+udocker run \
+	--volume=$(pwd):/data \
+	cactus_pg \
+cactus-align-batch ${path2}/jobstore ${chromfile} ${splitDir}
 
 
  --alignCores 16 --realTimeLogging --alignOptions "--pangenome --maxLen 10000 --reference Glycine_max_v4_0 --outVG" --logFile soybean-pg-${VERSION}-align.log --batchSystem mesos --provisioner aws --defaultPreemptable --nodeType r5.8xlarge:1.5 --nodeStorage 1000 --maxNodes 20 --betaInertia 0 --targetTime 1
