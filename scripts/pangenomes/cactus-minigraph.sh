@@ -1,9 +1,9 @@
 #!/bin/bash --login
-#SBATCH --time=3:59:00
+#SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=1
-#SBATCH --mem=10GB
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=100GB
 #SBATCH --job-name cactus-minigraph
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
