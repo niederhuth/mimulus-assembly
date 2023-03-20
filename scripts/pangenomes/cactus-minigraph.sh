@@ -31,8 +31,10 @@ fi
 export UDOCKER_CONTAINERS=$(pwd)/containers
 
 #The following shouldn't need to be changed, but should set automatically
-path1=$(pwd | sed s/data.*/misc/)
-path2=cactus_pg
+path1=$(pwd | sed s/data.*//)
+path2=$(pwd | sed s/data.*/misc/)
+path3=$(pwd)/cactus_pg
+seqFile=${path2}/${seqFile}
 
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/cactus_pg ]]
@@ -41,19 +43,19 @@ then
 fi
 
 #Create output directory
-if [[ ! -d ${path2} ]]
+if [[ ! -d ${path3} ]]
 then
-        mkdir ${path2}
+        mkdir ${path3}
 fi
 
 #Check for seqFile and copy over is not already
-if [[ ! -f ${path2}/${seqFile} ]]
-then
-        cp ${path1}/${seqFile} ${path2}/${seqFile}
-        seqFile=${path2}/${seqFile}
-else
-        seqFile=${path2}/${seqFile}
-fi
+#if [[ ! -f ${path3}/${seqFile} ]]
+#then
+ #       cp ${path1}/${seqFile} ${path3}/${seqFile}
+ #       seqFile=${path3}/${seqFile}
+#else
+ #       seqFile=${path3}/${seqFile}
+#fi
 
 #Get the reference genome
 if [ -z ${reference} ]
@@ -62,14 +64,14 @@ then
 fi
 
 #Set files & variables
-outputGFA=${path2}/${name}-pg.gfa.gz
-jobstore=${path2}/jobstore
-logFile=${path2}/${name}-pg-minigraph.log
+outputGFA=${path3}/${name}-pg.gfa.gz
+jobstore=${path3}/jobstore
+logFile=${path3}/${name}-pg-minigraph.log
 
 #Run cactus-minigraph
 echo "Running cactus-minigraph"
 udocker run \
-	--volume=$(pwd):/data \
+	--volume=${path1}:/data \
 	cactus_pg \
 	cactus-minigraph ${jobstore} ${seqFile} ${outputGFA} \
 		--reference ${reference} \
