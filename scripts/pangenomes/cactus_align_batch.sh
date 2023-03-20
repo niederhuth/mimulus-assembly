@@ -37,7 +37,7 @@ path2=cactus_pg
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/cactus_pg ]]
 then
-	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.3
+	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.4
 fi
 
 #Create output directory

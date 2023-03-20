@@ -36,7 +36,7 @@ path2=cactus_pg_gpu
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/cactus_pg_gpu ]]
 then
-	udocker create --name=cactus_pg_gpu quay.io/comparative-genomics-toolkit/cactus:v2.4.3-gpu
+	udocker create --name=cactus_pg_gpu quay.io/comparative-genomics-toolkit/cactus:v2.4.4-gpu
 fi
 
 #Create output directory

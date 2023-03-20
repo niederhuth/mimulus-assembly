@@ -3,8 +3,8 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
-#SBATCH --mem=200GB
-#SBATCH --job-name cactus-align
+#SBATCH --mem=100GB
+#SBATCH --job-name cactus-graphmap-split
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -15,7 +15,6 @@ threads=10
 name=Mguttatus
 seqFile=Mguttatus-pangenome-seqs.txt
 reference=
-maxLen=10000
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -38,7 +37,7 @@ path2=cactus_pg
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/cactus_pg ]]
 then
-	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.3
+	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.4
 fi
 
 #Create output directory
@@ -63,20 +62,19 @@ then
 fi
 
 #Set files & variables
+inputGFA=${path2}/${name}-pg.gfa.gz
 inputPAF=${path2}/${name}-pg.paf
-outputHal=${path2}/${name}-pg.hal
+outDir=${path2}/split
 jobstore=${path2}/jobstore
-logFile=${path2}/${name}-pg-align.log
+logFile=${path2}/${name}-pg-graphmap-split.log
 
 #Run cactus-minigraph
-echo "Running cactus-align"
+echo "Running cactus-graphmap-split"
 udocker run \
 	--volume=$(pwd):/data \
 	cactus_pg \
-	cactus-align ${jobstore} ${seqFile} ${inputPAF} ${outputHal} \
+	cactus-graphmap-split ${jobstore} ${seqFile} ${inputGFA} ${inputPAF} \
 		--reference ${reference} \
-		--pangenome \
-		--outVG \
-		--maxLen ${maxLen}
+		--outDir ${outDir}
 
 echo "Done"

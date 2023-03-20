@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=100GB
-#SBATCH --job-name cactus-minigraph
+#SBATCH --job-name cactus-graphmap
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -37,7 +37,7 @@ path2=cactus_pg
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/cactus_pg ]]
 then
-	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.3
+	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.4
 fi
 
 #Create output directory
@@ -62,16 +62,19 @@ then
 fi
 
 #Set files & variables
-outputGFA=${path2}/${name}-pg.gfa.gz
+inputGFA=${path2}/${name}-pg.gfa.gz
+outputPAF=${path2}/${name}-pg.paf
+outputFASTA=${path2}/${name}-pg.gfa.fa.gz
 jobstore=${path2}/jobstore
-logFile=${path2}/${name}-pg-minigraph.log
+logFile=${path2}/${name}-pg-graphmap.log
 
 #Run cactus-minigraph
-echo "Running cactus-minigraph"
+echo "Running cactus-graphmap"
 udocker run \
 	--volume=$(pwd):/data \
 	cactus_pg \
-	cactus-minigraph ${jobstore} ${seqFile} ${outputGFA} \
+	cactus-graphmap ${jobstore} ${seqFile} ${inputGFA} ${outputPAF} \
+		--outputFasta ${outputFASTA} \
 		--reference ${reference} \
 		--logFile ${logFile} \
 		--mapCores ${threads}

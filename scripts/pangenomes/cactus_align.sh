@@ -2,9 +2,9 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=10
 #SBATCH --mem=200GB
-#SBATCH --job-name cactus-graphmap-join
+#SBATCH --job-name cactus-align
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -15,6 +15,7 @@ threads=10
 name=Mguttatus
 seqFile=Mguttatus-pangenome-seqs.txt
 reference=
+maxLen=10000
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -30,14 +31,14 @@ then
 fi
 export UDOCKER_CONTAINERS=$(pwd)/containers
 
-##The following shouldn't need to be changed, but should set automatically
+#The following shouldn't need to be changed, but should set automatically
 path1=$(pwd | sed s/data.*/misc/)
 path2=cactus_pg
 
 #Check for docker container, if it doesnt exist, create it
 if [[ ! -d containers/cactus_pg ]]
 then
-	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.3
+	udocker create --name=cactus_pg quay.io/comparative-genomics-toolkit/cactus:v2.4.4
 fi
 
 #Create output directory
@@ -62,22 +63,20 @@ then
 fi
 
 #Set files & variables
-inputVG=${path2}/${species}-pg.vg
-outName=${species}-pg
+inputPAF=${path2}/${name}-pg.paf
+outputHal=${path2}/${name}-pg.hal
 jobstore=${path2}/jobstore
-logFile=${path2}/${species}-pg-minigraph.log
+logFile=${path2}/${name}-pg-align.log
 
 #Run cactus-minigraph
-echo "Running cactus-graphmap-join"
+echo "Running cactus-align"
 udocker run \
 	--volume=$(pwd):/data \
 	cactus_pg \
-	cactus-graphmap-join ${jobstore} \
-		--vg ${inputVG} \
-		--outDir ${path2} \
-		--outName ${outName} \
+	cactus-align ${jobstore} ${seqFile} ${inputPAF} ${outputHal} \
 		--reference ${reference} \
-		--vcf \
-		--giraffe
+		--pangenome \
+		--outVG \
+		--maxLen ${maxLen}
 
 echo "Done"
