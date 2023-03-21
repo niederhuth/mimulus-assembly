@@ -13,10 +13,10 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20
 haplotype_number=2 #Number of haplotypes/genomes
-pidentity=90 #Mercent identity for mapping/alignment [default: 90]
-segment_length=5000  #Segment length for mapping [default: 5000]
+pidentity=95 #Mercent identity for mapping/alignment [default: 90]
+segment_length=1000  #Segment length for mapping [default: 5000]
 min_match_length=19  #Filter exact matches below this length [default: 19]
-vcf='L1:#:1000' #Make a VCF against "ref" decomposing variants, SPEC = REF:DELIM[:LEN]
+vcf= #Make a VCF against "ref" decomposing variants, SPEC = REF:DELIM[:LEN]
 stats=TRUE #TRUE/FALSE generate statistics of the seqwish and smoothxg graph
 multiqc=TRUE #TRUE/FALSE generate MultiQC report of graphs' statistics and visualizations, runs odgi stats
 
@@ -131,8 +131,8 @@ fi
 echo "Running partition-before-pggb"
 echo "Settings: ${settings}"
 udocker run \
-	--volume=$(pwd):/data
-partition-before-pggb ${settings}
+	--volume=$(pwd):/data \
+	partition-before-pggb ${settings}
 
 #Make output directory for pggb runs for invidual paritions
 if [[ ! -d partition_scripts ]]
