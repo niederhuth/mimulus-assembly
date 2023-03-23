@@ -93,6 +93,17 @@ then
 			cat ${path2}/*_1.fastq.gz > $r1
 		fi
 	fi
+elif ls ${path2}/*.fastq.gz >/dev/null 2>&1
+then
+	echo "Data is Single-end"
+	echo "Single-end ${datatype}? If this is wrong, double check and restart"
+	PE="FALSE"
+	if ls ${t1} >/dev/null 2>&1
+	then
+		echo "Trimmed reads found, skipping trimming"
+	else
+		cat ${path2}/*.fastq.gz > $r1
+	fi
 else
 	echo "Data Missing"
 fi
