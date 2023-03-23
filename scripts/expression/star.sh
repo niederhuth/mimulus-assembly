@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=50GB
-#SBATCH --job-name star_rnaseq
+#SBATCH --job-name star_rnaseq_1pass
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -156,7 +156,7 @@ genomes=$(awk -v FS="," \
 for i in ${genomes}
 do
 	echo "Running STAR for ${sample} against ${i}"
-	path3=${datatype}_${i}
+	path3=${datatype}_${i}_STAR_1
 	mkdir ${path3}
 	index="$(pwd | sed s/${species}.*/${species}/)/${genotype}/ref/STAR"
 	STAR \
@@ -164,7 +164,7 @@ do
 		--runMode alignReads \
 		--genomeDir ${index} \
 		--readFilesIn ${fastq} \
-		--outFileNamePrefix ${path3}/ \
+		--outFileNamePrefix ${path3}/${sample} \
 		--readFilesCommand zcat \
 		--outSAMtype BAM SortedByCoordinate \
 		--outSAMstrandField intronMotif \

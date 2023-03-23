@@ -19,6 +19,7 @@ min_match_length=19  #Filter exact matches below this length [default: 19]
 vcf= #Make a VCF against "ref" decomposing variants, SPEC = REF:DELIM[:LEN]
 stats=TRUE #TRUE/FALSE generate statistics of the seqwish and smoothxg graph
 multiqc=TRUE #TRUE/FALSE generate MultiQC report of graphs' statistics and visualizations, runs odgi stats
+exclude_contigs=TRUE
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
