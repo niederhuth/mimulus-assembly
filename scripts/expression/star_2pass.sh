@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=50GB
-#SBATCH --job-name star_rnaseq_1pass
+#SBATCH --job-name star_rnaseq_2pass
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -157,13 +157,28 @@ genomes=$(awk -v FS="," \
 for i in ${genomes}
 do
 	echo "Running STAR for ${sample} against ${i}"
-	path3=${datatype}_${i}_STAR_1
+	path3=${datatype}_${i}_STAR_2
 	mkdir ${path3}
 	index="$(pwd | sed s/${species}.*/${species}/)/${genotype}/ref/STAR"
+	#Get junctions from all mapped samples
+	junctions_list=$(awk -v FS="," \
+		-v a=${species} \
+		-v b=${genotype} \
+		-v d=${condition} \
+		-v e=${datatype} \
+		'{if ($1 == a && $2 == b && $4 == d && $5 == e) print $3}' \
+		${path1}/samples.csv)
+	path4=$(pwd | sed s/data.*/data/)
+	for i in ${junctions_list}
+	do
+		junctions="${junctions} ${path4}/${species}/${genotype}/${i}/${datatype}_${i}_STAR_2/SJ.out.tab"
+	done
+	echo "Junctions: ${junctions}"
 	STAR \
 		--runThreadN ${threads} \
 		--runMode alignReads \
 		--genomeDir ${index} \
+		--sjdbFileChrStartEnd ${junctions} \
 		--readFilesIn ${fastq} \
 		--outFileNamePrefix ${path3}/${sample} \
 		--readFilesCommand zcat \
