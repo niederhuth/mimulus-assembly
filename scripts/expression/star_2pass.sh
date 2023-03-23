@@ -167,10 +167,11 @@ genomes=$(awk -v FS="," \
 #Run Star
 for i in ${genomes}
 do
+	path3=$(pwd | sed s/data.*/data/)/
 	echo "Running STAR for ${sample} against ${i}"
-	path3=${datatype}_${i}_STAR_2
-	mkdir ${path3}
-	index="$(pwd | sed s/${species}.*/${species}/)/${genotype}/ref/STAR"
+	path4=${datatype}_${i}_STAR_2
+	mkdir ${path4}
+	index=${i/_*/}/${i/*_/}/ref/STAR
 	#Get junctions from all mapped samples
 	junctions_list=$(awk -v FS="," \
 		-v a=${species} \
@@ -179,10 +180,10 @@ do
 		-v e=${datatype} \
 		'{if ($1 == a && $2 == b && $4 == d && $5 == e) print $3}' \
 		${path1}/samples.csv)
-	path4=$(pwd | sed s/data.*/data/)/${species}/${genotype}
-	for i in ${junctions_list}
+	path3=$(pwd | sed s/data.*/data/)/${species}/${genotype}
+	for x in ${junctions_list}
 	do
-		junctions="${junctions} ${path4}/${i}/${datatype}_${species}_${i}_STAR_1/${i}_SJ.out.tab"
+		junctions="${junctions} ${path3}/${x}/${datatype}_${x}_STAR_1/${x}_SJ.out.tab"
 	done
 	echo "Junctions: ${junctions}"
 	STAR \
@@ -191,7 +192,7 @@ do
 		--genomeDir ${index} \
 		--sjdbFileChrStartEnd ${junctions} \
 		--readFilesIn ${fastq} \
-		--outFileNamePrefix ${path3}/${sample}_ \
+		--outFileNamePrefix ${path4}/${sample}_ \
 		--readFilesCommand zcat \
 		--outSAMtype BAM SortedByCoordinate \
 		--outSAMstrandField intronMotif \

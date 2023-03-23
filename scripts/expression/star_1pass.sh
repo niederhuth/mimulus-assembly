@@ -170,7 +170,7 @@ do
 	echo "Running STAR for ${sample} against ${i}"
 	path3=${datatype}_${i}_STAR_1
 	mkdir ${path3}
-	index="$(pwd | sed s/${species}.*/${species}/)/${genotype}/ref/STAR"
+	index=${i/_*/}/${i/*_/}/ref/STAR
 	STAR \
 		--runThreadN ${threads} \
 		--runMode alignReads \
