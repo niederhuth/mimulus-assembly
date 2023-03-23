@@ -183,7 +183,7 @@ do
 	path3=$(pwd | sed s/data.*/data/)/${species}/${genotype}
 	for x in ${junctions_list}
 	do
-		junctions="${junctions} ${path3}/${x}/${datatype}_${x}_STAR_1/${x}_SJ.out.tab"
+		junctions="${junctions} ${path3}/${x}/${datatype}_${i}_STAR_1/${x}_SJ.out.tab"
 	done
 	echo "Junctions: ${junctions}"
 	STAR \
