@@ -167,16 +167,17 @@ genomes=$(awk -v FS="," \
 #Run Star
 for i in ${genomes}
 do
+	path3=$(pwd | sed s/data.*/data/)
 	echo "Running STAR for ${sample} against ${i}"
-	path3=${datatype}_${i}_STAR_1
-	mkdir ${path3}
-	index=${i/_*/}/${i/*_/}/ref/STAR
+	path4=${datatype}_${i}_STAR_1
+	mkdir ${path4}
+	index=${path3}/${i/_*/}/${i/*_/}/ref/STAR
 	STAR \
 		--runThreadN ${threads} \
 		--runMode alignReads \
 		--genomeDir ${index} \
 		--readFilesIn ${fastq} \
-		--outFileNamePrefix ${path3}/${sample}_ \
+		--outFileNamePrefix ${path4}/${sample}_ \
 		--readFilesCommand zcat \
 		--outSAMtype BAM SortedByCoordinate \
 		--outSAMstrandField intronMotif \
