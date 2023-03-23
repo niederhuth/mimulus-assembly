@@ -165,7 +165,7 @@ do
 		--runMode alignReads \
 		--genomeDir ${index} \
 		--readFilesIn ${fastq} \
-		--outFileNamePrefix ${path3}/${sample} \
+		--outFileNamePrefix ${path3}/${sample}_ \
 		--readFilesCommand zcat \
 		--outSAMtype BAM SortedByCoordinate \
 		--outSAMstrandField intronMotif \
