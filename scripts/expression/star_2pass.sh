@@ -179,10 +179,10 @@ do
 		-v e=${datatype} \
 		'{if ($1 == a && $2 == b && $4 == d && $5 == e) print $3}' \
 		${path1}/samples.csv)
-	path4=$(pwd | sed s/data.*/data/)
+	path4=$(pwd | sed s/data.*/data/)/${species}/${genotype}
 	for i in ${junctions_list}
 	do
-		junctions="${junctions} ${path4}/${species}/${genotype}/${i}/${datatype}_${i}_STAR_1/${i}_SJ.out.tab"
+		junctions="${junctions} ${path4}/${i}/${datatype}_${species}_${i}_STAR_1/${i}_SJ.out.tab"
 	done
 	echo "Junctions: ${junctions}"
 	STAR \
