@@ -160,7 +160,7 @@ genomes=$(awk -v FS="," \
 	-v b=${genotype} \
 	-v c=${sample} \
 	-v d=${condition} \
-	-v d=${datatype} \
+	-v e=${datatype} \
 	'{if ($1 == a && $2 == b && $3 == c && $4 == d && $5 == e) print $7}' \
 	${path1}/samples.csv)
 
