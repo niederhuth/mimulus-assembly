@@ -181,6 +181,7 @@ do
 		'{if ($1 == a && $2 == b && $4 == d && $5 == e) print $3}' \
 		${path1}/samples.csv)
 	path3=$(pwd | sed s/data.*/data/)/${species}/${genotype}
+	junctions=
 	for x in ${junctions_list}
 	do
 		junctions="${junctions} ${path3}/${x}/${datatype}_${i}_STAR_1/${x}_SJ.out.tab"
