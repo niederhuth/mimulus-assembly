@@ -21,5 +21,5 @@ unzip sbt.gtdb-rs202.genomic.k31.zip
 
 rm unzip sbt.gtdb-rs202.genomic.k31.zip
 
-echo "Down"
+echo "Done"
 
