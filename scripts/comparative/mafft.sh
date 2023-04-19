@@ -99,10 +99,10 @@ do
 		echo "Converting protein alignments to CDS alignments"
 		if [ ${prefilter} = "prequal" ]
 		then
-			pal2nal.pl \
+			   \
 				${alns}${filtered}.fas \
 				${seqs/proteins/cds}.fa \
-				-output fasta > ${alns/proteins/cds}${filtered}.fas.fas
+				-output fasta > ${alns/proteins/cds}${filtered}.fas
 
 		fi
 		if [[ ! -z ${prefilter} || ${align_unfiltered} = TRUE ]]
@@ -119,7 +119,7 @@ do
 	then
 		echo "Trimming the alignment with Gblocks"
 		Gblocks ${alns/proteins/cds}.fas \
-			-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gblocks
+			-t=c -b3=8 -b4=10 -b5=h -s=y -p=t -e=.gb
 		#sed -i s/\ //g cds.fas.gb
 	fi
 	#Trim with trimAL

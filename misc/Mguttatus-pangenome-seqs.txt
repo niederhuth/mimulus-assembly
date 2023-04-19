@@ -1,0 +1,3 @@
+# Haploid sample:
+L1	data/L1-v1.fa
+S1	data/S1-v1.fa

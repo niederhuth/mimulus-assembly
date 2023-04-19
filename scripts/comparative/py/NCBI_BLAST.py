@@ -190,16 +190,16 @@ if __name__ == "__main__":
 		if args.db:
 			blast_db=args.db
 		#if --db not provided, check blast_program and set to appropriate database
-		elif not args.db and args.blast_program in ['blastp','tblastx']:
+		elif not args.db and args.blast_program in ['blastp','blastx']:
 			blast_db='nr'
-		elif not args.db and args.blast_program in ['blastn','tblastn']:
+		elif not args.db and args.blast_program in ['blastn','tblastx','tblastn']:
 			blast_db='nr/nt' #I need to double check this!
 
 	#What db to use for Entrez, e.g. protein or nucleotide
 	if not args.convert:
-		if args.blast_program in ['blastp','tblastx']:
+		if args.blast_program in ['blastp','blastx']:
 			Entrez_db='protein'
-		elif args.blast_program in ['blastn','tblastn']:
+		elif args.blast_program in ['blastn','tblastx','tblastn']:
 			Entrez_db='nucleotide'
 
 	#Set output files
