@@ -74,9 +74,9 @@ genomes=$(awk -v FS="," \
 for i in ${genomes}
 do
 	#Set path to bowtie2 index
-	path2=$(pwd | sed s/data\\/${species}\\/.*/data\\/${species}\\/${i}/)
-	version=$(ls ${path2}/ref/${i}-v*.fa | sed s/.*\-v// | sed s/.fa//)
-	bowtie2_index="${path2}/ref/bowtie2/${i}-v${version}"
+	path2="$(pwd | sed s/data\\/.*/data/)/${i/_*}/${i/*_/}"
+	version=$(ls ${path2}/ref/${i/*_/}-v*.fa | sed s/.*\-v// | sed s/.fa//)
+	bowtie2_index="${path2}/ref/bowtie2/${i/*_/}-v${version}"
 	#Set bam name
 	bam="${sample}_ref_${i}-v${version}.bam"
 
