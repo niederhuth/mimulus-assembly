@@ -32,8 +32,8 @@ cd fastq/atac
 #Names of output fastq files, these should not have to be changed
 r1="combined.1.fastq.gz"
 r2="combined.2.fastq.gz"
-t1="fastp_trimmed.1.fastq.gz"
-t2="fastp_trimmed.2.fastq.gz"
+t1="trimmed.1.fastq.gz"
+t2="trimmed.2.fastq.gz"
 t3="trimmed.1.single.fastq.gz"
 t4="trimmed.2.single.fastq.gz"
 
@@ -104,7 +104,7 @@ then
 		--unpaired2 ${t4}
 	echo "Running fastqc"
 	mkdir trimmed_fastqc
-	fastqc -t ${threads} -o fastp_fastqc/ ${t1} ${t2} ${t3} ${t4}
+	fastqc -t ${threads} -o trimmed_fastqc/ ${t1} ${t2} ${t3} ${t4}
 elif [ ${PE} = "FALSE" ]
 then
 	echo "Running fastp"
@@ -118,7 +118,7 @@ then
 	#Run fastqc on trimmed data
 	echo "Running fastqc"
 	mkdir trimmed_fastqc
-	fastqc -t ${threads} -o fastp_fastqc/ ${t1}
+	fastqc -t ${threads} -o trimmed_fastqc/ ${t1}
 fi
 
 echo "Done"
