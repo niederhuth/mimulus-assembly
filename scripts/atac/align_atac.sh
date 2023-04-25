@@ -10,8 +10,10 @@
 #Set variables
 threads=10 #threads for bowtie2
 sort_threads=4 #threads for sorting bam file
-max_insert=1000
+compression_threads=4 #threads for compressing bam file
+max_insert=2000
 secondary_alignments=10 #Sets -k parameter to keep secondary alignments, necessary for genrich
+sort_by_read_names=TRUE
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -37,6 +39,13 @@ fi
 if [[ ! -z ${secondary_alignments} ]]
 then
 	bowtie2_options="${bowtie2_options} -k ${secondary_alignments}"
+fi
+
+#Set samtools sort options
+sort_options="-@ ${sort_threads}"
+if [ ${sort_by_read_names} = "TRUE" ]
+then
+	sort_options="${sort_options} -n"
 fi
 
 #Set fastq files
@@ -93,7 +102,7 @@ do
 			${bowtie2_options} \
 			-x ${bowtie2_index} \
 			-1 ${t1} \
-			-2 ${t2} | samtools view -@ ${sort_threads} -bSh | samtools sort -@ ${sort_threads} > ${bam}
+			-2 ${t2} | samtools view -@ ${compression_threads} -bSh | samtools sort ${sort_options} > ${bam}
 		#Index the bam file
 		echo "Indexing ${bam}"	
 		samtools index ${bam}
@@ -104,7 +113,7 @@ do
 		bowtie2 \
 			${bowtie2_options} \
 			-x ${bowtie2_index} \
-			-U ${t1} | samtools view -@ ${sort_threads} -bSh | samtools sort -@ ${sort_threads} > ${bam}
+			-U ${t1} | samtools view -@ ${compression_threads} -bSh | samtools sort ${sort_options} > ${bam}
 		#Index the bam file
 		echo "Indexing ${bam}"	
 		samtools index ${bam}
