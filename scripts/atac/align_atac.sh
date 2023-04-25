@@ -8,12 +8,14 @@
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set variables
-threads=10 #threads for bowtie2
+threads=20 #threads for bowtie2
 sort_threads=4 #threads for sorting bam file
 compression_threads=4 #threads for compressing bam file
-max_insert=2000
+max_insert=1000
 secondary_alignments=10 #Sets -k parameter to keep secondary alignments, necessary for genrich
 sort_by_read_names=TRUE
+dovetail=FALSE
+local_alignment=TRUE
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -31,14 +33,28 @@ sample=$(pwd | sed s/.*data\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 datatype="atac"
 
 #Set various options for bowtie2
-bowtie2_options="-p ${threads} --very-sensitive"
+bowtie2_options="-p ${threads}"
+#
+if [ ${local_alignment} = "TRUE" ]
+then
+	bowtie2_options="${bowtie2_options} --very-sensitive-local"
+else
+	bowtie2_options="${bowtie2_options} --very-sensitive"
+fi
+#Set max insert size
 if [[ ! -z ${max_insert} ]]
 then
 	bowtie2_options="${bowtie2_options} -X 1000"
 fi
+#Set number of secondary alignments for genrich
 if [[ ! -z ${secondary_alignments} ]]
 then
 	bowtie2_options="${bowtie2_options} -k ${secondary_alignments}"
+fi
+#Allow dovetail aignments
+if [ ${dovetail} = "TRUE" ]
+then
+	bowtie2_options="${bowtie2_options} --dovetail"
 fi
 
 #Set samtools sort options
@@ -90,11 +106,11 @@ do
 	bam="${sample}_ref_${i}-v${version}.bam"
 
 	#Check if the bam index already exists, if it does, then indicates data was already successfully aligned
-	if [ -f ${bam}.bai ]
+	if [ -f ${bam} ]
 	then
 		echo "Existing bam file found, skipping" to mark duplicates""
-		echo "To rerun this step, delete ${bam} & ${bam}.bai and resubmit"
-	elif [[ ! -f ${bam}.bai && ${PE} = "TRUE" ]]
+		echo "To rerun this step, delete ${bam} and resubmit"
+	elif [[ ! -f ${bam} && ${PE} = "TRUE" ]]
 	then
 		#Align paired-end data
 		echo "Aligning to ${i}-v${version}"
@@ -103,10 +119,13 @@ do
 			-x ${bowtie2_index} \
 			-1 ${t1} \
 			-2 ${t2} | samtools view -@ ${compression_threads} -bSh | samtools sort ${sort_options} > ${bam}
-		#Index the bam file
-		echo "Indexing ${bam}"	
-		samtools index ${bam}
-	elif [[ ! -f ${bam}.bai && ${PE} = "FALSE" ]]
+		if [ ${sort_by_read_names} = "TRUE" ]
+		then
+			#Index the bam file
+			echo "Indexing ${bam}"	
+			samtools index ${bam}
+		fi
+	elif [[ ! -f ${bam} && ${PE} = "FALSE" ]]
 	then
 		#Align single-end data
 		echo "Aligning to ${i}-v${version}"
@@ -114,9 +133,12 @@ do
 			${bowtie2_options} \
 			-x ${bowtie2_index} \
 			-U ${t1} | samtools view -@ ${compression_threads} -bSh | samtools sort ${sort_options} > ${bam}
-		#Index the bam file
-		echo "Indexing ${bam}"	
-		samtools index ${bam}
+		if [ ${sort_by_read_names} = "TRUE" ]
+		then
+			#Index the bam file
+			echo "Indexing ${bam}"	
+			samtools index ${bam}
+		fi
 	fi
 	echo "Alignment to ${i}-v${version} complete"
 done
