@@ -101,7 +101,7 @@ do
 			bam_files=""
 			for sample in ${replicates}
 			do
-				bam_files="${path2}/${sample}/${datatype}/${sample}_ref_${assembly}-v${version}.bam ${bam_files}"
+				bam_files="${path2}/${sample}/${datatype}/${sample}_ref_${assembly}-v${version}.bam,${bam_files}"
 			done
 
 			#Set various options for genrich
