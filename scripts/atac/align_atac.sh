@@ -15,7 +15,7 @@ max_insert=1000
 secondary_alignments=10 #Sets -k parameter to keep secondary alignments, necessary for genrich
 sort_by_read_names=TRUE
 dovetail=FALSE
-local_alignment=TRUE
+local_alignment=FALSE
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
