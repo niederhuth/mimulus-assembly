@@ -102,6 +102,7 @@ do
 			for sample in ${replicates}
 			do
 				bam_files="${path2}/${sample}/${datatype}/${sample}_ref_${assembly}-v${version}.bam,${bam_files}"
+				nDNA="${path2}/nDNA/atac/nDNA_ref_${assembly}-v${version}.bam,${nDNA}"
 			done
 
 			#Set various options for genrich
@@ -138,7 +139,7 @@ do
 				-g ${max_dist} \
 				-l ${min_length} \
 				-t ${bam_files} \
-				-c ${path2}/nDNA/atac/nDNA_ref_${assembly}-v${version}.bam \
+				-c ${nDNA} \
 				-o ${narrowPeak} \
 				-k ${bedgraphish}
 		fi
