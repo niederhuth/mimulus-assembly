@@ -81,7 +81,7 @@ do
 		${path1}/samples.csv | sort | uniq | sed '/^$/d')
 
 	#Run genrich for each assembly mapping
-	for assembly in genomes
+	for assembly in ${genomes}
 	do
 		#Get ref genome info
 		path3="$(pwd | sed s/data\\/.*/data/)/${assembly/_*}/${assembly/*_/}"
