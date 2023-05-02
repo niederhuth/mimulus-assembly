@@ -1,9 +1,9 @@
 #!/bin/bash --login
-#SBATCH --time=168:00:00
+#SBATCH --time=24:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem=100GB
+#SBATCH --mem=50GB
 #SBATCH --job-name genrich
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
@@ -11,13 +11,13 @@
 filter_chrs="chrM,chrC"
 remove_PCR_dups=TRUE
 atac_mode=TRUE
-auc=20 #Minimum AUC for a peak (default 200.0)
+auc=10 #Minimum AUC for a peak (default 200.0)
 max_dist=100 #Maximum distance between significant sites (default 100)
 min_length=0 #Minimum length of a peak (def. 0)
 sig_cutoff=0.01 #Maximum p-value/q-value (default 0.01)
 qvalue=FALSE #Use q-value rather than p-value
-skip_peak_calling=FALSE #Skip peak calling and generate log file only
-recall_peaks=FALSE #Recall peaks from log file
+skip_peak_calling=TRUE #Skip peak calling and generate log file only
+recall_peaks=TRUE #Recall peaks from log file
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
@@ -105,10 +105,10 @@ do
 		#Set various options for genrich
 		genrich_options="-z -v"
 		#Recall peaks?
-		if [ ${recall_peaks} = "FALSE" ]
+		if [ ${recall_peaks} = "TRUE" ]
 		then
 			#If recall_peaks = TRUE, set input files
-			genrich_options="${genrich_options} -P -f ${log_file}"
+			genrich_options="${genrich_options} -P -f ${log_file}.gz"
 		else
 			#If recall_peaks = FALSE, set input files
 			genrich_options="${genrich_options} -t ${bam_files} -c ${nDNA} -f ${log_file} -k ${reps_log}"
@@ -146,10 +146,10 @@ do
 		fi
 
 		#If log file already exists and recall_peaks is false, skip
-		if [[ -f ${log_file} && ${recall_peaks} = "FALSE" ]]
+		if [[ -f ${log_file}.gz && ${recall_peaks} = "FALSE" ]]
 		then
 			echo "Output files already exist. Skipping"
-			echo "To rerun this step, delete ${log_file}, ${narrowPeak}, ${reps_log} and resubmit"
+			echo "To rerun this step, delete ${log_file}.gz, ${narrowPeak}.gz, ${reps_log}.gz and resubmit"
 		#Otherwise run Genrich pipeline
 		else
 			echo "Running Genrich for ${condition} against reference ${assembly}-v${version}"
