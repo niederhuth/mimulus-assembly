@@ -16,7 +16,7 @@ max_dist=100 #Maximum distance between significant sites (default 100)
 min_length=0 #Minimum length of a peak (def. 0)
 sig_cutoff=0.01 #Maximum p-value/q-value (default 0.01)
 qvalue=FALSE #Use q-value rather than p-value
-skip_peak_calling=TRUE #Skip peak calling and generate log file only
+skip_peak_calling=FALSE #Skip peak calling and generate log file only
 recall_peaks=TRUE #Recall peaks from log file
 
 #Set this variable to the path to wherever you have conda installed
