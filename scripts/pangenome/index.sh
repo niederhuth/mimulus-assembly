@@ -47,13 +47,18 @@ then
 	echo "vcf/merged.vcf.gz already exists"
 	echo "To redo merging of vcf files please delete vcf/merged.vcf.gz and resubmit"
 else
-	echo "Merging vcf files"
-	bcftools merge \
-		--threads ${threads} \
-		-O z \
-		-o vcf/merged.vcf.gz \
-		-m none \
-		-0 ${vcf}
+	if [ $(echo ${vcf} | tr ' ' 'n' | wc -l) = 1 ]
+	then
+		cp ${vcf} vcf/merged.vcf.gz
+	else
+		echo "Merging vcf files"
+		bcftools merge \
+			--threads ${threads} \
+			-O z \
+			-o vcf/merged.vcf.gz \
+			-m none \
+			-0 ${vcf}
+	fi
 	echo "Indexing vcf file"
 	bcftools index vcf/merged.vcf.gz
 fi
