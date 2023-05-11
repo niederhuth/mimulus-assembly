@@ -5,16 +5,17 @@
 #SBATCH --cpus-per-task=20
 #SBATCH --mem=100GB
 #SBATCH --job-name genotype_giraffe
-#SBATCH --output=%x-%j.SLURMout
+#SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
 conda="${HOME}/miniconda3"
 
 #Set variables
 threads=20
-index="$(pwd | sed s/Vvinifera.*/Vvinifera/)/pangenome/giraffe/index.giraffe.gbz"
+index="$(pwd | sed s/Mguttatus.*/Mguttatus/)/pangenome/giraffe/index.giraffe.gbz"
 qual_cutoff=5 #-Q X ignore mapping and base qualitiy < X
 ignore_bp=5 #-s X ignore first and last X bp from each read
+datatype="poolseq"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -36,7 +37,7 @@ echo "Computing read support"
 vg pack \
 	-t ${threads} \
 	-x ${index} \
-	-g giraffe/aln.gam \
+	-g giraffe/${sample}_${datatype}.gam \
 	-Q ${qual_cutoff} \
 	-s ${ignore_bp} \
 	-o ${output}.pack
