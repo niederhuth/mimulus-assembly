@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
-#SBATCH --mem=60GB
+#SBATCH --mem=100GB
 #SBATCH --job-name giraffe
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
@@ -13,8 +13,8 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20
 PE="TRUE"
-index="$(pwd | sed s/Vvinifera.*/Vvinifera/)/pangenome/giraffe/index.giraffe.gbz"
-datatype="wgs"
+index="$(pwd | sed s/Mguttatus.*/Mguttatus/)/pangenome/giraffe/index.giraffe.gbz"
+datatype="poolseq"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}

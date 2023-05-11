@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=20
-#SBATCH --mem=60GB
+#SBATCH --mem=100GB
 #SBATCH --job-name genotype_giraffe
 #SBATCH --output=%x-%j.SLURMout
 
