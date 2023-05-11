@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=20
 worflow="giraffe" #map, mpmap, rpvg, giraffe
-ref_fasta="$(pwd | sed s/pangenome.*//)/Vvinifera/ref/Vvinifera.fa"
+ref_fasta="$(pwd | sed s/pangenome.*//)/L1/ref/L1-v1.fa"
 vcf="data/S1query.pseudo_L1ref.pseudo_mumandco.SVs__notranslocations_nocontractions_noNNNN.vcf"
 gff=
 tmp_dir=
