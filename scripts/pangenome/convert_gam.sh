@@ -13,7 +13,7 @@ conda="${HOME}/miniconda3"
 #Set variables
 threads=10
 index="$(pwd | sed s/Mguttatus.*/Mguttatus/)/pangenome/giraffe/index.giraffe.gbz"
-output_format=BAM #BAM, SAM, CRAM, GAMP, GAF
+output_format=bam #bam, sam, cram, gamp, gaf
 datatype="poolseq"
 
 #Change to current directory
@@ -31,19 +31,19 @@ sample=$(pwd | sed s/.*data\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 #Set output format
 arguments="-t ${threads} -x ${index}"
 #Set output format
-if [ ${output_format} = "BAM" ]
+if [ ${output_format} = "bam" ]
 then
 	arguments="${arguments} -b"
-elif [ ${output_format} = "SAM" ]
+elif [ ${output_format} = "sam" ]
 then
 	arguments="${arguments} -s"
-elif [ ${output_format} = "CRAM" ]
+elif [ ${output_format} = "cram" ]
 then
-	arguments="${arguments} c"
-elif [ ${output_format} = "GAMP" ]
+	arguments="${arguments} -c"
+elif [ ${output_format} = "gamp" ]
 then
 	arguments="${arguments} -m"
-elif [ ${output_format} = "GAF" ]
+elif [ ${output_format} = "gaf" ]
 then
 	arguments="${arguments} -G"
 else
