@@ -49,6 +49,6 @@ output="giraffe/${sample}_${datatype}"
 
 #Run giraffe
 echo "Running giraffe"
-vg giraffe ${arguments} > ${output}.${output_format}
+vg giraffe ${arguments} -o ${output_format} > ${output}.${output_format}
 
 echo "Done"
