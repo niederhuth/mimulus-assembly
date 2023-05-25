@@ -12,7 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 datatype="poolseq"
-ref_fasta="$(pwd | sed s/Mguttatus.*//)/L1/ref/L1-v1.fa"
+ref_fasta="$(pwd | sed s/Mguttatus.*/Mguttatus/)/L1/ref/L1-v1.fa"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
