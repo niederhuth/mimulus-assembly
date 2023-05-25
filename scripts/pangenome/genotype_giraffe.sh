@@ -2,7 +2,7 @@
 #SBATCH --time=168:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=20
+#SBATCH --cpus-per-task=10
 #SBATCH --mem=100GB
 #SBATCH --job-name genotype_giraffe
 #SBATCH --output=job_reports/%x-%j.SLURMout
@@ -11,7 +11,7 @@
 conda="${HOME}/miniconda3"
 
 #Set variables
-threads=20
+threads=10
 index="$(pwd | sed s/Mguttatus.*/Mguttatus/)/pangenome/giraffe/index.giraffe.gbz"
 qual_cutoff=5 #-Q X ignore mapping and base qualitiy < X
 ignore_bp=5 #-s X ignore first and last X bp from each read
@@ -47,8 +47,6 @@ echo "Calling variants"
 vg call \
 	-t ${threads} \
 	-a \
-	-A \
-	--nested \
 	${index} \
 	-k ${output}.pack > ${output}.vcf
 
