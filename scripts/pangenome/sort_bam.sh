@@ -33,9 +33,9 @@ output="giraffe/${sample}_${datatype}_sorted.bam"
 
 # Compute the read support from the gam
 echo "Sorting bam"
-samtools sort --threads ${threads} ${input} > ${output}
+samtools sort -@ ${threads} ${input} > ${output}
 
 #Index the bam
-samtools index --threads ${threads} ${output}
+samtools index -@ ${threads} ${output}
 
 echo "Done"
