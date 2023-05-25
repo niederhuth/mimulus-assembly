@@ -1,9 +1,9 @@
 #!/bin/bash --login
-#SBATCH --time=168:00:00
+#SBATCH --time=48:00:00
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=10
-#SBATCH --mem=150GB
+#SBATCH --cpus-per-task=20
+#SBATCH --mem=100GB
 #SBATCH --job-name giraffe
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
@@ -15,6 +15,7 @@ threads=10
 PE="TRUE"
 index="$(pwd | sed s/Mguttatus.*/Mguttatus/)/pangenome/giraffe/index.giraffe.gbz"
 datatype="poolseq"
+output_format="gam" #output the alignments in format (gam / gaf / json / tsv / SAM / BAM / CRAM) [gam]
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -48,8 +49,6 @@ output="giraffe/${sample}_${datatype}"
 
 #Run giraffe
 echo "Running giraffe"
-vg giraffe ${arguments} > ${output}.gam
-echo "Calculating alignment statistics"
-vg stats -v -p ${threads} -a ${output}.gam > ${output}_aln.stats
+vg giraffe ${arguments} > ${output}.${output_format}
 
 echo "Done"
