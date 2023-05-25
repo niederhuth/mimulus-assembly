@@ -12,6 +12,7 @@ conda="${HOME}/miniconda3"
 
 #Set variables
 datatype="poolseq"
+ref_fasta="$(pwd | sed s/pangenome.*//)/L1/ref/L1-v1.fa"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
@@ -30,8 +31,16 @@ input="giraffe/${sample}_${datatype}_sorted.bam"
 #Set output
 output="giraffe/${sample}_${datatype}.pileup"
 
+#Set arguments
+arguments="${input}"
+#Add reference fasta
+if [[ ! -z ${ref_fasta} ]]
+then
+	arguments="-f ${ref_fasta} ${arguments}"
+fi
+
 # Compute the read support from the gam
 echo "Converting to pileup"
-samtools mpileup ${input} > ${output}
+samtools mpileup ${arguments} > ${output}
 
 echo "Done"
