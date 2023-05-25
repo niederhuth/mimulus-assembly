@@ -47,6 +47,8 @@ echo "Calling variants"
 vg call \
 	-t ${threads} \
 	-a \
+	-A \
+	--nested \
 	${index} \
 	-k ${output}.pack > ${output}.vcf
 
