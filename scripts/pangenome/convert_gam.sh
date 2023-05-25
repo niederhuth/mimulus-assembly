@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=10
 #SBATCH --mem=150GB
-#SBATCH --job-name genotype_giraffe
+#SBATCH --job-name convert_gam
 #SBATCH --output=job_reports/%x-%j.SLURMout
 
 #Set this variable to the path to wherever you have conda installed
@@ -14,6 +14,7 @@ conda="${HOME}/miniconda3"
 threads=10
 index="$(pwd | sed s/Mguttatus.*/Mguttatus/)/pangenome/giraffe/index.giraffe.gbz"
 output_format=BAM #BAM, SAM, CRAM, GAMP, GAF
+datatype="poolseq"
 
 #Change to current directory
 cd ${PBS_O_WORKDIR}
