@@ -26,7 +26,7 @@ genotype=$(pwd | sed s/.*data\\/${species}\\/// | sed s/\\/.*//)
 sample=$(pwd | sed s/.*data\\/${species}\\/${genotype}\\/// | sed s/\\/.*//)
 
 #Set input
-input="giraffe/${sample}_${datatype}.bam"
+input="giraffe/${sample}_${datatype}_sorted.bam"
 #Set output
 output="giraffe/${sample}_${datatype}.pileup"
 
